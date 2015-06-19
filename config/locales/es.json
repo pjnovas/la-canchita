@@ -1,0 +1,15 @@
+{
+  "Welcome": "Bienvenido",
+  "A brand new app.": "Una aplicación de la nueva marca.",
+  "Error.Passport.Password.Invalid": "Esa contraseña no es valida!",
+  "Error.Passport.Password.Wrong": "Upa, la contraseña no está nada bien!",
+  "Error.Passport.Password.NotSet": "Te falta ingresar una contraseña!",
+  "Error.Passport.Username.NotFound": "Mmm, ese es tu usuario?, porque no te tengo registrado",
+  "Error.Passport.User.Exists": "El usuario ya está registrado.",
+  "Error.Passport.Email.NotFound": "El email no parece estar bien, puede ser?",
+  "Error.Passport.Email.Missing": "Es necesario un email para poder hacer validaciones mágicas. Prometo no mandar spam",
+  "Error.Passport.Email.Exists": "El email ya existe, deberías probar ingresar mejor.",
+  "Error.Passport.Username.Missing": "Es necesario un usuario para registrarte",
+  "Error.Passport.Password.Missing": "No no, no pusiste una contraseña!",
+  "Error.Passport.Generic": "Uff, algo salió mal y no sé que es, contactate."
+}

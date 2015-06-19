@@ -1,0 +1,141 @@
+
+<style type="text/css">
+  body {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: #f5f5f5;
+  }
+
+  .form-signin {
+    max-width: 300px;
+    padding: 19px 29px 29px;
+    margin: 0 auto 20px;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+       -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  }
+  .form-signin .form-signin-heading {
+    margin-bottom: 10px;
+  }
+  .form-signin input[type="text"],
+  .form-signin input[type="password"] {
+    font-size: 16px;
+    height: auto;
+    margin-bottom: 15px;
+    padding: 7px 9px;
+  }
+
+  .form-signin input[type="password"] {
+    margin-bottom: 0;
+  }
+
+  a {
+    cursor: pointer;
+  }
+
+  a.twitter,
+  a.facebook {
+    color: #fff;
+    text-align: center;
+    font-size: 30px;
+    border-radius: 6px;
+    border: 2px solid #fff;
+    margin: 5px;
+    display: inline-block;
+    width: 45%;
+  }
+
+  a.twitter:hover,
+  a.facebook:hover {
+    text-decoration: none;
+  }
+
+  a.twitter {
+    background-color: #0ba8d6;
+    border-color: #0ba8d6;
+  }
+
+  a.twitter:hover {
+    color: #0ba8d6;
+    background-color: #fff;
+  }
+
+  a.facebook {
+    background-color: #4264b3;
+    border-color: #4264b3;
+  }
+
+  a.facebook:hover {
+    color: #4264b3;
+    background-color: #fff;
+  }
+
+  .bg-warning {
+    padding: 6px;
+  }
+
+  h3 {
+    margin: 0 0 10px 0;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  .forgot {
+    margin-bottom: 15px;
+    display: inline-block;
+    float: right;
+  }
+
+  .signup {
+    text-align: center;
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 0;
+    text-transform: uppercase;
+    font-size: 16px;
+  }
+
+</style>
+
+<div class="container">
+
+  <form class="form-signin" role="form" action="/auth/local" method="post">
+    <h1 class="form-signin-heading text-center">La Canchita</h1>
+
+    <hr/>
+
+    <h3 class="text-muted">ingresar con</h3>
+
+    <a class="twitter" href="/auth/twitter" role="button">
+      <i class="fa fa-twitter"></i>
+    </a>
+
+    <a class="facebook" href="/auth/facebook" role="button">
+      <i class="fa fa-facebook"></i>
+    </a>
+
+    <hr/>
+
+    <h3 class="text-muted">... o a manopla con</h3>
+
+    <% if (errors) {%>
+      <% errors.forEach(function (error) { %>
+        <p class="bg-warning text-warning"><%= __(error) %></p>
+      <% }) %>
+    <% } %>
+
+    <input type="text" name="identifier" placeholder="Usuario o email" class="form-control">
+    <input type="password" name="password" placeholder="Contraseña" class="form-control">
+    <a class="forgot">me olvidé la contraseña</a>
+    <input type="submit" value="Ingresar" class="btn btn-lg btn-primary btn-block"/>
+
+    <a class="signup">registrarse</a>
+
+  </form>
+
+</div>
