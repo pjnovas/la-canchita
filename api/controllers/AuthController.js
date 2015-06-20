@@ -166,7 +166,7 @@ var AuthController = {
         }
 
         // Mark the session as authenticated to work with default Sails sessionAuth.js policy
-        req.session.authenticated = true
+        req.session.authenticated = true;
 
         // Upon successful login, send the user to the homepage were req.user
         // will be available.
@@ -183,7 +183,8 @@ var AuthController = {
    */
   disconnect: function (req, res) {
     passport.disconnect(req, res);
-  }
+  },
+
 };
 
 module.exports = AuthController;

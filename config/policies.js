@@ -26,12 +26,28 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  // '*': true,
+  '*': ['passport'],
 
-  '*': ['passport', 'sessionAuth'],
+  //'*': ['passport', 'isAuthenticated'],
 
   'auth': {
     '*': ['passport']
+  },
+
+  'user': {
+    '*': ['passport', 'isAuthenticated'],
+    //edit: ['isAdmin', 'isLoggedIn']
+
+    /*
+    find
+    findOne
+    create
+    update
+    destroy
+    populate
+    add
+    remove
+    */
   }
 
   /***************************************************************************
