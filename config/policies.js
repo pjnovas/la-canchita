@@ -48,6 +48,18 @@ module.exports.policies = {
     add
     remove
     */
+  },
+
+  'group': {
+    '*': ['passport', 'isAuthenticated'],
+
+    'update': ['passport', 'isAuthenticated', 'group/canUpdate'],
+
+    /*
+    'findOne': ['hasAccess'],
+    'create': ['canCreate'],
+    'remove': ['isOwner'],
+    */
   }
 
   /***************************************************************************

@@ -45,6 +45,8 @@ module.exports.routes = {
   'get /auth/:provider/callback': 'AuthController.callback',
   'get /auth/:provider/:action': 'AuthController.callback',
 
+  'get /api/users/me': 'UserController.me',
+
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

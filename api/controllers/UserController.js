@@ -6,6 +6,16 @@
  */
 
 module.exports = {
-	
+
+  me: function(req, res, next){
+    User
+      .findOne({ id: req.user.id })
+      .exec(function(err, user){
+        if (err) return next(err);
+        if (!user) return res.notFound();
+        res.json(user);
+      });
+  }
+
 };
 
