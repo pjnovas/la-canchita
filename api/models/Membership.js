@@ -20,6 +20,12 @@ module.exports = {
       defaultsTo: 'member'
     },
 
+    status: {
+      type: 'string',
+      enum: ['pending', 'active', 'rejected', 'removed'],
+      defaultsTo: 'pending'
+    },
+
     matches_played: {
       type: 'integer',
       defaultsTo: 0

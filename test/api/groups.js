@@ -128,7 +128,7 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
 
     });
 
-    it('must NOT update a group where is not owner', function (done) {
+    it('must NOT update a group where is not a member', function (done) {
 
       // get a group of userA to update
       global.userAgents[0]
@@ -145,6 +145,77 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
             .send({ title: 'A new title!'})
             .expect(403)
             .end(done);
+        });
+
+    });
+
+/*
+    it('must NOT update a group if you have role member', function (done) {
+
+      // get a group of userA to update
+      global.userAgents[0]
+        .get("/api/groups")
+        .expect(200)
+        .end(function(err, res){
+          if (err) return done(err);
+          expect(res.body).to.be.an('array');
+          expect(res.body.length).to.be.equal(1);
+
+          // send an update from userB
+          global.userAgents[1]
+            .put('/api/groups/' + res.body[0].id)
+            .send({ title: 'A new title!'})
+            .expect(403)
+            .end(done);
+        });
+
+    });
+*/
+
+  });
+
+  describe('POST /groups/:id/members', function() {
+    var gid;
+
+    before(function(done){
+      // set a group id of user A for members test
+      global.userAgents[0]
+        .get("/api/groups/")
+        .expect(200)
+        .end(function(err, res){
+          if (err) return done(err);
+          expect(res.body).to.be.an('array');
+          expect(res.body.length).to.be.equal(1);
+
+          var group = res.body[0];
+          expect(group).to.be.an('object');
+          expect(group.members.length).to.be.equal(1);
+          gid = group.id;
+          done();
+        });
+    });
+
+    it('must create a member as pending', function(done){
+      var userC = global.userAgents[2].user;
+
+      // user A > invites > user C
+      global.userAgents[0]
+        .post('/api/groups/' + gid + '/members')
+        .send({ user: userC.id })
+        .expect(200)
+        .end(function(err, res){
+          if (err) return done(err);
+
+          var member = res.body;
+          expect(member).to.be.an('object');
+          expect(member.id).to.be.ok();
+          expect(member.user).to.be.equal(userC.id);
+          expect(member.group).to.be.equal(gid);
+
+          expect(member.role).to.be.equal('member');
+          expect(member.status).to.be.equal('pending');
+
+          done();
         });
 
     });

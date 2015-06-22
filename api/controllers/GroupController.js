@@ -29,7 +29,10 @@ module.exports = {
           return m.group && m.group.id || m.group ;
         });
 
-        Group.find({ id: gids }, done);
+        Group
+          .find({ id: gids })
+          .populateAll()
+          .exec(done);
       },
 
     ], function(err, groups){
@@ -73,7 +76,8 @@ module.exports = {
         Membership.create({
           user: req.user.id,
           group: group.id,
-          role: 'owner'
+          role: 'owner',
+          status: 'active'
         }, function(err, member){
           group.members.add(member);
           group.save(done);
@@ -98,6 +102,43 @@ module.exports = {
       res.json(group);
     });
 
+  },
+
+  add: function(req, res, next){
+    var groupId = req.params.parentid;
+
+    if (req.options.alias !== 'members'){
+      return next();
+    }
+
+    async.waterfall([
+
+      // Find Group
+      function(done){
+        Group.findOne({ id: groupId }).populateAll().exec(done);
+      },
+
+      // Create Membership Group
+      function(group, done){
+        if (!group) return res.notFound();
+        req.body.group = groupId;
+        Membership.create(req.body, function(err, member){
+          done(err, group, member);
+        });
+      },
+
+      // Create Membership Group
+      function(group, member, done){
+        group.members.add(member);
+        group.save(function(err, group){
+          done(err, member);
+        });
+      }
+
+    ], function(err, member){
+      if (err) return next(err);
+      res.json(member);
+    });
   }
 
 };

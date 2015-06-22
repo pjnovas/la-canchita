@@ -37,17 +37,6 @@ module.exports.policies = {
   'user': {
     '*': ['passport', 'isAuthenticated'],
     //edit: ['isAdmin', 'isLoggedIn']
-
-    /*
-    find
-    findOne
-    create
-    update
-    destroy
-    populate
-    add
-    remove
-    */
   },
 
   'group': {
