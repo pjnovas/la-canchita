@@ -113,6 +113,21 @@ module.exports = {
 
     async.waterfall([
 
+      // Membership already exists?
+      function(done){
+        Membership.findOne({ group: groupId, user: req.body.user },
+        function(err, member){
+          if (err) return done(err);
+
+          if (member) {
+            res.conflict('User is already a member.');
+            return done('exited');
+          }
+
+          done();
+        });
+      },
+
       // Find Group
       function(done){
         Group.findOne({ id: groupId }).populateAll().exec(done);
@@ -121,8 +136,11 @@ module.exports = {
       // Create Membership Group
       function(group, done){
         if (!group) return res.notFound();
-        req.body.group = groupId;
-        Membership.create(req.body, function(err, member){
+
+        Membership.create({
+          group: groupId,
+          user: req.body.user
+        }, function(err, member){
           done(err, group, member);
         });
       },
@@ -136,10 +154,88 @@ module.exports = {
       }
 
     ], function(err, member){
+      if (err) {
+        if (err === 'exited') return;
+        return next(err);
+      }
+
+      res.json(member);
+    });
+  },
+
+  createMe: function(req, res, next){
+    var groupId = req.params.parentid;
+
+    async.waterfall([
+
+      // get my membership
+      function(done){
+        Membership.findOne({ group: groupId, user: req.user.id }, done);
+      },
+
+      // set role into active and save
+      function(member, done){
+        member.status = 'active';
+        member.save(done);
+      },
+
+    ], function(err, member){
       if (err) return next(err);
       res.json(member);
     });
+
+  },
+
+  removeMe: function(req, res, next){
+    var groupId = req.params.parentid;
+
+    async.waterfall([
+
+      // get my membership
+      function(done){
+        Membership.findOne({ group: groupId, user: req.user.id }, done);
+      },
+
+      // set role
+      function(member, done){
+
+        switch(member.status){
+          case 'pending': member.status = 'rejected'; break;
+          case 'active': member.status = 'removed'; break;
+        }
+
+        member.save(done);
+      },
+
+    ], function(err, member){
+      if (err) return next(err);
+      res.json(member);
+    });
+
+  },
+
+  setRole: function(req, res, next){
+    var groupId = req.params.parentid;
+    var memberId = req.params.id;
+
+    async.waterfall([
+
+      // get my membership
+      function(done){
+        Membership.findOne({ group: groupId, id: memberId }, done);
+      },
+
+      // set role into active and save
+      function(member, done){
+        member.role = req.body.role;
+        member.save(done);
+      },
+
+    ], function(err, member){
+      if (err) return next(err);
+      res.json(member);
+    });
+
   }
 
 };
-

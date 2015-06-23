@@ -33,6 +33,7 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
           expect(me.user).to.be.an('object');
           expect(me.user.id).to.be.equal(global.userAgents[0].user.id);
           expect(me.role).to.be.equal('owner');
+          expect(me.status).to.be.equal('active');
           expect(me.group).to.be.an('object');
           expect(me.group.id).to.be.equal(g.id);
 
@@ -57,7 +58,7 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
           expect(res.body).to.be.an('object');
           var otherGroupId = res.body.id;
 
-          // now get groups for user0
+          // now get groups for user0 should be still 1 (not see the below one)
           global.userAgents[0]
             .get('/api/groups')
             .expect(200)
@@ -89,7 +90,32 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
 
   });
 
+  describe('GET /groups/:id', function() {
+
+    it('must not allow to get a group where is not a member', function (done) {
+
+      // first create another group with other user
+      global.userAgents[1]
+        .post('/api/groups')
+        .send({ title: 'some Group mine '})
+        .expect(200)
+        .end(function(err, res){
+          if (err) return done(err);
+          expect(res.body).to.be.an('object');
+          var otherGroupId = res.body.id;
+
+          // now get groups for user0
+          global.userAgents[0]
+            .get('/api/groups/' + otherGroupId)
+            .expect(404)
+            .end(done);
+        });
+    });
+
+  });
+
   describe('PUT /groups/:id', function() {
+    var gid;
 
     it('must update a group', function (done) {
 
@@ -139,18 +165,17 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
           expect(res.body).to.be.an('array');
           expect(res.body.length).to.be.equal(1);
 
-          // send an update from userB
+          // send an update from userB, should see a NOT FOUND
           global.userAgents[1]
             .put('/api/groups/' + res.body[0].id)
             .send({ title: 'A new title!'})
-            .expect(403)
+            .expect(404)
             .end(done);
         });
 
     });
 
-/*
-    it('must NOT update a group if you have role member', function (done) {
+    it('must NOT update a group if user has role member', function (done) {
 
       // get a group of userA to update
       global.userAgents[0]
@@ -160,17 +185,125 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
           if (err) return done(err);
           expect(res.body).to.be.an('array');
           expect(res.body.length).to.be.equal(1);
+          gid = res.body[0].id;
 
-          // send an update from userB
-          global.userAgents[1]
-            .put('/api/groups/' + res.body[0].id)
-            .send({ title: 'A new title!'})
-            .expect(403)
-            .end(done);
+          // userA invites userB
+          global.userAgents[0]
+            .post('/api/groups/' + gid + '/members')
+            .send({ user: global.userAgents[1].user.id })
+            .expect(200)
+            .end(function(err, res){
+              if (err) return done(err);
+              expect(res.body).to.be.an('object');
+              expect(res.body.status).to.be.equal('pending');
+
+              // userB accepts invitation
+              global.userAgents[1]
+                .post('/api/groups/' + gid + '/members/me')
+                .expect(200)
+                .end(function(err, res){
+                  if (err) return done(err);
+                  expect(res.body).to.be.an('object');
+                  expect(res.body.status).to.be.equal('active');
+                  expect(res.body.role).to.be.equal('member');
+
+                  // userB tries to update
+                  global.userAgents[1]
+                    .put('/api/groups/' + gid)
+                    .send({ title: 'Not new title!'})
+                    .expect(403)
+                    .end(done);
+
+                });
+
+            });
         });
 
     });
-*/
+
+    it('must NOT update a group if user has role moderator', function (done) {
+      var userB = global.userAgents[1].user;
+
+      // userA gets userB memberId
+      global.userAgents[0]
+        .get('/api/groups/' + gid)
+        .expect(200)
+        .end(function(err, res){
+          if (err) return done(err);
+          expect(res.body).to.be.an('object');
+
+          var mid;
+          res.body.members.forEach(function(member){
+            if (member.user === userB.id){
+              mid = member.id;
+            }
+          });
+
+          expect(mid).to.be.ok();
+
+          // userA changes role of userB to admin
+          global.userAgents[0]
+            .put('/api/groups/' + gid + '/members/' + mid)
+            .send({ role: 'moderator' })
+            .expect(200)
+            .end(function(err, res){
+              if (err) return done(err);
+              expect(res.body).to.be.an('object');
+              expect(res.body.role).to.be.equal('moderator');
+
+              // userB tries to update
+              global.userAgents[1]
+                .put('/api/groups/' + gid)
+                .send({ title: 'Not new title!'})
+                .expect(403)
+                .end(done);
+
+            });
+
+      });
+    });
+
+    it('must update a group if user has role admin', function (done) {
+      var userB = global.userAgents[1].user;
+
+      // userA gets userB memberId
+      global.userAgents[0]
+        .get('/api/groups/' + gid)
+        .expect(200)
+        .end(function(err, res){
+          if (err) return done(err);
+          expect(res.body).to.be.an('object');
+
+          var mid;
+          res.body.members.forEach(function(member){
+            if (member.user === userB.id){
+              mid = member.id;
+            }
+          });
+
+          expect(mid).to.be.ok();
+
+          // userA changes role of userB to admin
+          global.userAgents[0]
+            .put('/api/groups/' + gid + '/members/' + mid)
+            .send({ role: 'admin' })
+            .expect(200)
+            .end(function(err, res){
+              if (err) return done(err);
+              expect(res.body).to.be.an('object');
+              expect(res.body.role).to.be.equal('admin');
+
+              // userB CAN to update
+              global.userAgents[1]
+                .put('/api/groups/' + gid)
+                .send({ title: 'Not new title!'})
+                .expect(200)
+                .end(done);
+
+            });
+
+      });
+    });
 
   });
 
@@ -189,7 +322,7 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
 
           var group = res.body[0];
           expect(group).to.be.an('object');
-          expect(group.members.length).to.be.equal(1);
+          expect(group.members.length).to.be.equal(2);
           gid = group.id;
           done();
         });
@@ -220,6 +353,172 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
 
     });
 
+    it ('users pending cannot see the group', function(done){
+        var userC = global.userAgents[2].user;
+
+        // user C
+        global.userAgents[2]
+          .get('/api/groups/' + gid)
+          .expect(404)
+          .end(done);
+      });
+
+    it('must throw error if the user is already a member', function(done){
+      var userC = global.userAgents[2].user;
+
+      // user A > invites > user C AGAIN
+      global.userAgents[0]
+        .post('/api/groups/' + gid + '/members')
+        .send({ user: userC.id })
+        .expect(409)
+        .end(done);
+
+    });
+
+    describe('POST /groups/:id/members/me', function() {
+
+      it ('must change the status of the member to active', function(done){
+        var userC = global.userAgents[2].user;
+
+        // user C (which is pending) is going to accept
+        global.userAgents[2]
+          .post('/api/groups/' + gid + '/members/me')
+          .expect(200)
+          .end(function(err, res){
+            if (err) return done(err);
+
+            var member = res.body;
+            expect(member).to.be.an('object');
+            expect(member.id).to.be.ok();
+            expect(member.user.id).to.be.equal(userC.id);
+            expect(member.group.id).to.be.equal(gid);
+
+            expect(member.role).to.be.equal('member');
+            expect(member.status).to.be.equal('active');
+
+            done();
+          });
+
+      });
+    });
+
+    describe('DELETE /groups/:id/members/me', function() {
+
+      it ('must change the status of the member to removed if was active', function(done){
+        var userC = global.userAgents[2].user;
+
+        // user C (which is active) is going to be removed
+        global.userAgents[2]
+          .delete('/api/groups/' + gid + '/members/me')
+          .expect(200)
+          .end(function(err, res){
+            if (err) return done(err);
+
+            var member = res.body;
+            expect(member).to.be.an('object');
+            expect(member.id).to.be.ok();
+            expect(member.user.id).to.be.equal(userC.id);
+            expect(member.group.id).to.be.equal(gid);
+
+            expect(member.role).to.be.equal('member');
+            expect(member.status).to.be.equal('removed');
+
+            done();
+          });
+      });
+
+      it ('must change the status of the member to rejected if was pending', function(done){
+        var userD = global.userAgents[3].user;
+
+        // user A > invites > user D
+        global.userAgents[0]
+          .post('/api/groups/' + gid + '/members')
+          .send({ user: userD.id })
+          .expect(200)
+          .end(function(err, res){
+            if (err) return done(err);
+
+            var member = res.body;
+            expect(member).to.be.an('object');
+            expect(member.id).to.be.ok();
+            expect(member.user).to.be.equal(userD.id);
+            expect(member.group).to.be.equal(gid);
+
+            expect(member.role).to.be.equal('member');
+            expect(member.status).to.be.equal('pending');
+
+            // userD rejects the invite
+            global.userAgents[3]
+              .delete('/api/groups/' + gid + '/members/me')
+              .expect(200)
+              .end(function(err, res){
+                if (err) return done(err);
+
+                var member = res.body;
+                expect(member).to.be.an('object');
+                expect(member.id).to.be.ok();
+                expect(member.user.id).to.be.equal(userD.id);
+                expect(member.group.id).to.be.equal(gid);
+
+                expect(member.role).to.be.equal('member');
+                expect(member.status).to.be.equal('rejected');
+
+                done();
+              });
+
+          });
+
+      });
+
+      it ('users cannot see the group if they are removed or rejected', function(done){
+        var userC = global.userAgents[2].user;
+        var userD = global.userAgents[3].user;
+
+        // user C
+        global.userAgents[2]
+          .get('/api/groups/' + gid)
+          .expect(404)
+          .end(function(err, res){
+
+            global.userAgents[3]
+              .get('/api/groups/' + gid)
+              .expect(404)
+              .end(done);
+          });
+      });
+
+    });
+
+    describe('PUT /groups/:id/members/me', function(){
+      it ('must update itself, like downgrade its own role');
+    });
+
+    describe('PUT /groups/:id/members/:id', function(){
+      it ('must set role of a user');
+      it ('must not allow to set role bigger or equal of what it has');
+    });
+
+    it('must not allow to invite if user has a member role');
+
+    it('must allow to invite if user has a moderator role');
+
+    it('must allow to invite if user has a admin role');
+
+    it('must throw error if the user invited does not exist');
+
+    it('must do something if the user is a member removed, active or revoked');
+
+  });
+
+  describe('DELETE /groups/:id/members/:id', function(){
+    it ('must allow to kick a user');
+    it ('must not allow to kick a user if is member');
+    it ('must not allow to kick a user if is moderator');
+    it ('must allow to kick a user if is admin');
+  });
+
+  describe('DELETE /groups/:id', function(){
+    it ('must allow to remove a group only if is owner and there is no matches');
   });
 
 });

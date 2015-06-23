@@ -39648,7 +39648,7 @@ module.exports = Application.extend({
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-    return "<div class=\"application__content\"></div>\n<div class=\"application__overlay\"></div>\n";
+    return "<div class=\"application__header\"></div>\n<div class=\"application__content\"></div>\n<div class=\"application__overlay\"></div>\n";
 },"useData":true});
 
 },{"hbsfy/runtime":"/home/pjnovas/projects/la-canchita-web-client/node_modules/hbsfy/runtime.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/application/layout-view.js":[function(require,module,exports){
@@ -39665,12 +39665,374 @@ module.exports = LayoutView.extend({
   template: template,
 
   regions: {
+    header: ".application__header",
     content: ".application__content",
     overlay: ".application__overlay"
   }
 });
 
-},{"./layout-template.hbs":"/home/pjnovas/projects/la-canchita-web-client/src/application/layout-template.hbs","backbone.marionette":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone.marionette/lib/core/backbone.marionette.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/index.js":[function(require,module,exports){
+},{"./layout-template.hbs":"/home/pjnovas/projects/la-canchita-web-client/src/application/layout-template.hbs","backbone.marionette":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone.marionette/lib/core/backbone.marionette.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/groups/collection.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Collection = require("backbone").Collection;
+
+var Model = _interopRequire(require("./model"));
+
+module.exports = Collection.extend({
+
+  url: "/api/groups",
+  model: Model
+
+});
+
+},{"./model":"/home/pjnovas/projects/la-canchita-web-client/src/groups/model.js","backbone":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone/backbone.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/groups/index/collection-view.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var CollectionView = require("backbone.marionette").CollectionView;
+
+var ItemView = _interopRequire(require("./item-view"));
+
+module.exports = CollectionView.extend({
+  className: "list-group",
+  childView: ItemView });
+
+},{"./item-view":"/home/pjnovas/projects/la-canchita-web-client/src/groups/index/item-view.js","backbone.marionette":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone.marionette/lib/core/backbone.marionette.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/groups/index/item-template.hbs":[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var HandlebarsCompiler = require('hbsfy/runtime');
+module.exports = HandlebarsCompiler.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var helper;
+
+  return "<h4 class=\"list-group-item-heading\">"
+    + this.escapeExpression(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"title","hash":{},"data":data}) : helper)))
+    + "</h4>\n<p class=\"list-group-item-text\">Some group desc</p>\n";
+},"useData":true});
+
+},{"hbsfy/runtime":"/home/pjnovas/projects/la-canchita-web-client/node_modules/hbsfy/runtime.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/groups/index/item-view.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var ItemView = require("backbone.marionette").ItemView;
+
+var template = _interopRequire(require("./item-template.hbs"));
+
+module.exports = ItemView.extend({
+  tagName: "a",
+  template: template,
+  className: "groups-item list-group-item",
+
+  attributes: function attributes() {
+    return {
+      href: "#groups/" + this.model.get("_id")
+    };
+  },
+
+  modelEvents: {
+    all: "render"
+  }
+});
+
+},{"./item-template.hbs":"/home/pjnovas/projects/la-canchita-web-client/src/groups/index/item-template.hbs","backbone.marionette":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone.marionette/lib/core/backbone.marionette.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/groups/index/layout-template.hbs":[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var HandlebarsCompiler = require('hbsfy/runtime');
+module.exports = HandlebarsCompiler.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    return "<div class=\"page-header\">\n  <a href=\"#groups/new\" class=\"btn btn-primary pull-right\">Create</a>\n  <h1>Mis Grupos</h1>\n  <p>Grupos a los que perteneces</p>\n</div>\n\n<div class=\"groups-list\"></div>\n";
+},"useData":true});
+
+},{"hbsfy/runtime":"/home/pjnovas/projects/la-canchita-web-client/node_modules/hbsfy/runtime.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/groups/index/layout-view.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _ = _interopRequire(require("lodash"));
+
+var LayoutView = require("backbone.marionette").LayoutView;
+
+var CollectionView = _interopRequire(require("./collection-view"));
+
+var Collection = require("backbone").Collection;
+
+var template = _interopRequire(require("./layout-template.hbs"));
+
+module.exports = LayoutView.extend({
+  template: template,
+  className: "groups container",
+
+  regions: {
+    list: ".groups-list"
+  },
+
+  onAttach: function onAttach() {
+    this.collectionView = new CollectionView({
+      collection: this.collection
+    });
+
+    this.list.show(this.collectionView);
+  } });
+
+},{"./collection-view":"/home/pjnovas/projects/la-canchita-web-client/src/groups/index/collection-view.js","./layout-template.hbs":"/home/pjnovas/projects/la-canchita-web-client/src/groups/index/layout-template.hbs","backbone":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone/backbone.js","backbone.marionette":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone.marionette/lib/core/backbone.marionette.js","lodash":"/home/pjnovas/projects/la-canchita-web-client/node_modules/lodash/index.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/groups/index/route.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Route = require("backbone-routing").Route;
+
+var LayoutView = _interopRequire(require("./layout-view"));
+
+var Groups = _interopRequire(require("../collection"));
+
+module.exports = Route.extend({
+  initialize: function initialize() {
+    var options = arguments[0] === undefined ? {} : arguments[0];
+
+    this.container = options.container;
+  },
+
+  fetch: function fetch() {
+    var _this = this;
+
+    var groups = new Groups();
+    return groups.fetch().done(function (collection) {
+      _this.collection = collection;
+    });
+  },
+
+  render: function render(params) {
+    var page = params && parseFloat(params.page) || 1;
+
+    this.layoutView = new LayoutView({
+      collection: this.collection,
+      page: page
+    });
+
+    this.container.show(this.layoutView);
+  }
+});
+
+},{"../collection":"/home/pjnovas/projects/la-canchita-web-client/src/groups/collection.js","./layout-view":"/home/pjnovas/projects/la-canchita-web-client/src/groups/index/layout-view.js","backbone-routing":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone-routing/dist/backbone-routing.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/groups/model.js":[function(require,module,exports){
+"use strict";
+
+var Model = require("backbone").Model;
+
+module.exports = Model.extend({
+
+  urlRoot: "/api/groups",
+
+  validate: function validate() {
+    var attrs = arguments[0] === undefined ? {} : arguments[0];
+
+    var errors = [];
+
+    if (attrs.title === "") {
+      errors.push("Missing \"title\" field");
+    }
+
+    return errors.length > 0 ? errors : undefined;
+  }
+
+});
+
+},{"backbone":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone/backbone.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/groups/router.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Router = require("backbone-routing").Router;
+
+var HeaderService = _interopRequire(require("../header/service"));
+
+var IndexRoute = _interopRequire(require("./index/route"));
+
+/*
+import ShowRoute from './show/route';
+import CreateRoute from './create/route';
+import EditRoute from './edit/route';
+*/
+module.exports = Router.extend({
+  initialize: function initialize() {
+    var options = arguments[0] === undefined ? {} : arguments[0];
+
+    this.container = options.container;
+
+    HeaderService.request("add", {
+      name: "My Groups",
+      path: "groups",
+      type: "primary"
+    });
+  },
+
+  onBeforeEnter: function onBeforeEnter() {
+    HeaderService.request("activate", {
+      path: "groups"
+    });
+  },
+
+  routes: {
+    groups: "index",
+    "groups/new": "create",
+    "groups/:id": "show",
+    "groups/:id/edit": "edit"
+  },
+
+  index: function index() {
+    return new IndexRoute({
+      container: this.container
+    });
+  } });
+
+/*
+  create() {
+    return new CreateRoute({
+      container: this.container
+    });
+  },
+
+  show() {
+    return new ShowRoute({
+      container: this.container
+    });
+  },
+
+  edit() {
+    return new EditRoute({
+      container: this.container
+    });
+  }
+*/
+
+},{"../header/service":"/home/pjnovas/projects/la-canchita-web-client/src/header/service.js","./index/route":"/home/pjnovas/projects/la-canchita-web-client/src/groups/index/route.js","backbone-routing":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone-routing/dist/backbone-routing.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/header/service.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var Service = _interopRequire(require("backbone.service"));
+
+var Collection = require("backbone").Collection;
+
+var View = _interopRequire(require("./view"));
+
+var HeaderService = Service.extend({
+  setup: function setup() {
+    var options = arguments[0] === undefined ? {} : arguments[0];
+
+    this.container = options.container;
+  },
+
+  start: function start() {
+    this.collection = new Collection();
+    this.view = new View({ collection: this.collection });
+    this.container.show(this.view);
+  },
+
+  requests: {
+    add: "add",
+    remove: "remove",
+    activate: "activate" },
+
+  add: function add(model) {
+    this.collection.add(model);
+  },
+
+  remove: function remove(model) {
+    model = this.collection.findWhere(model);
+    this.collection.remove(model);
+  },
+
+  activate: function activate(model) {
+    this.collection.invoke("set", "active", false);
+    model = this.collection.findWhere(model);
+    if (model) {
+      model.set("active", true);
+    }
+  }
+});
+
+module.exports = new HeaderService();
+
+},{"./view":"/home/pjnovas/projects/la-canchita-web-client/src/header/view.js","backbone":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone/backbone.js","backbone.service":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone.service/dist/backbone.service.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/header/template.hbs":[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var HandlebarsCompiler = require('hbsfy/runtime');
+module.exports = HandlebarsCompiler.template({"1":function(depth0,helpers,partials,data) {
+    var stack1, helper, alias1=helpers.helperMissing, alias2="function", alias3=this.escapeExpression;
+
+  return "        <li "
+    + ((stack1 = helpers['if'].call(depth0,(depth0 != null ? depth0.active : depth0),{"name":"if","hash":{},"fn":this.program(2, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "><a href=\"#"
+    + alias3(((helper = (helper = helpers.path || (depth0 != null ? depth0.path : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"path","hash":{},"data":data}) : helper)))
+    + "\">"
+    + alias3(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias1),(typeof helper === alias2 ? helper.call(depth0,{"name":"name","hash":{},"data":data}) : helper)))
+    + "</a></li>\n";
+},"2":function(depth0,helpers,partials,data) {
+    return "class=\"active\"";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1;
+
+  return "<div class=\"container-fluid\">\n  <div class=\"navbar-header\">\n    <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\"#navbar-collapse\">\n      <span class=\"sr-only\">Toggle navigation</span>\n      <span class=\"icon-bar\"></span>\n      <span class=\"icon-bar\"></span>\n      <span class=\"icon-bar\"></span>\n    </button>\n\n    <a class=\"navbar-brand\" href=\"#\">HEADER</a>\n  </div>\n\n  <div class=\"collapse navbar-collapse\" id=\"navbar-collapse\">\n    <ul class=\"nav navbar-nav\">\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.primaryItems : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "    </ul>\n\n    <ul class=\"nav navbar-nav navbar-right\">\n"
+    + ((stack1 = helpers.each.call(depth0,(depth0 != null ? depth0.secondaryItems : depth0),{"name":"each","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + "    </ul>\n  </div>\n</div>\n";
+},"useData":true});
+
+},{"hbsfy/runtime":"/home/pjnovas/projects/la-canchita-web-client/node_modules/hbsfy/runtime.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/header/view.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _ = _interopRequire(require("lodash"));
+
+var history = require("backbone").history;
+
+var ItemView = require("backbone.marionette").ItemView;
+
+var template = _interopRequire(require("./template.hbs"));
+
+module.exports = ItemView.extend({
+  template: template,
+  tagName: "nav",
+  className: "header navbar navbar-default navbar-fixed-top",
+
+  attributes: {
+    role: "navigation"
+  },
+
+  collectionEvents: {
+    all: "render"
+  },
+
+  templateHelpers: function templateHelpers() {
+    return {
+      primaryItems: this.serializeWhere({ type: "primary" }),
+      secondaryItems: this.serializeWhere({ type: "secondary" })
+    };
+  },
+
+  serializeWhere: function serializeWhere(props) {
+    return _.invoke(this.collection.where(props), "toJSON");
+  },
+
+  ui: {
+    collapse: "#navbar-collapse"
+  },
+
+  events: {
+    "show.bs.collapse #navbar-collapse": "onCollapseShow"
+  },
+
+  onCollapseShow: function onCollapseShow() {
+    var _this = this;
+
+    this.listenToOnce(history, "route", function () {
+      _this.ui.collapse.collapse("hide");
+    });
+  }
+});
+
+},{"./template.hbs":"/home/pjnovas/projects/la-canchita-web-client/src/header/template.hbs","backbone":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone/backbone.js","backbone.marionette":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone.marionette/lib/core/backbone.marionette.js","lodash":"/home/pjnovas/projects/la-canchita-web-client/node_modules/lodash/index.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/index.js":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -39685,7 +40047,11 @@ var Application = _interopRequire(require("./application/application"));
 
 var ModalService = _interopRequire(require("./modal/service"));
 
+var HeaderService = _interopRequire(require("./header/service"));
+
 var IndexRouter = _interopRequire(require("./index/router"));
+
+var GroupsRouter = _interopRequire(require("./groups/router"));
 
 var app = new Application();
 
@@ -39693,13 +40059,21 @@ ModalService.setup({
   container: app.layout.overlay
 });
 
+HeaderService.setup({
+  container: app.layout.header
+});
+
 app.index = new IndexRouter({
+  container: app.layout.content
+});
+
+app.groups = new GroupsRouter({
   container: app.layout.content
 });
 
 Backbone.history.start();
 
-},{"./application/application":"/home/pjnovas/projects/la-canchita-web-client/src/application/application.js","./index/router":"/home/pjnovas/projects/la-canchita-web-client/src/index/router.js","./modal/service":"/home/pjnovas/projects/la-canchita-web-client/src/modal/service.js","./plugins":"/home/pjnovas/projects/la-canchita-web-client/src/plugins.js","backbone":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone/backbone.js","jquery":"/home/pjnovas/projects/la-canchita-web-client/node_modules/jquery/dist/jquery.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/index/route.js":[function(require,module,exports){
+},{"./application/application":"/home/pjnovas/projects/la-canchita-web-client/src/application/application.js","./groups/router":"/home/pjnovas/projects/la-canchita-web-client/src/groups/router.js","./header/service":"/home/pjnovas/projects/la-canchita-web-client/src/header/service.js","./index/router":"/home/pjnovas/projects/la-canchita-web-client/src/index/router.js","./modal/service":"/home/pjnovas/projects/la-canchita-web-client/src/modal/service.js","./plugins":"/home/pjnovas/projects/la-canchita-web-client/src/plugins.js","backbone":"/home/pjnovas/projects/la-canchita-web-client/node_modules/backbone/backbone.js","jquery":"/home/pjnovas/projects/la-canchita-web-client/node_modules/jquery/dist/jquery.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/index/route.js":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -39754,7 +40128,7 @@ module.exports = Router.extend({
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-    return "<div class=\"index\">\n  Welcome!!!!!\n</div>\n";
+    return "INDEX PAGE\n";
 },"useData":true});
 
 },{"hbsfy/runtime":"/home/pjnovas/projects/la-canchita-web-client/node_modules/hbsfy/runtime.js"}],"/home/pjnovas/projects/la-canchita-web-client/src/index/view.js":[function(require,module,exports){

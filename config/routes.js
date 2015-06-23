@@ -47,6 +47,13 @@ module.exports.routes = {
 
   'get /api/users/me': 'UserController.me',
 
+  'post /api/groups/:parentid/members/me': 'GroupController.createMe',
+  'delete /api/groups/:parentid/members/me': 'GroupController.removeMe',
+  //'put /api/groups/:parentid/members/me': 'GroupController.updateMe',
+
+  'put /api/groups/:parentid/members/:id': 'GroupController.setRole',
+
+
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

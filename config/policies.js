@@ -16,6 +16,8 @@
  * http://sailsjs.org/#!/documentation/reference/sails.config/sails.config.policies.html
  */
 
+var setUser = ['passport'];
+var isAuth = setUser.concat(['isAuthenticated']);
 
 module.exports.policies = {
 
@@ -26,49 +28,42 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  '*': ['passport'],
+  '*': setUser,
 
-  //'*': ['passport', 'isAuthenticated'],
-
-  'auth': {
-    '*': ['passport']
+  'WebAppController': {
+    '*': setUser,
   },
 
-  'user': {
-    '*': ['passport', 'isAuthenticated'],
-    //edit: ['isAdmin', 'isLoggedIn']
+  'AuthController': {
+    '*': false,
+
+    'login': setUser,
+    'logout': setUser,
+    'register': setUser,
+    'callback': setUser,
+    'provider': setUser,
   },
 
-  'group': {
-    '*': ['passport', 'isAuthenticated'],
+  'UserController': {
+    '*': false,
+    'me': isAuth,
 
-    'update': ['passport', 'isAuthenticated', 'group/canUpdate'],
+    'find': isAuth, //TODO: REMOVE THIS POLICY
+  },
 
-    /*
-    'findOne': ['hasAccess'],
-    'create': ['canCreate'],
-    'remove': ['isOwner'],
-    */
-  }
+  'GroupController': {
+    '*': isAuth,
 
-  /***************************************************************************
-  *                                                                          *
-  * Here's an example of mapping some policies to run before a controller    *
-  * and its actions                                                          *
-  *                                                                          *
-  ***************************************************************************/
-	// RabbitController: {
+    'findOne': isAuth.concat([ 'group/isMember', 'group/canDoAction' ]),
 
-		// Apply the `false` policy as the default for all of RabbitController's actions
-		// (`false` prevents all access, which ensures that nothing bad happens to our rabbits)
-		// '*': false,
+    'create': isAuth.concat([ 'group/canDoAction' ]),
+    'update': isAuth.concat([ 'group/canDoAction' ]),
 
-		// For the action `nurture`, apply the 'isRabbitMother' policy
-		// (this overrides `false` above)
-		// nurture	: 'isRabbitMother',
+    'add': isAuth.concat([ 'group/canDoAction' ]),
 
-		// Apply the `isNiceToAnimals` AND `hasRabbitFood` policies
-		// before letting any users feed our rabbits
-		// feed : ['isNiceToAnimals', 'hasRabbitFood']
-	// }
+    'createMe': isAuth.concat([ 'group/isMember' ]),
+    'removeMe': isAuth.concat([ 'group/isMember' ]),
+
+  },
+
 };
