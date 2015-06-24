@@ -20,11 +20,14 @@ module.exports = {
       defaultsTo: 'member'
     },
 
-    status: {
+    state: {
       type: 'string',
-      enum: ['pending', 'active', 'rejected', 'removed'],
+      enum: ['pending', 'active', 'rejected', 'removed'], // left
       defaultsTo: 'pending'
     },
+
+    // inviteBy: array (of ids, but no association)
+    // removedBy: array (of ids, but no association)
 
     matches_played: {
       type: 'integer',
@@ -67,7 +70,7 @@ Members:
 
 ////////////////////////////////////////////////////////////////////////
 
-/* Statuses
+/* States
 
 PENDING:
 - The membership has just been created, a user has been invited to a group.

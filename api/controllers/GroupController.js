@@ -77,7 +77,7 @@ module.exports = {
           user: req.user.id,
           group: group.id,
           role: 'owner',
-          status: 'active'
+          state: 'active'
         }, function(err, member){
           group.members.add(member);
           group.save(done);
@@ -175,12 +175,20 @@ module.exports = {
 
       // set role into active and save
       function(member, done){
-        member.status = 'active';
+        if (member.state === 'active'){
+          return res.conflict();
+        }
+
+        member.state = 'active';
         member.save(done);
       },
 
     ], function(err, member){
-      if (err) return next(err);
+      if (err) {
+        if (err === 'exited') return;
+        return next(err);
+      }
+
       res.json(member);
     });
 
@@ -199,9 +207,14 @@ module.exports = {
       // set role
       function(member, done){
 
-        switch(member.status){
-          case 'pending': member.status = 'rejected'; break;
-          case 'active': member.status = 'removed'; break;
+        switch(member.state){
+          case 'pending': member.state = 'rejected'; break;
+          case 'active': member.state = 'removed'; break;
+
+          case 'rejected':
+          case 'removed':
+            return res.conflict();
+            break;
         }
 
         member.save(done);
@@ -209,6 +222,54 @@ module.exports = {
 
     ], function(err, member){
       if (err) return next(err);
+      res.status(204);
+      res.end();
+    });
+
+  },
+
+  remove: function(req, res, next){
+    var groupId = req.params.parentid;
+    var memberId = req.params.id;
+
+    async.waterfall([
+
+      // get my membership
+      function(done){
+        Membership.findOne({ group: groupId, id: memberId }, done);
+      },
+
+      // set state into removed and save
+      function(member, done){
+        if (member.state === 'pending' || member.state === 'rejected'){
+          // user wasn't a member yet
+          member.destroy(function(err){
+            res.status(204);
+            res.end();
+            done('exited');
+          });
+          return;
+        }
+
+        member.state = 'removed';
+        member.save(done);
+      },
+
+      /*
+      // Remove Membership from Group ?
+      function(group, member, done){
+        group.members.add(member);
+        group.save(function(err, group){
+          done(err, member);
+        });
+      }
+      */
+
+    ], function(err, member){
+      if (err) {
+        if (err === 'exited') return;
+        return next(err);
+      }
       res.json(member);
     });
 
@@ -225,7 +286,7 @@ module.exports = {
         Membership.findOne({ group: groupId, id: memberId }, done);
       },
 
-      // set role into active and save
+      // set role and save
       function(member, done){
         member.role = req.body.role;
         member.save(done);

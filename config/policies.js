@@ -60,6 +60,8 @@ module.exports.policies = {
     'update': isAuth.concat([ 'group/canDoAction' ]),
 
     'add': isAuth.concat([ 'group/canDoAction' ]),
+    'setRole': isAuth.concat([ 'group/canDoAction' ]),
+    'remove': isAuth.concat([ 'group/canDoAction' ]),
 
     'createMe': isAuth.concat([ 'group/isMember' ]),
     'removeMe': isAuth.concat([ 'group/isMember' ]),
