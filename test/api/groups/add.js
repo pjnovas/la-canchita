@@ -60,7 +60,11 @@ describe('POST /groups/:id/members', function() {
 
   after(builder.clean);
 
-  function checkUpdate(m, gid, uid){
+  function getMemberId(gid, uid, done){
+    Membership.findOne({ group: gid, user: uid }).exec(done);
+  }
+
+  function checkUpdate(m, gid, uid, index, done){
     expect(m).to.be.an('object');
 
     expect(m.id).to.be.ok();
@@ -69,6 +73,11 @@ describe('POST /groups/:id/members', function() {
 
     expect(m.role).to.be.equal('member');
     expect(m.state).to.be.equal('pending');
+
+    getMemberId(groups[0].id, userAgents[index].user.id, function(err, inviter){
+      expect(m.invitedBy).to.be.equal(inviter.id);
+      done();
+    });
   }
 
   function sendInviteBy(index, gid, uid, expected, done){
@@ -85,8 +94,7 @@ describe('POST /groups/:id/members', function() {
 
     sendInviteBy(0, gid, uid, 200, function(err, res){
       if (err) done(err);
-      checkUpdate(res.body, gid, uid);
-      done();
+      checkUpdate(res.body, gid, uid, 0, done);
     });
 
   });
@@ -97,8 +105,7 @@ describe('POST /groups/:id/members', function() {
 
     sendInviteBy(1, gid, uid, 200, function(err, res){
       if (err) done(err);
-      checkUpdate(res.body, gid, uid);
-      done();
+      checkUpdate(res.body, gid, uid, 1, done);
     });
 
   });
@@ -109,8 +116,7 @@ describe('POST /groups/:id/members', function() {
 
     sendInviteBy(2, gid, uid, 200, function(err, res){
       if (err) done(err);
-      checkUpdate(res.body, gid, uid);
-      done();
+      checkUpdate(res.body, gid, uid, 2, done);
     });
 
   });
@@ -137,6 +143,10 @@ describe('POST /groups/:id/members', function() {
 
   it('User is already a member - Conflict', function (done) {
     sendInviteBy(0, groups[0].id, 2, 409, done);
+  });
+
+  it('User is already invited - Conflict', function (done) {
+    sendInviteBy(0, groups[0].id, 4, 409, done);
   });
 
 });

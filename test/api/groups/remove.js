@@ -106,7 +106,11 @@ describe('DELETE /groups/:id/members/:id', function() {
           if (expected === 200){
             Membership.findOne({ id: mid }).exec(function(err, member){
               expect(member.state).to.be.equal('removed');
-              done();
+
+              getMemberId(gid, userAgents[index].user.id, function(err, remover){
+                expect(member.removedBy).to.be.equal(remover.id);
+                done();
+              });
             });
           }
 

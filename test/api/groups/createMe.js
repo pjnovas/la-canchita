@@ -19,6 +19,18 @@ describe('POST /groups/:id/members/me', function() {
         user: userAgents[1].user.id, // Invited
         role: 'member',
         state: 'pending'
+      },{
+        user: userAgents[3].user.id,
+        role: 'member',
+        state: 'rejected'
+      },{
+        user: userAgents[4].user.id,
+        role: 'member',
+        state: 'removed'
+      },{
+        user: userAgents[5].user.id,
+        role: 'member',
+        state: 'left'
       }]
     }];
 
@@ -70,7 +82,28 @@ describe('POST /groups/:id/members/me', function() {
       .end(done);
   });
 
-  it('State [rejected] ???');
-  it('State [removed] ???');
+  it('Disallow if is rejected - NotFound', function (done) {
+
+    userAgents[3]
+      .post('/api/groups/' + groups[0].id + '/members/me')
+      .expect(404)
+      .end(done);
+  });
+
+  it('Disallow if is removed - NotFound', function (done) {
+
+    userAgents[4]
+      .post('/api/groups/' + groups[0].id + '/members/me')
+      .expect(404)
+      .end(done);
+  });
+
+  it('Disallow if has left - NotFound', function (done) {
+
+    userAgents[5]
+      .post('/api/groups/' + groups[0].id + '/members/me')
+      .expect(404)
+      .end(done);
+  });
 
 });

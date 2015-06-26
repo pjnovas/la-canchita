@@ -19,6 +19,11 @@
 var setUser = ['passport'];
 var isAuth = setUser.concat(['isAuthenticated']);
 
+var group = {};
+group.isMember = isAuth.concat([ 'group/isMember' ]);
+group.checkRole = group.isMember.concat([ 'group/checkRole' ]);
+group.canChangeMember = group.checkRole.concat([ 'group/setMemberById', 'group/canChangeMember' ]);
+
 module.exports.policies = {
 
   /***************************************************************************
@@ -52,19 +57,21 @@ module.exports.policies = {
   },
 
   'GroupController': {
-    '*': isAuth,
+    '*': false,
 
-    'findOne': isAuth.concat([ 'group/isMember', 'group/canDoAction' ]),
+    'find': isAuth,
+    'create': isAuth,
 
-    'create': isAuth.concat([ 'group/canDoAction' ]),
-    'update': isAuth.concat([ 'group/canDoAction' ]),
+    'findOne': group.checkRole,
+    'update': group.checkRole,
+    'destroy': group.checkRole,
 
-    'add': isAuth.concat([ 'group/canDoAction' ]),
-    'setRole': isAuth.concat([ 'group/canDoAction' ]),
-    'remove': isAuth.concat([ 'group/canDoAction' ]),
+    'add': group.checkRole,
+    'setRole': group.canChangeMember,
+    'remove': group.canChangeMember,
 
-    'createMe': isAuth.concat([ 'group/isMember' ]),
-    'removeMe': isAuth.concat([ 'group/isMember' ]),
+    'createMe': group.isMember,
+    'removeMe': group.isMember,
 
   },
 

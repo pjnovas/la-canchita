@@ -31,6 +31,10 @@ describe('POST /groups/:id/members/me', function() {
         user: userAgents[4].user.id, // Removed
         role: 'member',
         state: 'removed'
+      },{
+        user: userAgents[5].user.id, // left
+        role: 'member',
+        state: 'left'
       }]
     }];
 
@@ -82,29 +86,37 @@ describe('POST /groups/:id/members/me', function() {
       .end(function(err, res){
         if (err) done(err);
         expect(res.body).to.be.empty();
-        checkMember(gid, userAgents[2].user.id, 'removed', done);
+        checkMember(gid, userAgents[2].user.id, 'left', done);
       });
   });
 
-  it('Disallow if is rejected - Conflict', function (done) {
+  it('Disallow if is rejected - NotFound', function (done) {
 
     userAgents[3]
       .delete('/api/groups/' + groups[0].id + '/members/me')
-      .expect(409)
+      .expect(404)
       .end(done);
   });
 
-  it('Disallow if is removed - Conflict', function (done) {
+  it('Disallow if is removed - NotFound', function (done) {
 
     userAgents[4]
       .delete('/api/groups/' + groups[0].id + '/members/me')
-      .expect(409)
+      .expect(404)
       .end(done);
   });
 
-   it('Disallow if no Invitation - NotFound', function (done) {
+  it('Disallow if is left - NotFound', function (done) {
 
     userAgents[5]
+      .delete('/api/groups/' + groups[0].id + '/members/me')
+      .expect(404)
+      .end(done);
+  });
+
+  it('Disallow if no Invitation - NotFound', function (done) {
+
+    userAgents[6]
       .delete('/api/groups/' + groups[0].id + '/members/me')
       .expect(404)
       .end(done);

@@ -7,7 +7,7 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
   require('./findOne');
   require('./create');
   require('./update');
-  //require('./destroy');
+  require('./destroy');
 
 
   // Members --------------------------
@@ -24,14 +24,12 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
   require('./removeMe'); // decline an invitation or leave group
 
 
-
-
   // TODO:
   /*
    * Check if the group is removing the member after a "remove" (physical)
-   * Check for new state [left]
-   * Split Policies for Roles and Removals
    * Add InvitedBy and RemovedBy > also check how it works for re-invite and physical removal
+   * Create quota
+   * DisplayName ? > adding updateMe
    *
    */
 
