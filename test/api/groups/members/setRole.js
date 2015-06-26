@@ -1,5 +1,5 @@
 
-var builder = require('./builder');
+var builder = require('../builder');
 
 describe('PUT /groups/:id/members/:id', function() {
   var groups;

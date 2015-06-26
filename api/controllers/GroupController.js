@@ -131,63 +131,13 @@ module.exports = {
   },
 
   add: function(req, res, next){
-    var groupId = req.params.parentid;
 
-    if (req.options.alias !== 'members'){
-      return next();
+    switch(req.options.alias){
+      case 'members': return addMember(req, res, next);
+      case 'meetings': return addMeeting(req, res, next);
     }
 
-    async.waterfall([
-
-      // Membership already exists?
-      function(done){
-        Membership.findOne({ group: groupId, user: req.body.user },
-        function(err, member){
-          if (err) return done(err);
-
-          if (member) {
-            res.conflict('User is already a member.');
-            return done('exited');
-          }
-
-          done();
-        });
-      },
-
-      // Find Group
-      function(done){
-        Group.findOne({ id: groupId }).populateAll().exec(done);
-      },
-
-      // Create Membership Group
-      function(group, done){
-        if (!group) return res.notFound();
-
-        Membership.create({
-          group: groupId,
-          user: req.body.user,
-          invitedBy: req.groupMember.id
-        }, function(err, member){
-          done(err, group, member);
-        });
-      },
-
-      // Create Membership Group
-      function(group, member, done){
-        group.members.add(member);
-        group.save(function(err, group){
-          done(err, member);
-        });
-      }
-
-    ], function(err, member){
-      if (err) {
-        if (err === 'exited') return;
-        return next(err);
-      }
-
-      res.json(member);
-    });
+    return next();
   },
 
   createMe: function(req, res, next){
@@ -256,3 +206,95 @@ module.exports = {
   }
 
 };
+
+function addMember(req, res, next){
+  var groupId = req.params.parentid;
+
+  async.waterfall([
+
+    // Membership already exists?
+    function(done){
+      Membership.findOne({ group: groupId, user: req.body.user },
+      function(err, member){
+        if (err) return done(err);
+
+        if (member) {
+          res.conflict('User is already a member.');
+          return done('exited');
+        }
+
+        done();
+      });
+    },
+
+    // Find Group
+    function(done){
+      Group.findOne({ id: groupId }).populateAll().exec(done);
+    },
+
+    // Create Membership Group
+    function(group, done){
+      if (!group) return res.notFound();
+
+      Membership.create({
+        group: groupId,
+        user: req.body.user,
+        invitedBy: req.groupMember.id
+      }, function(err, member){
+        done(err, group, member);
+      });
+    },
+
+    // Create Membership Group
+    function(group, member, done){
+      group.members.add(member);
+      group.save(function(err, group){
+        done(err, member);
+      });
+    }
+
+  ], function(err, member){
+    if (err) {
+      if (err === 'exited') return;
+      return next(err);
+    }
+
+    res.json(member);
+  });
+}
+
+function addMeeting(req, res, next){
+  var groupId = req.params.parentid;
+
+  async.waterfall([
+
+    // Find Group
+    function(done){
+      Group.findOne({ id: groupId }).populateAll().exec(done);
+    },
+
+    // Create a Meeting
+    function(group, done){
+      if (!group) return res.notFound();
+
+      req.body.group = groupId;
+      req.body.createdBy = req.groupMember.id;
+
+      Meeting.create(req.body, function(err, meeting){
+        done(err, group, meeting);
+      });
+    },
+
+    // Create Membership Group
+    function(group, meeting, done){
+      group.meetings.add(meeting);
+      group.save(function(err, group){
+        done(err, meeting);
+      });
+    }
+
+  ], function(err, meeting){
+    if (err) return next(err);
+    res.json(meeting);
+  });
+}

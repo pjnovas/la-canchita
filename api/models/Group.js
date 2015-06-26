@@ -16,6 +16,8 @@ module.exports = {
     description: { type: 'string' },
 
     members : { collection: 'Membership', via: 'group' },
+    meetings : { collection: 'Meeting', via: 'group' },
+
   }
 };
 

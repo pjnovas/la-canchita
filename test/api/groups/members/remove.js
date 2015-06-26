@@ -1,5 +1,5 @@
 
-var builder = require('./builder');
+var builder = require('../builder');
 
 describe('DELETE /groups/:id/members/:id', function() {
 

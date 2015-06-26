@@ -1,5 +1,5 @@
 
-var builder = require('./builder');
+var builder = require('../builder');
 
 describe('POST /groups/:id/members', function() {
 

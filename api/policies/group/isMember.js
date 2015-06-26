@@ -12,7 +12,7 @@ module.exports = function(req, res, next) {
   var groupId = req.params.id;
   var action = req.options.action;
 
-  if (req.options.alias === 'members' ||
+  if (['members', 'meetings'].indexOf(req.options.alias) > -1 ||
     ['createme', 'removeme', 'setrole'].indexOf(action) > -1){
 
     groupId = req.params.parentid;

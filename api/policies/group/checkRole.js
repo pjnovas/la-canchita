@@ -9,19 +9,30 @@
 
 var allowed = {
   findOne : [ 'owner', 'admin', 'moderator', 'member' ],
-  add     : [ 'owner', 'admin', 'moderator' ],
-  setrole : [ 'owner', 'admin' ],
   update  : [ 'owner', 'admin' ],
-  remove  : [ 'owner', 'admin' ],
   destroy : [ 'owner' ],
+
+  add     : {
+    members   : [ 'owner', 'admin', 'moderator' ],
+    meetings  : [ 'owner', 'admin' ],
+  },
+  setrole : [ 'owner', 'admin' ],
+  remove  : [ 'owner', 'admin' ],
 };
 
 module.exports = function(req, res, next) {
 
   var action = req.options.action;
   var member = req.groupMember;
+  var alias = req.options.alias;
 
-  if (allowed[action].indexOf(member.role) === -1){
+  var roles = allowed[action];
+
+  if (!Array.isArray(roles)){
+    roles = allowed[action][alias];
+  }
+
+  if (roles.indexOf(member.role) === -1){
     return res.forbidden('cannot_perform_this_action');
   }
 
