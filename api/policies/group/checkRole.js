@@ -12,25 +12,22 @@ var allowed = {
   update  : [ 'owner', 'admin' ],
   destroy : [ 'owner' ],
 
-  add     : {
-    members   : [ 'owner', 'admin', 'moderator' ],
-    meetings  : [ 'owner', 'admin' ],
-  },
-  setrole : [ 'owner', 'admin' ],
-  remove  : [ 'owner', 'admin' ],
+  createmember   : [ 'owner', 'admin', 'moderator' ],
+  removemember  : [ 'owner', 'admin' ],
+  changemember : [ 'owner', 'admin' ],
+
+  createmeeting : [ 'owner', 'admin' ],
+  removemeeting : [ 'owner', 'admin' ],
+  changemeeting : [ 'owner', 'admin' ],
+
 };
 
 module.exports = function(req, res, next) {
 
   var action = req.options.action;
   var member = req.groupMember;
-  var alias = req.options.alias;
 
   var roles = allowed[action];
-
-  if (!Array.isArray(roles)){
-    roles = allowed[action][alias];
-  }
 
   if (roles.indexOf(member.role) === -1){
     return res.forbidden('cannot_perform_this_action');

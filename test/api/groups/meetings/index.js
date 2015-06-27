@@ -1,9 +1,9 @@
 
 describe('Meetings', function() {
 
-  require('./add'); // create a Meeting
-  //require('./update'); // update a Meeting
-  //require('./remove'); // remove a Meeting
+  require('./create'); // create a Meeting
+  require('./change'); // update a Meeting
+  require('./remove'); // remove a Meeting
 
   //require('./createMe'); // assist a meeting
   //require('./updateMe'); // confirm a meeting

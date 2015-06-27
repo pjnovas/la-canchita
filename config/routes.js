@@ -47,12 +47,16 @@ module.exports.routes = {
 
   'get /api/users/me': 'UserController.me',
 
-  'post /api/groups/:parentid/members/me': 'GroupController.createMe',
-  'delete /api/groups/:parentid/members/me': 'GroupController.removeMe',
-  //'put /api/groups/:parentid/members/me': 'GroupController.updateMe',
+  'post /api/groups/:gid/members/me': 'GroupController.createMe',
+  'delete /api/groups/:gid/members/me': 'GroupController.removeMe',
 
-  'put /api/groups/:parentid/members/:id': 'GroupController.setRole',
+  'post /api/groups/:gid/members': 'GroupController.createMember',
+  'put /api/groups/:gid/members/:id': 'GroupController.changeMember',
+  'delete /api/groups/:gid/members/:id': 'GroupController.removeMember',
 
+  'post /api/groups/:gid/meetings': 'GroupController.createMeeting',
+  'put /api/groups/:gid/meetings/:id': 'GroupController.changeMeeting',
+  'delete /api/groups/:gid/meetings/:id': 'GroupController.removeMeeting',
 
   /***************************************************************************
   *                                                                          *

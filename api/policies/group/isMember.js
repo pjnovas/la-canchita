@@ -9,14 +9,8 @@
  */
 
 module.exports = function(req, res, next) {
-  var groupId = req.params.id;
+  var groupId = req.params.gid || req.params.id;
   var action = req.options.action;
-
-  if (['members', 'meetings'].indexOf(req.options.alias) > -1 ||
-    ['createme', 'removeme', 'setrole'].indexOf(action) > -1){
-
-    groupId = req.params.parentid;
-  }
 
   Membership
     .findOne({ group: groupId, user: req.user.id })

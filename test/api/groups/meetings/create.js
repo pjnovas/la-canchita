@@ -27,18 +27,6 @@ describe('POST /groups/:id/meetings', function() {
         user: userAgents[3].user.id,
         role: 'member',
         state: 'active'
-      },{
-        user: userAgents[4].user.id,
-        role: 'moderator',
-        state: 'pending'
-      },{
-        user: userAgents[5].user.id,
-        role: 'moderator',
-        state: 'rejected'
-      },{
-        user: userAgents[6].user.id,
-        role: 'moderator',
-        state: 'removed'
       }]
     }];
 
@@ -111,22 +99,6 @@ describe('POST /groups/:id/meetings', function() {
 
   it('Disallow ROLE [member] - Forbidden', function (done) {
     sendCreateMeeting(3, groups[0].id, 12, 403, done);
-  });
-
-  it('Disallow STATE [pending] - NotFound', function (done) {
-    sendCreateMeeting(4, groups[0].id, 12, 404, done);
-  });
-
-  it('Disallow STATE [rejected] - NotFound', function (done) {
-    sendCreateMeeting(5, groups[0].id, 12, 404, done);
-  });
-
-  it('Disallow STATE [removed] - NotFound', function (done) {
-    sendCreateMeeting(6, groups[0].id, 12, 404, done);
-  });
-
-  it('Disallow Non Member - NotFound', function (done) {
-    sendCreateMeeting(7, groups[0].id, 12, 404, done);
   });
 
 });

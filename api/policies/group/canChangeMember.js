@@ -17,7 +17,7 @@ module.exports = function(req, res, next) {
   var userRole = roles.indexOf(req.groupMember.role);
   var actualRole = roles.indexOf(memberReq.role);
 
-  if (action === 'setrole'){
+  if (action === 'changemember'){
 
     var requestedRole = roles.indexOf(req.body.role);
 
@@ -32,7 +32,7 @@ module.exports = function(req, res, next) {
     return next();
   }
 
-  if (action === 'remove'){
+  if (action === 'removemember'){
 
     if (!memberReq || memberReq.state === 'removed') {
       return res.notFound('Group not found');
