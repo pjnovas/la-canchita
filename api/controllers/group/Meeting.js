@@ -23,7 +23,7 @@ module.exports = {
         });
       },
 
-      // Create Membership Group
+      // Add meeting to Group
       function(group, meeting, done){
         group.meetings.add(meeting);
         group.save(function(err, group){
@@ -70,14 +70,6 @@ module.exports = {
   join: function(req, res, next){
     var meeting = req.requestedMeeting;
 
-    var exists = meeting.assistants.some(function(member){
-      return (member.id === req.groupMember.id);
-    });
-
-    if (exists){
-      return res.conflict('member_already_joined');
-    }
-
     meeting.assistants.add(req.groupMember);
 
     meeting.save(function(err, _meeting){
@@ -90,15 +82,19 @@ module.exports = {
   leave: function(req, res, next){
     var meeting = req.requestedMeeting;
 
-    var exists = meeting.assistants.some(function(member){
-      return (member.id === req.groupMember.id);
-    });
-
-    if (!exists){
-      return res.conflict('member_is_not_assistant');
-    }
-
     meeting.assistants.remove(req.groupMember.id);
+
+    meeting.save(function(err, _meeting){
+      if (err) return next(err);
+      res.status(204);
+      res.end();
+    });
+  },
+
+  confirm: function(req, res, next){
+    var meeting = req.requestedMeeting;
+
+    meeting.confirmed.add(req.groupMember);
 
     meeting.save(function(err, _meeting){
       if (err) return next(err);

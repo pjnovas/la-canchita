@@ -51,6 +51,12 @@ describe('DELETE /meetings/:id/assistants/me', function() {
         title: 'Meeting 2',
         when: new Date(),
         assistants: [  groups[0].members[2] ]
+      },{
+        group: gid,
+        createdBy: groups[0].members[3].id,
+        title: 'Meeting 3',
+        assistants: [  groups[0].members[3] ],
+        confirmed: [  groups[0].members[3] ],
       }];
 
       async.series(
@@ -100,6 +106,10 @@ describe('DELETE /meetings/:id/assistants/me', function() {
 
   it('Disallow a member to Leave after the meeting date [when]', function (done) {
     sendLeave(2, 0, 2, 403, done);
+  });
+
+  it('Disallow a member to Leave if is Confirmed', function (done) {
+    sendLeave(3, 0, 3, 409, done);
   });
 
 });

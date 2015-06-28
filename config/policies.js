@@ -22,13 +22,17 @@ var isAuth = setUser.concat(['isAuthenticated']);
 var group = {};
 group.isMember = isAuth.concat([ 'group/isMember' ]);
 group.checkRole = group.isMember.concat([ 'group/checkRole' ]);
+
 group.canChangeMember = group.checkRole.concat([ 'group/setMemberById', 'group/canChangeMember' ]);
-group.canRemoveMeeting = group.checkRole.concat([ 'group/setMeetingById', 'group/canRemoveMeeting' ]);
+group.canRemoveMeeting = group.checkRole.concat([ 'meeting/setMeetingById', 'group/canRemoveMeeting' ]);
 
 var meeting = {};
-meeting.isMember = isAuth.concat([ 'group/setMeetingById' ]).concat(group.isMember);
-meeting.join = meeting.isMember.concat([ 'group/isMeetingOpen', 'group/meetingHasRoom' ]);
-meeting.leave = meeting.isMember.concat([ 'group/isMeetingOpen' ]);
+meeting.isMember = isAuth.concat([ 'meeting/setMeetingById' ]).concat(group.isMember);
+meeting.isOpen = meeting.isMember.concat([ 'meeting/isOpen' ]);
+
+meeting.join = meeting.isOpen.concat([ 'meeting/canJoin' ]);
+meeting.leave = meeting.isOpen.concat([ 'meeting/canLeave' ]);
+meeting.confirm = meeting.isOpen.concat([ 'meeting/canConfirm' ]);
 
 module.exports.policies = {
 
@@ -89,6 +93,7 @@ module.exports.policies = {
 
     'joinMeeting': meeting.join,
     'leaveMeeting': meeting.leave,
+    'confirmMeeting': meeting.confirm,
 
   },
 

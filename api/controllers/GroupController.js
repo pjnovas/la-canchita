@@ -131,17 +131,24 @@ module.exports = {
 
   },
 
+  // Members
+
   createMember: MemberController.create,
   removeMember: MemberController.remove,
   changeMember: MemberController.change,
+
   createMe: MemberController.createMe,
   removeMe: MemberController.removeMe,
+
+
+  // Meetings
 
   createMeeting: MeetingController.create,
   removeMeeting: MeetingController.remove,
   changeMeeting: MeetingController.change,
+
   joinMeeting: MeetingController.join,
-  //confirmMeeting: MeetingController.confirm,
+  confirmMeeting: MeetingController.confirm,
   leaveMeeting: MeetingController.leave,
 
 };

@@ -6,7 +6,7 @@ describe('Meetings', function() {
   require('./remove'); // remove a Meeting
 
   require('./join'); // assist a meeting
-  require('./leave'); // confirm a meeting
-  //require('./confirm'); // decline assistance of a meeting
+  require('./leave'); // decline assistance of a meeting
+  require('./confirm'); // confirm a meeting
 
 });

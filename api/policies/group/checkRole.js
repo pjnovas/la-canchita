@@ -8,6 +8,7 @@
  */
 
 var allowed = {
+
   findOne : [ 'owner', 'admin', 'moderator', 'member' ],
   update  : [ 'owner', 'admin' ],
   destroy : [ 'owner' ],
