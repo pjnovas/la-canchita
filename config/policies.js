@@ -23,7 +23,12 @@ var group = {};
 group.isMember = isAuth.concat([ 'group/isMember' ]);
 group.checkRole = group.isMember.concat([ 'group/checkRole' ]);
 group.canChangeMember = group.checkRole.concat([ 'group/setMemberById', 'group/canChangeMember' ]);
-group.canRemoveMetting = group.checkRole.concat([ 'group/setMeetingById', 'group/canRemoveMeeting' ]);
+group.canRemoveMeeting = group.checkRole.concat([ 'group/setMeetingById', 'group/canRemoveMeeting' ]);
+
+var meeting = {};
+meeting.isMember = isAuth.concat([ 'group/setMeetingById' ]).concat(group.isMember);
+meeting.join = meeting.isMember.concat([ 'group/isMeetingOpen', 'group/meetingHasRoom' ]);
+meeting.leave = meeting.isMember.concat([ 'group/isMeetingOpen' ]);
 
 module.exports.policies = {
 
@@ -80,7 +85,10 @@ module.exports.policies = {
 
     'createMeeting': group.checkRole,
     'changeMeeting': group.checkRole,
-    'removeMeeting': group.canRemoveMetting,
+    'removeMeeting': group.canRemoveMeeting,
+
+    'joinMeeting': meeting.join,
+    'leaveMeeting': meeting.leave,
 
   },
 

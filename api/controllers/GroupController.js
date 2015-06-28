@@ -140,5 +140,8 @@ module.exports = {
   createMeeting: MeetingController.create,
   removeMeeting: MeetingController.remove,
   changeMeeting: MeetingController.change,
+  joinMeeting: MeetingController.join,
+  //confirmMeeting: MeetingController.confirm,
+  leaveMeeting: MeetingController.leave,
 
 };

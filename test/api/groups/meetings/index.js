@@ -5,8 +5,8 @@ describe('Meetings', function() {
   require('./change'); // update a Meeting
   require('./remove'); // remove a Meeting
 
-  //require('./createMe'); // assist a meeting
-  //require('./updateMe'); // confirm a meeting
-  //require('./removeMe'); // decline assistance of a meeting
+  require('./join'); // assist a meeting
+  require('./leave'); // confirm a meeting
+  //require('./confirm'); // decline assistance of a meeting
 
 });

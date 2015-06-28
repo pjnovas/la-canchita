@@ -1,7 +1,7 @@
 
 var builder = require('../builder');
 
-describe('DELETE /groups/:id/meetings/:id', function() {
+describe('POST /meetings/:id/assistants/me', function() {
 
   var groups;
 
@@ -47,22 +47,19 @@ describe('DELETE /groups/:id/meetings/:id', function() {
       },{
         createdBy: groups[0].members[1].id,
         title: 'Meeting 1',
+        max: 2,
       },{
         createdBy: groups[0].members[2].id,
         title: 'Meeting 2',
+        max: 2,
+        replacements: true,
       },{
         createdBy: groups[0].members[3].id,
         title: 'Meeting 3',
-      },{
-        createdBy: groups[0].members[4].id,
-        title: 'Meeting 4',
-      },{
-        createdBy: groups[0].members[5].id,
-        title: 'Meeting 5',
+        when: new Date()
       }]);
 
       groups[0].save(function(err, group){
-        expect(group.meetings.length).to.be.equal(6);
         groups[0] = group;
         done();
       });
@@ -72,58 +69,49 @@ describe('DELETE /groups/:id/meetings/:id', function() {
 
   afterEach(builder.clean);
 
-  function sendRemove(index, gIndex, mIndex, expected, done){
+  function sendJoin(index, gIndex, mIndex, expected, done){
     var group = groups[gIndex];
     var gid = group.id;
     var mid = group.meetings[mIndex].id;
 
     userAgents[index]
-      .delete('/api/groups/' + gid + '/meetings/' + mid)
+      .post('/api/meetings/' + mid + '/assistants/me')
       .expect(expected)
-      .end(function(err, res){
-        if (err) return done(err);
-        if (expected !== 200){
-          return done();
-        }
-
-        if (expected === 204){
-
-          Meeting.findOne({ id: mid }).exec(function(err, meeting){
-            expect(err).to.not.be.ok();
-            expect(meeting).to.not.be.ok();
-            done();
-          });
-
-          return;
-        }
-
-      });
+      .end(done);
   }
 
-  it('Allow ROLE [owner]', function (done) {
-    sendRemove(0, 0, 0, 204, done);
+  it('Allow a member to Join as assistant', function (done) {
+    sendJoin(0, 0, 0, 204, done);
   });
 
-  it('Allow ROLE [owner] to remove any other', function (done) {
-    sendRemove(0, 0, 2, 204, done);
+  it('Disallow to Join as assistant twice - Conflict', function (done) {
+    sendJoin(0, 0, 0, 204, function(){
+      sendJoin(0, 0, 0, 409, done);
+    });
   });
 
-  // Admin
-
-  it('Allow ROLE [admin] to remove its own meeting', function (done) {
-    sendRemove(2, 0, 2, 204, done);
+  it('Disallow a NON member to Join as assistant', function (done) {
+    sendJoin(10, 0, 0, 404, done);
   });
 
-  it('Disallow ROLE [admin] to remove a non own meeting - Forbidden', function (done) {
-    sendRemove(2, 0, 4, 403, done);
+  it('Disallow to Join more than max - Conflict', function (done) {
+    sendJoin(0, 0, 1, 204, function(){
+      sendJoin(1, 0, 1, 204, function(){
+        sendJoin(2, 0, 1, 403, done);
+      });
+    });
   });
 
-  it('Disallow ROLE [moderator] to remove a meetin - Forbidden', function (done) {
-    sendRemove(3, 0, 4, 403, done);
+  it('Allow to Join more than max if it has replacements', function (done) {
+    sendJoin(0, 0, 2, 204, function(){
+      sendJoin(1, 0, 2, 204, function(){
+        sendJoin(2, 0, 2, 204, done);
+      });
+    });
   });
 
-  it('Disallow ROLE [member] to remove a meetin - Forbidden', function (done) {
-    sendRemove(4, 0, 5, 403, done);
+  it('Disallow to Join after the meeting date [when]', function (done) {
+    sendJoin(0, 0, 3, 403, done);
   });
 
 });

@@ -16,7 +16,15 @@ module.exports = {
     title: { type: 'string' },
     info: { type: 'string' },
     place: { type: 'string' },
-    when: { type: 'date' },
+
+    when: {
+      type: 'date',
+      defaultsTo: function(){
+        var now = new Date();
+        var aWeek = 7 * 24 * 60 * 60 * 1000;
+        return new Date(now.getTime() + aWeek);
+      }
+    },
 
     replacements: { type: 'boolean' },
 
@@ -24,15 +32,15 @@ module.exports = {
     confirmStart: { type: 'date' },
     confirmEnd: { type: 'date' },
 
-    minParticipants: { type: 'integer', defaultsTo: 0 }, // 0 - no limit
-    maxParticipants: { type: 'integer', defaultsTo: 0 }, // 0 - no limit
+    min: { type: 'integer', defaultsTo: 0 }, // 0 - no limit
+    max: { type: 'integer', defaultsTo: 0 }, // 0 - no limit
 
-    participants : { collection: 'Membership' },
+    assistants : { collection: 'Membership' },
     confirmed : { collection: 'Membership' },
 
     //alerts: { type: 'array' }, // hooks, emails, etc > New Model for this
 
-  }
+  },
 
 };
 

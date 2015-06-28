@@ -9,7 +9,8 @@
  */
 
 module.exports = function(req, res, next) {
-  var groupId = req.params.gid || req.params.id;
+  var group = req.group;
+  var groupId = req.params.gid || (group && group.id) || req.params.id;
   var action = req.options.action;
 
   Membership

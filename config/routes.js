@@ -47,16 +47,25 @@ module.exports.routes = {
 
   'get /api/users/me': 'UserController.me',
 
+  // Group Members
+
   'post /api/groups/:gid/members/me': 'GroupController.createMe',
   'delete /api/groups/:gid/members/me': 'GroupController.removeMe',
 
   'post /api/groups/:gid/members': 'GroupController.createMember',
-  'put /api/groups/:gid/members/:id': 'GroupController.changeMember',
-  'delete /api/groups/:gid/members/:id': 'GroupController.removeMember',
+  'put /api/groups/:gid/members/:memberId': 'GroupController.changeMember',
+  'delete /api/groups/:gid/members/:memberId': 'GroupController.removeMember',
+
+  // Group Meetings
 
   'post /api/groups/:gid/meetings': 'GroupController.createMeeting',
-  'put /api/groups/:gid/meetings/:id': 'GroupController.changeMeeting',
-  'delete /api/groups/:gid/meetings/:id': 'GroupController.removeMeeting',
+  'put /api/groups/:gid/meetings/:meetingId': 'GroupController.changeMeeting',
+  'delete /api/groups/:gid/meetings/:meetingId': 'GroupController.removeMeeting',
+
+  'post /api/meetings/:meetingId/assistants/me': 'GroupController.joinMeeting',
+  'delete /api/meetings/:meetingId/assistants/me': 'GroupController.leaveMeeting',
+  //'post /api/meetings/:meetingId/confirmed/me': 'GroupController.confirmMeeting',
+  //'delete /api/meetings/:meetingId/confirmed/me': 'GroupController.unconfirmedMeeting',
 
   /***************************************************************************
   *                                                                          *

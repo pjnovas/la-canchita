@@ -51,6 +51,7 @@ describe('POST /groups/:id/meetings', function() {
     expect(m.title).to.be.equal('test title');
     expect(m.info).to.be.equal('test info');
     expect(m.place).to.be.equal('Some cool place');
+    expect(new Date(m.when)).to.be.greaterThan(new Date()); // defaults to next week
 
     getMemberId(groups[0].id, userAgents[index].user.id, function(err, creator){
       expect(m.createdBy).to.be.equal(creator.id);
@@ -64,8 +65,7 @@ describe('POST /groups/:id/meetings', function() {
       .send({
         title: 'test title',
         info: 'test info',
-        place: 'Some cool place',
-        when: new Date()
+        place: 'Some cool place'
       })
       .expect(expected)
       .end(done);

@@ -10,7 +10,7 @@
 module.exports = function(req, res, next) {
 
   Membership
-    .findOne({ id: req.params.id })
+    .findOne({ id: req.params.memberId })
     .populateAll()
     .exec(function(err, member){
       if (err) return next(err);

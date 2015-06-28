@@ -38,13 +38,13 @@ module.exports = {
   },
 
   change: function(req, res, next){
-    var query = { id: req.params.id };
+    var query = { id: req.params.meetingId };
 
     // Not allowed props
     delete req.body.id;
     delete req.body.createdBy;
     delete req.body.group;
-    delete req.body.participants;
+    delete req.body.assistants;
     delete req.body.confirmed;
 
     Meeting.update(query, req.body).exec(function(err, updated){
@@ -67,5 +67,44 @@ module.exports = {
 
   },
 
+  join: function(req, res, next){
+    var meeting = req.requestedMeeting;
+
+    var exists = meeting.assistants.some(function(member){
+      return (member.id === req.groupMember.id);
+    });
+
+    if (exists){
+      return res.conflict('member_already_joined');
+    }
+
+    meeting.assistants.add(req.groupMember);
+
+    meeting.save(function(err, _meeting){
+      if (err) return next(err);
+      res.status(204);
+      res.end();
+    });
+  },
+
+  leave: function(req, res, next){
+    var meeting = req.requestedMeeting;
+
+    var exists = meeting.assistants.some(function(member){
+      return (member.id === req.groupMember.id);
+    });
+
+    if (!exists){
+      return res.conflict('member_is_not_assistant');
+    }
+
+    meeting.assistants.remove(req.groupMember.id);
+
+    meeting.save(function(err, _meeting){
+      if (err) return next(err);
+      res.status(204);
+      res.end();
+    });
+  },
 
 };
