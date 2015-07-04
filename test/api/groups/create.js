@@ -10,7 +10,7 @@ describe('POST /groups', function() {
     var group = {
       title: 'Group Awesome',
       description: 'My cool group',
-      picture: 'http://pic.com/pic.png'
+      picture: 'http://test.com/picture.png'
     };
 
     userAgents[0]
@@ -23,9 +23,12 @@ describe('POST /groups', function() {
         expect(g).to.be.an('object');
 
         for (var p in group){
-          expect(g[p]).to.be.equal(group[p]);
+          if (p !== 'picture'){
+            expect(g[p]).to.be.equal(group[p]);
+          }
         }
 
+        expect(g.picture).to.not.be.ok();
         expect(g.members).to.be.an('array');
         expect(g.members.length).to.be.equal(1);
 

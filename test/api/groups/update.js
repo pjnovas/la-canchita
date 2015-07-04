@@ -10,7 +10,6 @@ describe('PUT /groups/:id', function() {
     var groups_data = [{
       title: 'Group Awesome',
       description: 'My cool group',
-      picture: 'http://pic.com/pic.png',
       members: [{
         user: userAgents[0].user.id,
         role: 'owner',
@@ -43,7 +42,6 @@ describe('PUT /groups/:id', function() {
     }, {
       title: 'Group Awesome 2',
       description: 'My cool group 2',
-      picture: 'http://pic.com/pic2.png',
       members: [{
         user: userAgents[7].user.id,
         role: 'owner',
@@ -73,7 +71,7 @@ describe('PUT /groups/:id', function() {
 
     expect(g.title).to.be.equal('Title ' + index);
     expect(g.description).to.be.equal('Description ' + index);
-    expect(g.picture).to.be.equal('http://pic.com/pic' + index + '.png');
+    expect(g.picture).to.not.be.ok();
 
     expect(g.members).to.be.an('array');
     expect(g.members.length).to.be.equal(7);

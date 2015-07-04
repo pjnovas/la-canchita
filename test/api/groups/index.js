@@ -8,6 +8,7 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
   require('./create');
   require('./update');
   require('./destroy');
+  require('./picture');
 
   require('./members');
 

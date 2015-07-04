@@ -49,6 +49,8 @@ module.exports.routes = {
 
   // Group Members
 
+  'post /api/groups/:gid/picture': 'GroupController.uploadPicture',
+
   'post /api/groups/:gid/members/me': 'GroupController.createMe',
   'delete /api/groups/:gid/members/me': 'GroupController.removeMe',
 

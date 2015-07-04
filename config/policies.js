@@ -76,6 +76,8 @@ module.exports.policies = {
     'update': group.checkRole,
     'destroy': group.checkRole,
 
+    'uploadPicture': group.checkRole,
+
     // Members
 
     'createMember': group.checkRole,

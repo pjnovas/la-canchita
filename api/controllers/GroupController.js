@@ -53,7 +53,6 @@ module.exports = {
 
         group.title = req.body.title || group.title;
         group.description = req.body.description || group.description;
-        group.picture = req.body.picture || group.picture;
 
         group.save(function(err, group){
           if (err) return next(err);
@@ -89,6 +88,8 @@ module.exports = {
   },
 
   create: function(req, res, next){
+
+    delete req.body.picture;
 
     async.waterfall([
 
@@ -130,6 +131,29 @@ module.exports = {
     });
 
   },
+
+  uploadPicture: function (req, res) {
+
+    req.file('image').upload({
+      saveAs: req.params.gid + '.jpg',
+      maxBytes: 300000, // ~300KB
+      dirname: require('path').resolve(sails.config.appPath, 'assets/images/groups')
+    }, function (err, uploadedFiles) {
+      if (err) return res.negotiate(err);
+
+      if (uploadedFiles.length === 0){
+        return res.badRequest('No file was uploaded');
+      }
+
+      if (uploadedFiles.length > 1){
+        return res.badRequest('only one file is allowed');
+      }
+
+      res.status(204);
+      res.end();
+    });
+  },
+
 
   // Members
 

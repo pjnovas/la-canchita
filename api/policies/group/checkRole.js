@@ -11,6 +11,7 @@ var allowed = {
 
   findOne : [ 'owner', 'admin', 'moderator', 'member' ],
   update  : [ 'owner', 'admin' ],
+  uploadpicture  : [ 'owner', 'admin' ],
   destroy : [ 'owner' ],
 
   createmember   : [ 'owner', 'admin', 'moderator' ],

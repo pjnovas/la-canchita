@@ -8677,14 +8677,6 @@ body,
   font-weight: bold;
 }
 /*
- * Footer
- */
-.mastfoot {
-  color: #999;
-  /* IE8 proofing */
-  color: rgba(255, 255, 255, 0.5);
-}
-/*
  * Affix and center
  */
 @media (min-width: 768px) {
@@ -8693,17 +8685,12 @@ body,
     position: fixed;
     top: 0;
   }
-  .mastfoot {
-    position: fixed;
-    bottom: 0;
-  }
   /* Start the vertical centering */
   .site-wrapper-inner {
     vertical-align: middle;
   }
   /* Handle the widths */
   .masthead,
-  .mastfoot,
   .cover-container {
     width: 100%;
     /* Must be percentage or pixels for horizontal alignment */
@@ -8711,7 +8698,6 @@ body,
 }
 @media (min-width: 992px) {
   .masthead,
-  .mastfoot,
   .cover-container {
     width: 700px;
   }
@@ -8796,6 +8782,122 @@ h3 {
   text-transform: uppercase;
   font-size: 16px;
 }
+.groups {
+  text-align: left;
+}
+.groups .media-list .media {
+  margin-top: 0;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.groups .media-list .media:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.groups .media-list .media:hover,
+.groups .media-list .media:active {
+  background-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.1) inset;
+  cursor: pointer;
+}
+.groups .media-list .media .media-object {
+  width: 64px;
+  height: 64px;
+}
+.groups .media-list .media.media-info {
+  background-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.1) inset;
+}
+.groups .media-list .media.media-info:hover,
+.groups .media-list .media.media-info:active {
+  background-color: rgba(0, 0, 0, 0.1);
+  cursor: default;
+}
+.groups .media-list .media.media-info p {
+  text-align: center;
+  font-size: 20px;
+}
+.groups .media-list .media.media-buttons {
+  background-color: rgba(0, 0, 0, 0.2);
+  text-align: center;
+  font-size: 24px;
+}
+.groups .media-list .media.media-buttons:hover,
+.groups .media-list .media.media-buttons:active {
+  background-color: rgba(0, 0, 0, 0.2);
+  box-shadow: none;
+}
+.group-picture {
+  width: 100%;
+  max-width: 300px;
+  height: 150px;
+  display: block;
+  margin: 15px auto;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.4);
+  background-position: center center;
+  background-size: cover;
+}
+.group-picture .dropzone {
+  width: 100% !important;
+  max-width: 300px !important;
+  height: 150px !important;
+  position: relative;
+  border: none !important;
+}
+.group-picture .dropzone .preview {
+  width: 100% !important;
+  max-width: 300px !important;
+  height: 150px !important;
+  border-radius: 6px;
+  background-position: center center;
+  background-size: cover;
+}
+.group-picture .dropzone .info {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 20px;
+  vertical-align: middle;
+  padding: 20px;
+  border-radius: 9px;
+}
+.group-picture .dropzone .info:hover {
+  background: rgba(0, 0, 0, 0);
+  color: #ffd853;
+  cursor: pointer;
+}
 body {
   /*background: lighten(@link-color, 25%);*/
+}
+.form-control {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3) inset;
+  border: none;
+}
+.form-control:focus {
+  border: none;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(200, 200, 200, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(200, 200, 200, 0.6);
+}
+.form-control::-moz-placeholder {
+  font-style: italic;
+  color: #777777;
+  opacity: 1;
+}
+.form-control:-ms-input-placeholder {
+  font-style: italic;
+  color: #777777;
+}
+.form-control::-webkit-input-placeholder {
+  font-style: italic;
+  color: #777777;
+}
+.link-cancel {
+  padding-top: 15px;
 }
