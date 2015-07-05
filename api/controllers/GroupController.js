@@ -43,6 +43,45 @@ module.exports = {
 
   },
 
+  findOne: function(req, res, next){
+
+    async.waterfall([
+
+      // fetch Group
+      function (done){
+        Group
+          .findOne({ id: req.params.id })
+          .populate('members')
+          .exec(done);
+      },
+
+      // fetch & fill users members
+      function (group, done){
+        var userIds = _.pluck(group.members, 'user');
+        User
+          .find()
+          .where({ id: userIds })
+          .exec(function(err, users){
+
+            if (err) return done(err);
+
+            var usersObj = _.indexBy(users, 'id');
+
+            _.forEach(group.members, function(member) {
+              member.user = _.pick(usersObj[member.user], ['id', 'name', 'picture']);
+            });
+
+            done(err, group);
+          });
+      },
+
+    ], function(err, group){
+      if (err) return next(err);
+      res.json(group);
+    });
+
+  },
+
   update: function(req, res, next){
 
     Group

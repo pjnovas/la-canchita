@@ -61,7 +61,10 @@ module.exports.policies = {
 
   'UserController': {
     '*': false,
+
     'me': isAuth,
+    'updateMe': isAuth,
+    'search': isAuth,
 
     'find': isAuth, //TODO: REMOVE THIS POLICY
   },

@@ -10,7 +10,6 @@ describe('GET /groups/:id', function() {
     var groups_data = [{
       title: 'Group Awesome',
       description: 'My cool group',
-      picture: 'http://pic.com/pic.png',
       members: [{
         user: userAgents[0].user.id,
         role: 'owner',
@@ -43,7 +42,6 @@ describe('GET /groups/:id', function() {
     }, {
       title: 'Group Awesome 2',
       description: 'My cool group 2',
-      picture: 'http://pic.com/pic2.png',
       members: [{
         user: userAgents[7].user.id,
         role: 'owner',
@@ -60,12 +58,34 @@ describe('GET /groups/:id', function() {
 
   after(builder.clean);
 
+  function checkGroup(group){
+    expect(group).to.be.an('object');
+    expect(group.members).to.be.an('array');
+    expect(group.members.length).to.be.equal(7);
+
+    var aUser = group.members[0].user;
+    var user = userAgents[0].user;
+
+    expect(aUser).to.be.an('object');
+    expect(aUser.id).to.be.equal(user.id);
+    expect(aUser.name).to.be.ok();
+    expect(aUser.picture).to.be.ok();
+
+    expect(aUser.username).to.not.be.ok();
+    expect(aUser.email).to.not.be.ok();
+    expect(aUser.passports).to.not.be.ok();
+  }
+
   it('Allow ROLE [owner]', function (done) {
 
     userAgents[0]
       .get('/api/groups/' + groups[0].id)
       .expect(200)
-      .end(done);
+      .end(function(err, res){
+        expect(err).to.not.be.ok();
+        checkGroup(res.body);
+        done();
+      });
   });
 
   it('Allow ROLE [admin]', function (done) {

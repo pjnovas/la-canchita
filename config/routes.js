@@ -34,6 +34,8 @@ module.exports.routes = {
 
   'get /': 'WebAppController.index',
 
+  // Authentication
+
   'get /login': 'AuthController.login',
   'get /logout': 'AuthController.logout',
   'get /register': 'AuthController.register',
@@ -45,11 +47,18 @@ module.exports.routes = {
   'get /auth/:provider/callback': 'AuthController.callback',
   'get /auth/:provider/:action': 'AuthController.callback',
 
-  'get /api/users/me': 'UserController.me',
+  // Users
 
-  // Group Members
+  'get /api/users/search': 'UserController.search',
+  'get /api/users/me': 'UserController.me',
+  'put /api/users/me': 'UserController.updateMe',
+  //'post /api/users/me/picture': 'UserController.uploadPicture',
+
+  // Group
 
   'post /api/groups/:gid/picture': 'GroupController.uploadPicture',
+
+  // Group Members
 
   'post /api/groups/:gid/members/me': 'GroupController.createMe',
   'delete /api/groups/:gid/members/me': 'GroupController.removeMe',
