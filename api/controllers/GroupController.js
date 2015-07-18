@@ -5,6 +5,8 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+var moment = require('moment');
+
 var MemberController = require('./group/Member');
 var MeetingController = require('./group/Meeting');
 
@@ -173,12 +175,14 @@ module.exports = {
 
   uploadPicture: function (req, res) {
 
+    var picname = req.params.gid + '_' + moment().unix() + '.jpg';
+
     req.file('image').upload({
-      saveAs: req.params.gid + '.jpg',
+      saveAs: picname,
       maxBytes: 300000, // ~300KB
       dirname: require('path').resolve(sails.config.appPath, 'assets/images/groups')
     }, function (err, uploadedFiles) {
-      if (err) return res.negotiate(err);
+      if (err) return next(err);
 
       if (uploadedFiles.length === 0){
         return res.badRequest('No file was uploaded');
@@ -188,8 +192,15 @@ module.exports = {
         return res.badRequest('only one file is allowed');
       }
 
-      res.status(204);
-      res.end();
+      Group.update(
+        { id: req.params.gid },
+        { picture: picname }
+      ).exec(function (err, updates){
+        if (err) return next(err);
+        if (updates === 0) return res.serverError('Picture was not updated');
+
+        res.json({ picture: picname });
+      });
     });
   },
 

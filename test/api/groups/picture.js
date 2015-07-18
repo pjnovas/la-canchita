@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var builder = require('./builder');
+var moment = require('moment');
 
 describe('POST /groups/:id/picture', function() {
 
@@ -36,31 +37,50 @@ describe('POST /groups/:id/picture', function() {
   it('must upload a picture and set it to the group', function (done) {
     var gid = groups[0].id;
 
-    userAgents[0]
-      .post('/api/groups/' + gid + '/picture')
-      .attach('image', __dirname + '/test.jpg')
-      .expect(204)
-      .end(function(err, res){
+    Group.findOneById(gid, function(err, g){
+      var prevG = g;
 
-        var _path = path.resolve(sails.config.appPath, 'assets/images/groups');
-        var uploaded = _path + '/' + gid + '.jpg';
+      expect(prevG.picture).to.not.be.ok();
 
-        var expected = getFilesizeInBytes(__dirname + '/test.jpg');
-        var actual = getFilesizeInBytes(uploaded);
+      userAgents[0]
+        .post('/api/groups/' + gid + '/picture')
+        .attach('image', __dirname + '/test.jpg')
+        .expect(200)
+        .end(function(err, res){
 
-        // compare uploaded image size
-        expect(expected).to.be.equal(actual);
+          expect(res.body.picture).to.be.ok();
 
-        // check the image is accesible
-        userAgents[0]
-          .get('/images/groups/' + gid + '.jpg')
-          .expect(200)
-          .end(function(err, res){
-            // remove uploaded image
-            fs.unlink(uploaded, done);
-          });
-      });
+          var _path = path.resolve(sails.config.appPath, 'assets/images/groups');
 
+          Group.findOneById(gid, function(err, g){
+            var newG = g;
+
+            expect(newG.picture).to.be.ok();
+            expect(newG.picture.indexOf(gid)).to.be.greaterThan(-1);
+            expect(newG.picture.split('_').length).to.be.equal(2);
+
+            var uploaded = _path + '/' + newG.picture;
+
+            var expected = getFilesizeInBytes(__dirname + '/test.jpg');
+            var actual = getFilesizeInBytes(uploaded);
+
+            // compare uploaded image size
+            expect(expected).to.be.equal(actual);
+
+            // check the image is accesible
+            userAgents[0]
+              .get('/images/groups/' + newG.picture)
+              .expect(200)
+              .end(function(err, res){
+                // remove uploaded image
+                fs.unlink(uploaded, done);
+              });
+
+            });
+
+        });
+
+    });
   });
 
 });
