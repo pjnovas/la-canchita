@@ -72,8 +72,35 @@ describe('POST /groups/:id/picture', function() {
               .get('/images/groups/' + newG.picture)
               .expect(200)
               .end(function(err, res){
-                // remove uploaded image
-                fs.unlink(uploaded, done);
+
+                setTimeout(function(){
+                // upload a second one to test removal of previous
+                userAgents[0]
+                  .post('/api/groups/' + gid + '/picture')
+                  .attach('image', __dirname + '/test.jpg')
+                  .expect(200)
+                  .end(function(err, res){
+
+                    var lastPic = res.body.picture;
+                    expect(lastPic).to.be.ok();
+                    expect(lastPic).to.not.be.equal(newG.picture);
+
+                    userAgents[0]
+                      .get('/images/groups/' + newG.picture)
+                      .expect(404)
+                      .end(function(err){
+
+                        expect(function(){
+                          fs.statSync(uploaded);
+                        }).to.throwError();
+
+                        // remove last uploaded image
+                        fs.unlink(_path + '/' + lastPic, done);
+                      });
+
+                  });
+                }, 1500); // it's using a unix time (so let pass at least 1 sec)
+
               });
 
             });

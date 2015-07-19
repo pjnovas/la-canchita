@@ -175,12 +175,14 @@ module.exports = {
 
   uploadPicture: function (req, res) {
 
-    var picname = req.params.gid + '_' + moment().unix() + '.jpg';
+    var gid = req.params.gid;
+    var picsDir = require('path').resolve(sails.config.appPath, 'assets/images/groups');
+    var picname = gid + '_' + moment().unix() + '.jpg';
 
     req.file('image').upload({
       saveAs: picname,
       maxBytes: 300000, // ~300KB
-      dirname: require('path').resolve(sails.config.appPath, 'assets/images/groups')
+      dirname: picsDir
     }, function (err, uploadedFiles) {
       if (err) return next(err);
 
@@ -192,15 +194,31 @@ module.exports = {
         return res.badRequest('only one file is allowed');
       }
 
-      Group.update(
-        { id: req.params.gid },
-        { picture: picname }
-      ).exec(function (err, updates){
-        if (err) return next(err);
-        if (updates === 0) return res.serverError('Picture was not updated');
+      Group
+        .findOne({ id: gid })
+        .exec(function (err, group){
+          if (err) return next(err);
+          if (!group) return res.notFound();
 
-        res.json({ picture: picname });
-      });
+          if (group.picture){
+            // remove last picture
+            require('fs').unlink(picsDir + '/' + group.picture, function(err){
+              if (err) {
+                console.log('ERROR ON Removing previous Group Picture > ');
+                console.dir(err);
+              }
+            });
+          }
+
+          group.picture = picname;
+
+          group.save(function (err, lgroup){
+            if (err) return next(err);
+            res.json({ picture: lgroup.picture });
+          });
+
+        });
+
     });
   },
 
