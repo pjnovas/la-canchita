@@ -225,6 +225,7 @@ module.exports = {
 
   // Members
 
+  getMembers: MemberController.find,
   createMember: MemberController.create,
   removeMember: MemberController.remove,
   changeMember: MemberController.change,
@@ -235,6 +236,7 @@ module.exports = {
 
   // Meetings
 
+  getMeetings: MeetingController.find,
   createMeeting: MeetingController.create,
   removeMeeting: MeetingController.remove,
   changeMeeting: MeetingController.change,

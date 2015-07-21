@@ -1,6 +1,17 @@
 
 module.exports = {
 
+  find: function(req, res, next){
+
+    Membership
+      .find({ group: req.params.gid })
+      .populate('user')
+      .exec(function(err, members){
+        if (err) return done(err);
+        res.json(members);
+      });
+  },
+
   create: function(req, res, next){
     var groupId = req.params.gid;
 

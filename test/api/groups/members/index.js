@@ -1,6 +1,8 @@
 
 describe('Members', function() {
 
+  require('./findAll'); // retrieve members of a group
+
   require('./create'); // create a member (invite a user)
   require('./change'); // assign a role to a member
   require('./remove'); // kick a member

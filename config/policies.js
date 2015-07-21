@@ -83,6 +83,7 @@ module.exports.policies = {
 
     // Members
 
+    'getMembers': group.isMember,
     'createMember': group.checkRole,
     'changeMember': group.canChangeMember,
     'removeMember': group.canChangeMember,
@@ -92,6 +93,7 @@ module.exports.policies = {
 
     // Meetings
 
+    'getMeetings': group.isMember,
     'createMeeting': group.checkRole,
     'changeMeeting': group.checkRole,
     'removeMeeting': group.canRemoveMeeting,

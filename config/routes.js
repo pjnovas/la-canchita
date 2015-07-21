@@ -60,6 +60,7 @@ module.exports.routes = {
 
   // Group Members
 
+  'get /api/groups/:gid/members': 'GroupController.getMembers',
   'post /api/groups/:gid/members/me': 'GroupController.createMe',
   'delete /api/groups/:gid/members/me': 'GroupController.removeMe',
 
@@ -69,6 +70,7 @@ module.exports.routes = {
 
   // Group Meetings
 
+  'get /api/groups/:gid/meetings': 'GroupController.getMeetings',
   'post /api/groups/:gid/meetings': 'GroupController.createMeeting',
   'put /api/groups/:gid/meetings/:meetingId': 'GroupController.changeMeeting',
   'delete /api/groups/:gid/meetings/:meetingId': 'GroupController.removeMeeting',

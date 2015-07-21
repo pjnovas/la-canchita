@@ -14,10 +14,12 @@ var allowed = {
   uploadpicture  : [ 'owner', 'admin' ],
   destroy : [ 'owner' ],
 
+  getmembers   : [ 'owner', 'admin', 'moderator', 'member' ],
   createmember   : [ 'owner', 'admin', 'moderator' ],
   removemember  : [ 'owner', 'admin' ],
   changemember : [ 'owner', 'admin' ],
 
+  getmeetings: [ 'owner', 'admin', 'moderator', 'member' ],
   createmeeting : [ 'owner', 'admin' ],
   removemeeting : [ 'owner', 'admin' ],
   changemeeting : [ 'owner', 'admin' ],
