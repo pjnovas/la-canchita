@@ -14,6 +14,14 @@ describe('GET /groups', function() {
         user: userAgents[0].user.id,
         role: 'owner',
         state: 'active'
+      }, {
+        user: userAgents[2].user.id,
+        role: 'member',
+        state: 'active'
+      }, {
+        user: userAgents[3].user.id,
+        role: 'member',
+        state: 'pending'
       }]
     }, {
       title: 'Group Awesome 2',
@@ -61,6 +69,26 @@ describe('GET /groups', function() {
       });
   });
 
+  it('must return the groups where the user is invited [pending]', function (done) {
+
+    userAgents[3]
+      .get('/api/groups')
+      .expect(200)
+      .end(function(err, res){
+        if (err) return done(err);
+        expect(res.body).to.be.an('array');
+        expect(res.body.length).to.be.equal(1);
+
+        var group = res.body[0];
+        expect(group.id).to.be.equal(groups[0].id);
+
+        expect(group.member.role).to.be.equal('member');
+        expect(group.member.state).to.be.equal('pending');
+
+        done();
+      });
+  });
+
   it('must return owned groups no matter the search', function (done) {
 
     //TODO: check this to enable query search
@@ -75,9 +103,34 @@ describe('GET /groups', function() {
         expect(res.body).to.be.an('array');
         expect(res.body.length).to.be.equal(2);
 
-        res.body.forEach(function(g){
-          expect(g.members[0].user).to.be.equal(userAgents[0].user.id);
-        });
+        done();
+      });
+  });
+
+  it('must return the groups with a [member] of the user', function (done) {
+
+    // get groups for user0
+    userAgents[0]
+      .get('/api/groups')
+      .expect(200)
+      .end(function(err, res){
+        if (err) return done(err);
+        expect(res.body).to.be.an('array');
+        expect(res.body.length).to.be.equal(2);
+
+        var group = res.body[0];
+        expect(group.id).to.be.equal(groups[0].id);
+
+        expect(group.members).to.not.be.ok();
+        expect(group.meetings).to.not.be.ok();
+
+        expect(group.member).to.be.an('object');
+        expect(group.member.role).to.be.equal('owner');
+        expect(group.member.state).to.be.equal('active');
+
+        expect(group.count).to.be.an('object');
+        expect(group.count.members).to.be.equal(3);
+        expect(group.count.meetings).to.be.equal(0);
 
         done();
       });

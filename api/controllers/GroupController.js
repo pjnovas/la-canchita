@@ -38,6 +38,34 @@ module.exports = {
           .exec(done);
       },
 
+      // prepare groups data
+      function(groups, done){
+        var result = groups.map(function(group){
+          var g = group.toJSON();
+
+          var members = g.members.filter(function(member){
+            return (member.user === req.user.id);
+          });
+
+          g.member = {
+            role: members[0].role,
+            state: members[0].state
+          };
+
+          g.count = {
+            members: g.members.length,
+            meetings: g.meetings && g.meetings.length || 0
+          };
+
+          delete g.meetings;
+          delete g.members;
+
+          return g;
+        });
+
+        done(null, result);
+      },
+
     ], function(err, groups){
       if (err) return next(err);
       res.json(groups || []);
