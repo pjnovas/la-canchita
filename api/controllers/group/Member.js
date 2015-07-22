@@ -17,19 +17,17 @@ module.exports = {
 
     async.waterfall([
 
-      // Membership already exists?
+      // validations
       function(done){
-        Membership.findOne({ group: groupId, user: req.body.user },
-        function(err, member){
-          if (err) return done(err);
+        var users = req.body.users || (req.body.user && [req.body.user]);
+        var emails = req.body.emails || [];
 
-          if (member) {
-            res.conflict('User is already a member.');
-            return done('exited');
-          }
+        if (emails.length + users.length > 10){
+          res.forbidden('Cannot invite more than 10 for once');
+          return done('exited');
+        }
 
-          done();
-        });
+        done();
       },
 
       // Find Group
@@ -37,34 +35,56 @@ module.exports = {
         Group.findOne({ id: groupId }).populateAll().exec(done);
       },
 
-      // Create Membership Group
+      // Create Memberships
       function(group, done){
         if (!group) return res.notFound();
+        var users = req.body.users || (req.body.user && [req.body.user]);
 
-        Membership.create({
-          group: groupId,
-          user: req.body.user,
-          invitedBy: req.groupMember.id
-        }, function(err, member){
-          done(err, group, member);
+        // remove existant users
+        group.members.forEach(function(member){
+          var idx = users.indexOf(member.user);
+          if (idx >= 0){
+            users.splice(idx, 1);
+          }
+        });
+
+        if (users.length === 0){
+          res.conflict('All users invited are already members.');
+          return done('exited');
+        }
+
+        var invites = users.map(function(uid){
+          return {
+            group: groupId,
+            user: uid,
+            invitedBy: req.groupMember.id
+          };
+        });
+
+        Membership.create(invites, function(err, members){
+          done(err, group, members);
         });
       },
 
-      // Create Membership Group
-      function(group, member, done){
-        group.members.add(member);
+      // Add Members to Group
+      function(group, members, done){
+
+        members.forEach(function(member){
+          group.members.add(member);
+        });
+
         group.save(function(err, group){
-          done(err, member);
+          done(err, members);
         });
       }
 
-    ], function(err, member){
+    ], function(err, members){
       if (err) {
         if (err === 'exited') return;
         return next(err);
       }
 
-      res.json(member);
+      res.json(members);
     });
   },
 
