@@ -49,6 +49,10 @@ module.exports.policies = {
     '*': setUser,
   },
 
+  'VerifyController': {
+    '*': setUser,
+  },
+
   'AuthController': {
     '*': false,
 

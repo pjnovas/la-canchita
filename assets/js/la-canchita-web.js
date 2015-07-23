@@ -29178,7 +29178,27 @@ actions.kick = function (gid, id) {
 
 module.exports = actions;
 
-},{"../constants/Member":"/home/pjnovas/projects/la-canchita-web/src/constants/Member.js","../dispatcher/AppDispatcher":"/home/pjnovas/projects/la-canchita-web/src/dispatcher/AppDispatcher.js"}],"/home/pjnovas/projects/la-canchita-web/src/actions/builder.js":[function(require,module,exports){
+},{"../constants/Member":"/home/pjnovas/projects/la-canchita-web/src/constants/Member.js","../dispatcher/AppDispatcher":"/home/pjnovas/projects/la-canchita-web/src/dispatcher/AppDispatcher.js"}],"/home/pjnovas/projects/la-canchita-web/src/actions/User.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var AppDispatcher = _interopRequire(require("../dispatcher/AppDispatcher"));
+
+var UserConstants = _interopRequire(require("../constants/User"));
+
+var actions = {};
+actions.search = function (query) {
+
+  AppDispatcher.dispatch({
+    type: UserConstants.SEARCH,
+    query: query
+  });
+};
+
+module.exports = actions;
+
+},{"../constants/User":"/home/pjnovas/projects/la-canchita-web/src/constants/User.js","../dispatcher/AppDispatcher":"/home/pjnovas/projects/la-canchita-web/src/dispatcher/AppDispatcher.js"}],"/home/pjnovas/projects/la-canchita-web/src/actions/builder.js":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -29509,16 +29529,21 @@ module.exports = Home;
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 var App = (function (_React$Component) {
-  function App() {
+  function App(props) {
     _classCallCheck(this, App);
 
-    if (_React$Component != null) {
-      _React$Component.apply(this, arguments);
+    _get(Object.getPrototypeOf(App.prototype), "constructor", this).call(this, props);
+
+    this.state = {};
+    if (window.redirect) {
+      this.state.redirect = window.redirect;
     }
   }
 
@@ -29527,6 +29552,19 @@ var App = (function (_React$Component) {
   _createClass(App, {
     render: {
       value: function render() {
+
+        var uris = {
+          local: "/auth/local",
+          twitter: "/auth/twitter",
+          facebook: "/auth/facebook"
+        };
+
+        if (this.state.redirect) {
+          for (var p in uris) {
+            uris[p] += "?redirect=" + this.state.redirect;
+          }
+        }
+
         return React.createElement(
           "div",
           { className: "login" },
@@ -29538,7 +29576,7 @@ var App = (function (_React$Component) {
               { className: "row" },
               React.createElement(
                 "form",
-                { className: "white col center s12 m6 z-depth-2", action: "/auth/local", method: "post" },
+                { className: "white col center s12 m6 z-depth-2", action: uris.local, method: "post" },
                 React.createElement(
                   "h1",
                   null,
@@ -29559,7 +29597,7 @@ var App = (function (_React$Component) {
                   { className: "row" },
                   React.createElement(
                     "a",
-                    { className: "col s6 social-button", href: "/auth/twitter", role: "button" },
+                    { className: "col s6 social-button", href: uris.twitter, role: "button" },
                     React.createElement(
                       "div",
                       { className: "twitter waves-effect waves-light" },
@@ -29568,7 +29606,7 @@ var App = (function (_React$Component) {
                   ),
                   React.createElement(
                     "a",
-                    { className: "col s6 social-button", href: "/auth/facebook", role: "button" },
+                    { className: "col s6 social-button", href: uris.facebook, role: "button" },
                     React.createElement(
                       "div",
                       { className: "facebook waves-effect waves-light" },
@@ -29817,7 +29855,338 @@ var ReactListener = (function (_React$Component) {
 
 module.exports = ReactListener;
 
-},{"./Events":"/home/pjnovas/projects/la-canchita-web/src/components/Events.js","shortid":"/home/pjnovas/projects/la-canchita-web/node_modules/shortid/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/group/Create.jsx":[function(require,module,exports){
+},{"./Events":"/home/pjnovas/projects/la-canchita-web/src/components/Events.js","shortid":"/home/pjnovas/projects/la-canchita-web/node_modules/shortid/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/controls/Button.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Link = require("react-router").Link;
+
+var Icon = _interopRequire(require("./Icon"));
+
+var Button = (function (_React$Component) {
+  function Button() {
+    _classCallCheck(this, Button);
+
+    if (_React$Component != null) {
+      _React$Component.apply(this, arguments);
+    }
+  }
+
+  _inherits(Button, _React$Component);
+
+  _createClass(Button, {
+    render: {
+      value: function render() {
+        var _this = this;
+
+        if (this.props.hidden) {
+          return null;
+        }
+
+        var css = "btn-large waves-effect waves-light ";
+        css += this.props.css || "";
+
+        if (this.props.loading) {
+          css += " disabled";
+        }
+
+        var icon = function () {
+          if (_this.props.icon) {
+            var css = _this.props.iconcss || "right";
+            return React.createElement(Icon, { name: _this.props.icon, css: css });
+          }
+          return React.createElement("i", null);
+        };
+
+        if (this.props.to) {
+          return React.createElement(
+            Link,
+            { to: this.props.to, params: this.props.params, className: css },
+            this.props.text,
+            icon()
+          );
+        }
+
+        return React.createElement(
+          "a",
+          { className: css, onClick: function (e) {
+              _this.props.onClick(e);
+            } },
+          this.props.loading ? this.props.loadingText : this.props.text,
+          this.props.loading ? React.createElement(
+            "div",
+            { className: "la-ball-atom la-2x left" },
+            React.createElement("div", null),
+            React.createElement("div", null),
+            React.createElement("div", null),
+            React.createElement("div", null)
+          ) : icon()
+        );
+      }
+    }
+  });
+
+  return Button;
+})(React.Component);
+
+module.exports = Button;
+
+Button.displayName = "Button";
+
+},{"./Icon":"/home/pjnovas/projects/la-canchita-web/src/components/controls/Icon.js","react-router":"/home/pjnovas/projects/la-canchita-web/node_modules/react-router/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/controls/ButtonAction.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Link = require("react-router").Link;
+
+var Icon = _interopRequire(require("./Icon"));
+
+var ButtonAction = (function (_React$Component) {
+  function ButtonAction() {
+    _classCallCheck(this, ButtonAction);
+
+    if (_React$Component != null) {
+      _React$Component.apply(this, arguments);
+    }
+  }
+
+  _inherits(ButtonAction, _React$Component);
+
+  _createClass(ButtonAction, {
+    render: {
+      value: function render() {
+        var _this = this;
+
+        if (this.props.hidden) {
+          return null;
+        }
+
+        var css = "btn-floating btn-large ";
+
+        var icon = function () {
+          return React.createElement(Icon, { large: true, name: _this.props.icon });
+        };
+
+        return React.createElement(
+          "div",
+          { className: "fixed-action-btn" },
+          this.props.to ? React.createElement(
+            Link,
+            { to: this.props.to, params: this.props.params, className: css },
+            icon()
+          ) : React.createElement(
+            "a",
+            { className: css, onClick: function (e) {
+                _this.props.onClick(e);
+              } },
+            icon()
+          )
+        );
+      }
+    }
+  });
+
+  return ButtonAction;
+})(React.Component);
+
+module.exports = ButtonAction;
+
+ButtonAction.displayName = "ButtonAction";
+
+},{"./Icon":"/home/pjnovas/projects/la-canchita-web/src/components/controls/Icon.js","react-router":"/home/pjnovas/projects/la-canchita-web/node_modules/react-router/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/controls/ButtonFlat.js":[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var ButtonFlat = (function (_React$Component) {
+  function ButtonFlat() {
+    _classCallCheck(this, ButtonFlat);
+
+    if (_React$Component != null) {
+      _React$Component.apply(this, arguments);
+    }
+  }
+
+  _inherits(ButtonFlat, _React$Component);
+
+  _createClass(ButtonFlat, {
+    render: {
+      value: function render() {
+        var _this = this;
+
+        if (this.props.hidden) {
+          return null;
+        }
+
+        var defaultCSS = "waves-effect waves-teal btn-flat ";
+        var css = defaultCSS + this.props.css;
+
+        return React.createElement(
+          "a",
+          { className: css,
+            onClick: function (e) {
+              _this.props.onClick(e);
+            } },
+          this.props.text
+        );
+      }
+    }
+  });
+
+  return ButtonFlat;
+})(React.Component);
+
+module.exports = ButtonFlat;
+
+ButtonFlat.displayName = "ButtonFlat";
+
+},{}],"/home/pjnovas/projects/la-canchita-web/src/components/controls/Icon.js":[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Icon = (function (_React$Component) {
+  function Icon() {
+    _classCallCheck(this, Icon);
+
+    if (_React$Component != null) {
+      _React$Component.apply(this, arguments);
+    }
+  }
+
+  _inherits(Icon, _React$Component);
+
+  _createClass(Icon, {
+    render: {
+      value: function render() {
+        var large = this.props.large ? "large" : "";
+        var css = large + " material-icons " + this.props.css || "";
+
+        return React.createElement(
+          "i",
+          { className: css },
+          this.props.name
+        );
+      }
+    }
+  });
+
+  return Icon;
+})(React.Component);
+
+module.exports = Icon;
+
+Icon.displayName = "Icon";
+
+},{}],"/home/pjnovas/projects/la-canchita-web/src/components/controls/Tabs.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Icon = _interopRequire(require("./Icon"));
+
+var Tabs = (function (_React$Component) {
+  function Tabs() {
+    _classCallCheck(this, Tabs);
+
+    if (_React$Component != null) {
+      _React$Component.apply(this, arguments);
+    }
+  }
+
+  _inherits(Tabs, _React$Component);
+
+  _createClass(Tabs, {
+    componentDidMount: {
+      value: function componentDidMount() {
+        $(React.findDOMNode(this.refs.tabs)).tabs();
+      }
+    },
+    render: {
+      value: function render() {
+        var css = "tab col ";
+
+        return React.createElement(
+          "ul",
+          { className: "tabs", ref: "tabs" },
+          this.props.tabs.map(function (tab) {
+            return React.createElement(
+              "li",
+              { key: tab.id, className: css + tab.css },
+              React.createElement(
+                "a",
+                { href: "#" + tab.id, className: tab.active ? "active" : "" },
+                React.createElement(Icon, { name: tab.icon }),
+                tab.text
+              )
+            );
+          })
+        );
+      }
+    }
+  });
+
+  return Tabs;
+})(React.Component);
+
+module.exports = Tabs;
+
+Tabs.displayName = "Tabs";
+
+},{"./Icon":"/home/pjnovas/projects/la-canchita-web/src/components/controls/Icon.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/controls/index.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Icon = _interopRequire(require("./Icon"));
+
+var ButtonFlat = _interopRequire(require("./ButtonFlat"));
+
+var ButtonAction = _interopRequire(require("./ButtonAction"));
+
+var Button = _interopRequire(require("./Button"));
+
+var Tabs = _interopRequire(require("./Tabs"));
+
+exports.Icon = Icon;
+exports.ButtonFlat = ButtonFlat;
+exports.ButtonAction = ButtonAction;
+exports.Button = Button;
+exports.Tabs = Tabs;
+
+},{"./Button":"/home/pjnovas/projects/la-canchita-web/src/components/controls/Button.js","./ButtonAction":"/home/pjnovas/projects/la-canchita-web/src/components/controls/ButtonAction.js","./ButtonFlat":"/home/pjnovas/projects/la-canchita-web/src/components/controls/ButtonFlat.js","./Icon":"/home/pjnovas/projects/la-canchita-web/src/components/controls/Icon.js","./Tabs":"/home/pjnovas/projects/la-canchita-web/src/components/controls/Tabs.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/group/Create.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -30163,6 +30532,11 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
+var _controls = require("../controls");
+
+var Button = _controls.Button;
+var ButtonFlat = _controls.ButtonFlat;
+
 var DropPicture = _interopRequire(require("./DropPicture.jsx"));
 
 var GroupForm = (function (_React$Component) {
@@ -30199,55 +30573,6 @@ var GroupForm = (function (_React$Component) {
       value: function render() {
         var _this = this;
 
-        var buttons = (function () {
-
-          if (_this.props.loading) {
-            return React.createElement(
-              "div",
-              { className: "col s12" },
-              React.createElement(
-                "a",
-                { className: "waves-effect waves-light btn-large disabled right" },
-                React.createElement(
-                  "div",
-                  { className: "la-ball-atom la-2x left" },
-                  React.createElement("div", null),
-                  React.createElement("div", null),
-                  React.createElement("div", null),
-                  React.createElement("div", null)
-                ),
-                "guardando"
-              )
-            );
-          }
-
-          return React.createElement(
-            "div",
-            { className: "col s12" },
-            React.createElement(
-              "a",
-              { className: "waves-effect waves-teal btn-flat left",
-                onClick: function () {
-                  _this.props.onCancel();
-                } },
-              "cancelar"
-            ),
-            React.createElement(
-              "a",
-              { className: "waves-effect waves-light btn-large right",
-                onClick: function (e) {
-                  _this.save(e);
-                } },
-              React.createElement(
-                "i",
-                { className: "material-icons right" },
-                "check"
-              ),
-              "Guardar"
-            )
-          );
-        })();
-
         return React.createElement(
           "form",
           { className: "white col center s12 m8 offset-m2 l6 offset-l3 z-depth-1" },
@@ -30272,11 +30597,7 @@ var GroupForm = (function (_React$Component) {
                 { htmlFor: "title" },
                 "Título"
               )
-            )
-          ),
-          React.createElement(
-            "div",
-            { className: "row" },
+            ),
             React.createElement(
               "div",
               { className: "input-field col s12" },
@@ -30291,12 +30612,21 @@ var GroupForm = (function (_React$Component) {
                 { htmlFor: "description" },
                 "Descripción"
               )
+            ),
+            React.createElement(
+              "div",
+              { className: "col s12" },
+              React.createElement(ButtonFlat, { css: "left", text: "cancelar", hidden: this.props.loading,
+                onClick: function (e) {
+                  _this.props.onCancel(e);
+                } }),
+              React.createElement(Button, {
+                text: "Guardar", css: "right", icon: "check",
+                loadingText: "Guardando", loading: this.props.loading,
+                onClick: function (e) {
+                  _this.save(e);
+                } })
             )
-          ),
-          React.createElement(
-            "div",
-            { className: "row" },
-            buttons
           )
         );
       }
@@ -30310,7 +30640,7 @@ module.exports = GroupForm;
 
 GroupForm.displayName = "GroupForm";
 
-},{"./DropPicture.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/DropPicture.jsx"}],"/home/pjnovas/projects/la-canchita-web/src/components/group/Index.jsx":[function(require,module,exports){
+},{"../controls":"/home/pjnovas/projects/la-canchita-web/src/components/controls/index.js","./DropPicture.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/DropPicture.jsx"}],"/home/pjnovas/projects/la-canchita-web/src/components/group/Index.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -30446,8 +30776,6 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var Link = require("react-router").Link;
-
 var GroupStore = _interopRequire(require("../../stores/Group"));
 
 var GroupItem = _interopRequire(require("./Item.jsx"));
@@ -30455,6 +30783,8 @@ var GroupItem = _interopRequire(require("./Item.jsx"));
 var GroupActions = _interopRequire(require("../../actions/Group"));
 
 var ReactListener = _interopRequire(require("../ReactListener"));
+
+var ButtonAction = require("../controls").ButtonAction;
 
 var GroupList = (function (_ReactListener) {
   function GroupList(props) {
@@ -30525,19 +30855,7 @@ var GroupList = (function (_ReactListener) {
             { className: "row" },
             list
           ),
-          React.createElement(
-            "div",
-            { className: "fixed-action-btn" },
-            React.createElement(
-              Link,
-              { to: "groupnew", className: "btn-floating btn-large" },
-              React.createElement(
-                "i",
-                { className: "large material-icons" },
-                "group_add"
-              )
-            )
-          )
+          React.createElement(ButtonAction, { icon: "group_add", to: "groupnew" })
         );
       }
     }
@@ -30550,7 +30868,7 @@ module.exports = GroupList;
 
 GroupList.displayName = "GroupList";
 
-},{"../../actions/Group":"/home/pjnovas/projects/la-canchita-web/src/actions/Group.js","../../stores/Group":"/home/pjnovas/projects/la-canchita-web/src/stores/Group.js","../ReactListener":"/home/pjnovas/projects/la-canchita-web/src/components/ReactListener.js","./Item.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/Item.jsx","react-router":"/home/pjnovas/projects/la-canchita-web/node_modules/react-router/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/group/View.jsx":[function(require,module,exports){
+},{"../../actions/Group":"/home/pjnovas/projects/la-canchita-web/src/actions/Group.js","../../stores/Group":"/home/pjnovas/projects/la-canchita-web/src/stores/Group.js","../ReactListener":"/home/pjnovas/projects/la-canchita-web/src/components/ReactListener.js","../controls":"/home/pjnovas/projects/la-canchita-web/src/components/controls/index.js","./Item.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/Item.jsx"}],"/home/pjnovas/projects/la-canchita-web/src/components/group/View.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -30573,7 +30891,11 @@ var Header = _interopRequire(require("../Header.jsx"));
 
 var ReactListener = _interopRequire(require("../ReactListener"));
 
-var Link = require("react-router").Link;
+var _controls = require("../controls");
+
+var Button = _controls.Button;
+var ButtonAction = _controls.ButtonAction;
+var Tabs = _controls.Tabs;
 
 var GroupView = (function (_ReactListener) {
   function GroupView(props) {
@@ -30592,7 +30914,6 @@ var GroupView = (function (_ReactListener) {
       value: function componentDidMount() {
         _get(Object.getPrototypeOf(GroupView.prototype), "componentDidMount", this).call(this);
         GroupActions.findOne(this.state.id);
-        $(React.findDOMNode(this.refs.tabs)).tabs();
       }
     },
     onFind: {
@@ -30622,6 +30943,29 @@ var GroupView = (function (_ReactListener) {
 
         var navs = [];
 
+        var tabs = [{
+          css: "s3",
+          id: "info",
+          icon: "info_outline",
+          text: "Detalle",
+          active: true
+        }, {
+          css: "s3",
+          id: "players",
+          icon: "group",
+          text: "Jugadores"
+        }, {
+          css: "s3",
+          id: "matches",
+          icon: "event_note",
+          text: "Partidos"
+        }, {
+          css: "s3 disabled",
+          id: "chrono",
+          icon: "settings",
+          text: "Configurar"
+        }];
+
         return React.createElement(
           "div",
           { className: "groups view" },
@@ -30635,66 +30979,7 @@ var GroupView = (function (_ReactListener) {
               React.createElement(
                 "div",
                 { className: "col s12" },
-                React.createElement(
-                  "ul",
-                  { className: "tabs", ref: "tabs" },
-                  React.createElement(
-                    "li",
-                    { className: "tab col s3" },
-                    React.createElement(
-                      "a",
-                      { href: "#info", className: "active" },
-                      React.createElement(
-                        "i",
-                        { className: "material-icons" },
-                        "info_outline"
-                      ),
-                      "Detalle"
-                    )
-                  ),
-                  React.createElement(
-                    "li",
-                    { className: "tab col s3" },
-                    React.createElement(
-                      "a",
-                      { href: "#players" },
-                      React.createElement(
-                        "i",
-                        { className: "material-icons" },
-                        "group"
-                      ),
-                      "Jugadores"
-                    )
-                  ),
-                  React.createElement(
-                    "li",
-                    { className: "tab col s3" },
-                    React.createElement(
-                      "a",
-                      { href: "#matches" },
-                      React.createElement(
-                        "i",
-                        { className: "material-icons" },
-                        "event_note"
-                      ),
-                      "Partidos"
-                    )
-                  ),
-                  React.createElement(
-                    "li",
-                    { className: "tab col s3 disabled" },
-                    React.createElement(
-                      "a",
-                      { href: "#chrono" },
-                      React.createElement(
-                        "i",
-                        { className: "material-icons" },
-                        "settings"
-                      ),
-                      "Configurar"
-                    )
-                  )
-                )
+                React.createElement(Tabs, { tabs: tabs })
               ),
               React.createElement(
                 "div",
@@ -30713,34 +30998,19 @@ var GroupView = (function (_ReactListener) {
                   { className: "flow-text description" },
                   this.state.description
                 ),
+                React.createElement(ButtonAction, { icon: "mode_edit",
+                  to: "groupedit", params: { groupId: this.state.id } }),
                 React.createElement(
-                  "div",
-                  { className: "fixed-action-btn" },
-                  React.createElement(
-                    Link,
-                    { to: "groupedit", params: { groupId: this.state.id },
-                      className: "btn-floating btn-large" },
-                    React.createElement(
-                      "i",
-                      { className: "large material-icons" },
-                      "mode_edit"
-                    )
-                  )
-                ),
-                this.state.destroying ? "" : React.createElement(
                   "div",
                   { className: "row" },
                   React.createElement(
                     "div",
                     { className: "col s12" },
-                    React.createElement(
-                      "a",
-                      { className: "btn-large waves-effect waves-light red left",
-                        onClick: function () {
-                          _this.onDestroyClick();
-                        } },
-                      "eliminar grupo"
-                    )
+                    React.createElement(Button, { text: "eliminar groupo", css: "red left",
+                      hidden: this.state.destroying,
+                      onClick: function () {
+                        _this.onDestroyClick();
+                      } })
                   )
                 )
               ),
@@ -30752,19 +31022,7 @@ var GroupView = (function (_ReactListener) {
               React.createElement(
                 "div",
                 { id: "matches", className: "col s12" },
-                React.createElement(
-                  "div",
-                  { className: "fixed-action-btn" },
-                  React.createElement(
-                    Link,
-                    { to: "groups", className: "btn-floating btn-large" },
-                    React.createElement(
-                      "i",
-                      { className: "large material-icons" },
-                      "add"
-                    )
-                  )
-                )
+                React.createElement(ButtonAction, { icon: "add", to: "groups" })
               )
             )
           )
@@ -30786,7 +31044,7 @@ text: 'Editar',
 icon: 'mode_edit'
 }*/
 
-},{"../../actions/Group":"/home/pjnovas/projects/la-canchita-web/src/actions/Group.js","../../stores/Group":"/home/pjnovas/projects/la-canchita-web/src/stores/Group.js","../Header.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/Header.jsx","../ReactListener":"/home/pjnovas/projects/la-canchita-web/src/components/ReactListener.js","../member/List.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/member/List.jsx","react-router":"/home/pjnovas/projects/la-canchita-web/node_modules/react-router/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/member/Item.jsx":[function(require,module,exports){
+},{"../../actions/Group":"/home/pjnovas/projects/la-canchita-web/src/actions/Group.js","../../stores/Group":"/home/pjnovas/projects/la-canchita-web/src/stores/Group.js","../Header.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/Header.jsx","../ReactListener":"/home/pjnovas/projects/la-canchita-web/src/components/ReactListener.js","../controls":"/home/pjnovas/projects/la-canchita-web/src/components/controls/index.js","../member/List.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/member/List.jsx"}],"/home/pjnovas/projects/la-canchita-web/src/components/member/Item.jsx":[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -30794,8 +31052,6 @@ var _createClass = (function () { function defineProperties(target, props) { for
 var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var Link = require("react-router").Link;
 
 var MemberItem = (function (_React$Component) {
   function MemberItem() {
@@ -30812,7 +31068,6 @@ var MemberItem = (function (_React$Component) {
     render: {
       value: function render() {
         var model = this.props.model;
-        var style = { backgroundImage: "url(" + model.user.picture + ")" };
 
         return React.createElement(
           "li",
@@ -30849,7 +31104,7 @@ module.exports = MemberItem;
 
 MemberItem.displayName = "MemberItem";
 
-},{"react-router":"/home/pjnovas/projects/la-canchita-web/node_modules/react-router/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/member/List.jsx":[function(require,module,exports){
+},{}],"/home/pjnovas/projects/la-canchita-web/src/components/member/List.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -30866,11 +31121,13 @@ var MemberStore = _interopRequire(require("../../stores/Member"));
 
 var MemberActions = _interopRequire(require("../../actions/Member"));
 
-var Link = require("react-router").Link;
-
 var MemberItem = _interopRequire(require("./Item.jsx"));
 
+var UserInvite = _interopRequire(require("../user/Search.jsx"));
+
 var ReactListener = _interopRequire(require("../ReactListener"));
+
+var ButtonAction = require("../controls").ButtonAction;
 
 var MemberList = (function (_ReactListener) {
   function MemberList(props) {
@@ -30899,87 +31156,75 @@ var MemberList = (function (_ReactListener) {
         this.setState({ members: members });
       }
     },
+    onInvite: {
+      value: function onInvite(members) {
+        this.setState({ members: members });
+      }
+    },
+    showInvite: {
+      value: function showInvite() {
+        this.setState({ showInvite: true });
+      }
+    },
+    hideInvite: {
+      value: function hideInvite() {
+        this.setState({ showInvite: false });
+      }
+    },
+    inviteUsers: {
+      value: function inviteUsers(invites) {
+        if (!invites.length) {
+          return;
+        }
+
+        var users = [];
+        var emails = [];
+
+        invites.forEach(function (invite) {
+          if (invite.isEmail) {
+            emails.push(invite.id);
+          } else {
+            users.push(invite.id);
+          }
+        });
+
+        MemberActions.invite(this.state.gid, { users: users, emails: emails });
+      }
+    },
     render: {
       value: function render() {
+        var _this = this;
+
         var list = this.state.members;
+        var skipIds = list.map(function (member) {
+          return member.user.id;
+        });
+
         return React.createElement(
           "div",
-          { className: "members" },
-          React.createElement(
-            "ul",
-            { className: "collection" },
-            this.state.members.map(function (member) {
-              return React.createElement(MemberItem, { key: member.id, model: member });
-            })
-          ),
+          null,
+          this.state.showInvite ? React.createElement(UserInvite, {
+            skipIds: skipIds,
+            onSelect: function (users) {
+              _this.inviteUsers(users);
+            },
+            onClose: function () {
+              _this.hideInvite();
+            } }) : "",
           React.createElement(
             "div",
-            { className: "fixed-action-btn" },
-            React.createElement(
-              "a",
-              { className: "btn-floating btn-large" },
-              React.createElement(
-                "i",
-                { className: "large material-icons" },
-                "person_add"
-              )
-            ),
+            { className: "members" },
             React.createElement(
               "ul",
-              null,
-              React.createElement(
-                "li",
-                null,
-                React.createElement(
-                  "a",
-                  { className: "btn-floating blue-grey darken-1" },
-                  React.createElement(
-                    "i",
-                    { className: "material-icons" },
-                    "person_outline"
-                  )
-                )
-              ),
-              React.createElement(
-                "li",
-                null,
-                React.createElement(
-                  "a",
-                  { className: "btn-floating lime darken-2" },
-                  React.createElement(
-                    "i",
-                    { className: "material-icons" },
-                    "my_location"
-                  )
-                )
-              ),
-              React.createElement(
-                "li",
-                null,
-                React.createElement(
-                  "a",
-                  { className: "btn-floating blue" },
-                  React.createElement(
-                    "i",
-                    { className: "material-icons" },
-                    "mail"
-                  )
-                )
-              ),
-              React.createElement(
-                "li",
-                null,
-                React.createElement(
-                  "a",
-                  { className: "btn-floating" },
-                  React.createElement(
-                    "i",
-                    { className: "material-icons" },
-                    "add"
-                  )
-                )
-              )
-            )
+              { className: "collection" },
+              this.state.members.map(function (member) {
+                return React.createElement(MemberItem, { key: member.id, model: member });
+              })
+            ),
+            React.createElement(ButtonAction, { icon: "person_add",
+              onClick: function (e) {
+                _this.showInvite(e);
+              } })
           )
         );
       }
@@ -30993,7 +31238,366 @@ module.exports = MemberList;
 
 MemberList.displayName = "MemberList";
 
-},{"../../actions/Member":"/home/pjnovas/projects/la-canchita-web/src/actions/Member.js","../../stores/Member":"/home/pjnovas/projects/la-canchita-web/src/stores/Member.js","../ReactListener":"/home/pjnovas/projects/la-canchita-web/src/components/ReactListener.js","./Item.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/member/Item.jsx","react-router":"/home/pjnovas/projects/la-canchita-web/node_modules/react-router/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/constants/Group.js":[function(require,module,exports){
+},{"../../actions/Member":"/home/pjnovas/projects/la-canchita-web/src/actions/Member.js","../../stores/Member":"/home/pjnovas/projects/la-canchita-web/src/stores/Member.js","../ReactListener":"/home/pjnovas/projects/la-canchita-web/src/components/ReactListener.js","../controls":"/home/pjnovas/projects/la-canchita-web/src/components/controls/index.js","../user/Search.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/user/Search.jsx","./Item.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/member/Item.jsx"}],"/home/pjnovas/projects/la-canchita-web/src/components/user/Item.jsx":[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Icon = require("../controls").Icon;
+
+var UserItem = (function (_React$Component) {
+  function UserItem() {
+    _classCallCheck(this, UserItem);
+
+    if (_React$Component != null) {
+      _React$Component.apply(this, arguments);
+    }
+  }
+
+  _inherits(UserItem, _React$Component);
+
+  _createClass(UserItem, {
+    render: {
+      value: function render() {
+        var _this = this;
+
+        var model = this.props.model;
+
+        return React.createElement(
+          "a",
+          { onClick: function (e) {
+              _this.props.onSelect(_this.props.model);
+            },
+            className: "collection-item avatar" },
+          model.isEmail ? React.createElement(
+            "div",
+            { className: "circle" },
+            React.createElement(Icon, { name: "mail" })
+          ) : React.createElement("img", { src: model.picture, className: "circle" }),
+          React.createElement(
+            "span",
+            { className: "title" },
+            model.name
+          )
+        );
+      }
+    }
+  });
+
+  return UserItem;
+})(React.Component);
+
+module.exports = UserItem;
+
+UserItem.displayName = "UserItem";
+
+},{"../controls":"/home/pjnovas/projects/la-canchita-web/src/components/controls/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/user/List.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var UserItem = _interopRequire(require("./Item.jsx"));
+
+var UserList = (function (_React$Component) {
+  function UserList() {
+    _classCallCheck(this, UserList);
+
+    if (_React$Component != null) {
+      _React$Component.apply(this, arguments);
+    }
+  }
+
+  _inherits(UserList, _React$Component);
+
+  _createClass(UserList, {
+    render: {
+      value: function render() {
+        var _this = this;
+
+        var users = this.props.users;
+
+        if (!users.length) {
+          return React.createElement("div", null);
+        }
+
+        return React.createElement(
+          "div",
+          { className: "row" },
+          !this.props.message ? null : React.createElement(
+            "label",
+            { className: "col s12 left" },
+            this.props.message
+          ),
+          React.createElement(
+            "div",
+            { className: "collection col s12 " + this.props.cssClass },
+            users.length === 0 ? null : users.map(function (user) {
+              return React.createElement(UserItem, {
+                key: user.id, model: user,
+                onSelect: function (user) {
+                  _this.props.onSelect(user);
+                } });
+            })
+          )
+        );
+      }
+    }
+  });
+
+  return UserList;
+})(React.Component);
+
+module.exports = UserList;
+
+UserList.displayName = "UserList";
+
+},{"./Item.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/user/Item.jsx"}],"/home/pjnovas/projects/la-canchita-web/src/components/user/Search.jsx":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var UserStore = _interopRequire(require("../../stores/User"));
+
+var UserActions = _interopRequire(require("../../actions/User"));
+
+var UserList = _interopRequire(require("./List.jsx"));
+
+var ReactListener = _interopRequire(require("../ReactListener"));
+
+var _controls = require("../controls");
+
+var Button = _controls.Button;
+var ButtonFlat = _controls.ButtonFlat;
+
+var SearchUser = (function (_ReactListener) {
+  function SearchUser(props) {
+    _classCallCheck(this, SearchUser);
+
+    _get(Object.getPrototypeOf(SearchUser.prototype), "constructor", this).call(this, props);
+
+    this.state.users = [];
+    this.state.invites = [];
+    this.store = UserStore;
+  }
+
+  _inherits(SearchUser, _ReactListener);
+
+  _createClass(SearchUser, {
+    componentDidMount: {
+      value: function componentDidMount() {
+        _get(Object.getPrototypeOf(SearchUser.prototype), "componentDidMount", this).call(this);
+        $(React.findDOMNode(this.refs.modal)).openModal({
+          dismissible: false
+        });
+      }
+    },
+    onKeyUp: {
+      value: function onKeyUp(e) {
+        var value = e.target.value;
+
+        if (value.trim().length === 0) {
+          this.clear();
+          return;
+        }
+
+        this.email = null;
+        if (this.isValidEmail(value)) {
+          this.email = value;
+          this.setState({ showAddEmail: true });
+          return;
+        }
+
+        if (this.state.showAddEmail) {
+          this.setState({ showAddEmail: false });
+        }
+
+        UserActions.search(value);
+      }
+    },
+    isValidEmail: {
+      value: function isValidEmail(email) {
+        var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+        return re.test(email);
+      }
+    },
+    addEmail: {
+      value: function addEmail(e) {
+        if (this.state.showAddEmail && this.email) {
+          this.onSelect({
+            id: this.email,
+            name: this.email,
+            picture: "",
+            isEmail: true
+          });
+        }
+      }
+    },
+    onSearch: {
+      value: function onSearch(users) {
+        var _this = this;
+
+        if (this.props.skipIds) {
+          // remove skip ids
+          users = users.filter(function (user) {
+            return _this.props.skipIds.indexOf(user.id) === -1;
+          });
+        }
+
+        // remove invites
+        users = users.filter(function (user) {
+          return !_this.state.invites.some(function (invite) {
+            return user.id === invite.id;
+          });
+        });
+
+        this.setState({ users: users });
+      }
+    },
+    onSelect: {
+      value: function onSelect(invite) {
+
+        var exist = this.state.invites.some(function (user) {
+          return user.id === invite.id;
+        });
+
+        if (!exist) {
+          this.state.invites.push(invite);
+          this.setState({ invites: this.state.invites });
+        }
+
+        this.clear();
+      }
+    },
+    clear: {
+      value: function clear() {
+        React.findDOMNode(this.refs.searchbox).value = "";
+        this.setState({ users: [] });
+
+        this.setState({ showAddEmail: false });
+        this.email = null;
+      }
+    },
+    onSelectInvite: {
+      value: function onSelectInvite(user) {
+        var filter = this.state.invites.filter(function (invite) {
+          return user.id !== invite.id;
+        });
+
+        this.setState({ invites: filter });
+      }
+    },
+    onSend: {
+      value: function onSend() {
+        this.props.onSelect(this.state.invites);
+        $(React.findDOMNode(this.refs.modal)).closeModal();
+        this.props.onClose();
+      }
+    },
+    render: {
+      value: function render() {
+        var _this = this;
+
+        return React.createElement(
+          "div",
+          { id: "user-search", ref: "modal", className: "modal col s12 m10 l6 modal-full user-search" },
+          React.createElement(
+            "div",
+            { className: "modal-content" },
+            React.createElement(
+              "h4",
+              null,
+              "Invitar al Grupo"
+            ),
+            React.createElement(
+              "div",
+              { className: "row" },
+              React.createElement(
+                "span",
+                { className: "right" },
+                "Invitaciones (" + this.state.invites.length + "/ 10)"
+              )
+            ),
+            React.createElement(UserList, { cssClass: "s12 invites", message: "click para quitar",
+              users: this.state.invites,
+              onSelect: function (invite) {
+                _this.onSelectInvite(invite);
+              } }),
+            React.createElement(
+              "div",
+              { className: "row no-margin" },
+              React.createElement("input", { ref: "searchbox", className: "col s10", type: "text",
+                onKeyUp: function (e) {
+                  _this.onKeyUp(e);
+                },
+                placeholder: "nombre o email" }),
+              this.state.showAddEmail ? React.createElement(
+                "a",
+                { className: "waves-effect waves-light btn-floating compose plus-icon",
+                  onClick: function (e) {
+                    _this.addEmail(e);
+                  } },
+                React.createElement(
+                  "i",
+                  { className: "material-icons teal-text" },
+                  "add_circle"
+                ),
+                React.createElement(
+                  "i",
+                  { className: "material-icons" },
+                  "mail"
+                )
+              ) : ""
+            ),
+            React.createElement(UserList, { cssClass: "s12 m10",
+              users: this.state.users,
+              onSelect: function (user) {
+                _this.onSelect(user);
+              } })
+          ),
+          React.createElement(
+            "div",
+            { className: "modal-footer" },
+            React.createElement(ButtonFlat, { css: "modal-action modal-close left", text: "Cerrar",
+              onClick: function (e) {
+                _this.props.onClose(e);
+              } }),
+            React.createElement(Button, { icon: "send", text: "Invitar",
+              hidden: !this.state.invites.length,
+              onClick: function (e) {
+                _this.onSend(e);
+              } })
+          )
+        );
+      }
+    }
+  });
+
+  return SearchUser;
+})(ReactListener);
+
+module.exports = SearchUser;
+
+SearchUser.displayName = "SearchUser";
+
+},{"../../actions/User":"/home/pjnovas/projects/la-canchita-web/src/actions/User.js","../../stores/User":"/home/pjnovas/projects/la-canchita-web/src/stores/User.js","../ReactListener":"/home/pjnovas/projects/la-canchita-web/src/components/ReactListener.js","../controls":"/home/pjnovas/projects/la-canchita-web/src/components/controls/index.js","./List.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/user/List.jsx"}],"/home/pjnovas/projects/la-canchita-web/src/constants/Group.js":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -31010,6 +31614,15 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 var builder = _interopRequire(require("./builder"));
 
 module.exports = builder("MEMBER", ["FIND", "JOIN", "LEAVE", "INVITE", "SETROLE", "KICK"]);
+
+},{"./builder":"/home/pjnovas/projects/la-canchita-web/src/constants/builder.js"}],"/home/pjnovas/projects/la-canchita-web/src/constants/User.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var builder = _interopRequire(require("./builder"));
+
+module.exports = builder("USER", ["SEARCH"]);
 
 },{"./builder":"/home/pjnovas/projects/la-canchita-web/src/constants/builder.js"}],"/home/pjnovas/projects/la-canchita-web/src/constants/builder.js":[function(require,module,exports){
 "use strict";
@@ -31502,7 +32115,7 @@ var MemberStore = (function (_ListStore) {
 
             break;
           case MemberConstants.INVITE:
-
+            this.invite(payload.gid, payload.data);
             break;
           case MemberConstants.SETROLE:
 
@@ -31570,6 +32183,22 @@ var MemberStore = (function (_ListStore) {
           _this.emit("find", _this.get(gid));
         });
       }
+    },
+    invite: {
+      value: function invite(gid, invites) {
+        var _this = this;
+
+        this.emit("before:invite");
+
+        request.post(this.getURI(gid)).end(function (err, res) {
+          if (_this.errorHandler(err, "invite")) {
+            return;
+          }
+
+          _this.add(gid, res.body);
+          _this.emit("invite", _this.get(gid));
+        });
+      }
     }
   });
 
@@ -31578,4 +32207,77 @@ var MemberStore = (function (_ListStore) {
 
 module.exports = new MemberStore();
 
-},{"../constants/Member":"/home/pjnovas/projects/la-canchita-web/src/constants/Member.js","./ListStore":"/home/pjnovas/projects/la-canchita-web/src/stores/ListStore.js","superagent":"/home/pjnovas/projects/la-canchita-web/node_modules/superagent/lib/client.js"}]},{},["/home/pjnovas/projects/la-canchita-web/src/index.js"]);
+},{"../constants/Member":"/home/pjnovas/projects/la-canchita-web/src/constants/Member.js","./ListStore":"/home/pjnovas/projects/la-canchita-web/src/stores/ListStore.js","superagent":"/home/pjnovas/projects/la-canchita-web/node_modules/superagent/lib/client.js"}],"/home/pjnovas/projects/la-canchita-web/src/stores/User.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var ListStore = _interopRequire(require("./ListStore"));
+
+var request = _interopRequire(require("superagent"));
+
+var UserConstants = _interopRequire(require("../constants/User"));
+
+var GroupStore = (function (_ListStore) {
+  function GroupStore() {
+    var _this = this;
+
+    _classCallCheck(this, GroupStore);
+
+    _get(Object.getPrototypeOf(GroupStore.prototype), "constructor", this).call(this);
+
+    this.uri = "/api/users/";
+    this.type = "USER";
+
+    this.events = ["error"];
+
+    ["search"].forEach(function (event) {
+      _this.events.push("before:" + event);
+      _this.events.push(event);
+    });
+  }
+
+  _inherits(GroupStore, _ListStore);
+
+  _createClass(GroupStore, {
+    dispatchCallback: {
+      value: function dispatchCallback(payload) {
+
+        switch (payload.type) {
+          case UserConstants.SEARCH:
+            this.search(payload.query);
+            break;
+        };
+      }
+    },
+    search: {
+      value: function search(query) {
+        var _this = this;
+
+        this.emit("before:search");
+
+        request.get(this.uri + "search?q=" + query).end(function (err, res) {
+          if (_this.errorHandler(err, "search")) {
+            return;
+          }
+
+          _this.emit("search", res.body);
+        });
+      }
+    }
+  });
+
+  return GroupStore;
+})(ListStore);
+
+module.exports = new GroupStore();
+
+},{"../constants/User":"/home/pjnovas/projects/la-canchita-web/src/constants/User.js","./ListStore":"/home/pjnovas/projects/la-canchita-web/src/stores/ListStore.js","superagent":"/home/pjnovas/projects/la-canchita-web/node_modules/superagent/lib/client.js"}]},{},["/home/pjnovas/projects/la-canchita-web/src/index.js"]);

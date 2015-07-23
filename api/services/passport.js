@@ -225,6 +225,8 @@ passport.endpoint = function (req, res) {
     options.scope = strategies[provider].scope;
   }
 
+  req.session.queries = req.query;
+
   // Redirect the user to the provider for authentication. When complete,
   // the provider will redirect the user back to the application at
   //     /auth/:provider/callback

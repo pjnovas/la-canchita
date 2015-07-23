@@ -47,6 +47,9 @@ module.exports.routes = {
   'get /auth/:provider/callback': 'AuthController.callback',
   'get /auth/:provider/:action': 'AuthController.callback',
 
+  'get /v/invite/:token': 'VerifyController.verifyInvite',
+  'get /v/email/:token': 'VerifyController.verifyEmail',
+
   // Users
 
   'get /api/users/search': 'UserController.search',

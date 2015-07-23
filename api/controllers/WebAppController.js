@@ -17,8 +17,14 @@ module.exports = {
 
       return;
     }
-
-    res.view('index');
+/*
+    if (req.session.redirect){
+      console.log('index redirect > ' + req.session.redirect);
+    }
+*/
+    res.view('index', {
+      redirect: req.session.redirect
+    });
   }
 };
 

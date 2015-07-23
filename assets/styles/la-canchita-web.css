@@ -1977,6 +1977,39 @@
 .members .collection .collection-item {
   min-height: 64px;
 }
+.user-search .collection {
+  /* fix collection */
+}
+@media only screen and (min-width : 993px) {
+  .user-search .collection {
+    padding: 0;
+    border-right: 2px solid #e0e0e0;
+  }
+}
+.user-search .collection .collection-item.avatar {
+  cursor: pointer;
+  min-height: 45px;
+}
+.user-search .collection .collection-item.avatar img {
+  width: 25px;
+  height: 25px;
+  left: 25px;
+}
+.user-search .collection .collection-item.avatar .title {
+  font-size: 18px;
+}
+.user-search .collection.invites {
+  overflow: initial;
+  border: none;
+}
+.user-search .collection.invites .collection-item {
+  cursor: pointer;
+  min-height: 45px;
+  display: inline-block;
+  border: 1px solid #e0e0e0;
+  border-radius: 2px;
+  margin: 0.1rem;
+}
 body {
   margin: 0;
   position: relative;
@@ -2014,6 +2047,30 @@ h1 {
 }
 .btn-floating.btn-large {
   background-color: #F44336 !important;
+}
+.btn-floating.compose i {
+  position: absolute;
+}
+.btn-floating.compose i:first-child {
+  position: absolute;
+  left: -8px;
+  margin: 0;
+  top: 5px;
+  z-index: 2;
+}
+.btn-floating.compose.plus-icon i:first-child {
+  background: #FFF;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  line-height: 15px;
+  width: 15px;
+  top: 17px;
+  right: 4px;
+  left: initial;
+}
+.btn-floating.compose.plus-icon i:last-child {
+  top: 0px;
+  left: -2px;
 }
 .btn-flat.left,
 .btn-flat.right {
@@ -2071,4 +2128,23 @@ nav .side-nav a.profile-item .profile + span {
 }
 .card.small .card-content {
   height: 60px;
+}
+.modal.modal-full {
+  margin-left: auto!important;
+  margin-right: auto!important;
+  float: none!important;
+}
+@media only screen and (max-width : 992px) {
+  .modal.modal-full {
+    top: 0!important;
+  }
+}
+@media only screen and (max-width : 600px) {
+  .modal.modal-full {
+    height: 100%;
+    max-height: 100%;
+  }
+}
+.row.no-margin {
+  margin-bottom: 0;
 }
