@@ -32564,7 +32564,7 @@ var MemberStore = (function (_ListStore) {
 
         this.emit("before:invite");
 
-        request.post(this.getURI(gid)).end(function (err, res) {
+        request.post(this.getURI(gid)).send(invites).end(function (err, res) {
           if (_this.errorHandler(err, "invite")) {
             return;
           }

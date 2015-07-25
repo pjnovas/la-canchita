@@ -136,11 +136,14 @@ passport.connect = function (req, query, profile, next) {
           // check if user with same email already exists and assign new passport
           function(done){
             if (user.email){
-              User.findOne({ email: user.email }, done);
+              User.findOne({ email: user.email }, function(err, user){
+                if (err) return done(err);
+                done(null, null);
+              });
               return;
             }
 
-            done();
+            done(null, null);
           },
 
           // if user was found with email, go on, else create one
