@@ -203,7 +203,7 @@ describe('POST /groups/:id/members', function() {
 
   });
 
-  it('Allow multiples ROLE [owner] - only emails', function (done) {
+  it('Allow multiples - only emails', function (done) {
     var userIdx = 0;
     var gid = groups[2].id;
     var emails = ['t100@t.com', 't200@t.com'];
@@ -218,6 +218,85 @@ describe('POST /groups/:id/members', function() {
           expect(err).to.not.be.ok();
           expect(invites.length).to.be.equal(2);
           done();
+        });
+
+    });
+
+  });
+
+  it('Allow multiples - invite by same email twice', function (done) {
+    var userIdx = 0;
+    var gid = groups[2].id;
+    var emails = ['t110@t.com', 't210@t.com'];
+
+    sendInvitesBy(userIdx, gid, [], emails, 200, function(err, res){
+      if (err) done(err);
+      expect(res.body.length).to.be.equal(0);
+
+      sendInvitesBy(userIdx, gid, [], emails, 200, function(err, res){
+
+        Invite
+          .find({ email: emails })
+          .exec(function(err, invites){
+            expect(err).to.not.be.ok();
+            expect(invites.length).to.be.equal(2); // same amount
+            done();
+          });
+
+        });
+
+    });
+
+  });
+
+  it('Allow multiples - RE invite by same email for expired ones', function (done) {
+    var userIdx = 0;
+    var gid = groups[2].id;
+    var emails = ['t120@t.com', 't220@t.com'];
+
+    sendInvitesBy(userIdx, gid, [], emails, 200, function(err, res){
+      if (err) done(err);
+
+      var today = new Date();
+      var aDay = 24 * 60 * 60 * 1000;
+      var yesterday = new Date(today.getTime() - aDay);
+      var aWeek = 7 * 24 * 60 * 60 * 1000;
+      var nextWeek = new Date(today.getTime() + aWeek);
+
+      Invite
+        .findOne({ email: emails[0] })
+        .exec(function(err, invite){
+          expect(err).to.not.be.ok();
+
+          invite.expires = yesterday;
+          invite.save(function(err, invite){
+            expect(err).to.not.be.ok();
+            expect(invite.expires).to.be.eql(yesterday);
+            var lastInvite = invite;
+
+            // re send invites
+            sendInvitesBy(userIdx, gid, [], emails, 200, function(err, res){
+
+              Invite
+                .find({ email: emails })
+                .exec(function(err, invites){
+                  expect(err).to.not.be.ok();
+                  expect(invites.length).to.be.equal(2); // same amount (removed last invite)
+
+                  // a new invite is sent and it's different
+                  var newInvite = invites[0];
+
+                  expect(newInvite.id).to.not.be.equal(lastInvite.id);
+                  expect(newInvite.token).to.not.be.equal(lastInvite.token);
+                  expect(newInvite.expires).to.be.greaterThan(today);
+                  expect(newInvite.expires).to.be.lessThan(nextWeek);
+
+                  done();
+                });
+
+              });
+          });
+
         });
 
     });

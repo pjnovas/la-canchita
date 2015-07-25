@@ -12,4 +12,6 @@ describe('Members', function() {
   require('./createMe'); // accept an invitation
   require('./removeMe'); // decline an invitation or leave group
 
+  require('./emailInvites'); // verification of token and creation of pending member
+
 });

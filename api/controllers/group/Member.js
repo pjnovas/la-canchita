@@ -66,7 +66,47 @@ module.exports = {
           });
       },
 
-      // Validate emails and create Invite tokens
+      // Validate emails and if invitations already exists
+      function(done){
+        var emails = req.invites.emails || [];
+
+        if (emails.length === 0){
+          return done();
+        }
+
+        Invite
+          .find({ group: groupId, email: emails })
+          .exec(function(err, invites){
+            if (err) return done(err);
+            if (invites.length === 0) return done();
+
+            var expiredOnes = [];
+            var today = new Date();
+
+            invites.forEach(function(invite){
+              if (invite.expires < today){
+                expiredOnes.push(invite.id);
+              }
+              else {
+                var idx = emails.indexOf(invite.email);
+                req.invites.emails.splice(idx, 1);
+              }
+            });
+
+            if (expiredOnes.length > 0){ // destroy expired ones
+              Invite.destroy({ id: expiredOnes }).exec(function(err){
+                //TODO: manage error
+                done();
+              });
+
+              return;
+            }
+
+            done();
+          });
+      },
+
+      // create Invite tokens and send emails
       function(done){
         var emails = req.invites.emails || [];
 
