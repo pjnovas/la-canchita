@@ -92,7 +92,13 @@ var AuthController = {
    * @param {Object} res
    */
   register: function (req, res) {
-    res.view({
+    res.view('index', {
+      errors: req.flash('error')
+    });
+  },
+
+  recover: function (req, res) {
+    res.view('index', {
       errors: req.flash('error')
     });
   },
@@ -147,6 +153,9 @@ var AuthController = {
       switch (action) {
         case 'register':
           res.redirect('/register');
+          break;
+        case 'recover':
+          res.redirect('/recover');
           break;
         case 'disconnect':
           res.redirect('back');

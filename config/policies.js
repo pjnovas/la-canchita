@@ -59,6 +59,7 @@ module.exports.policies = {
     'login': setUser,
     'logout': setUser,
     'register': setUser,
+    'recover': setUser,
     'callback': setUser,
     'provider': setUser,
   },

@@ -29067,6 +29067,8 @@ var routes = React.createElement(
   React.createElement(Route, { name: "group", path: "/groups/:groupId", handler: GroupView }),
   React.createElement(Route, { name: "profile", path: "/profile", handler: Login }),
   React.createElement(Route, { name: "login", path: "/login", handler: Login }),
+  React.createElement(Route, { name: "register", path: "/register", handler: Login }),
+  React.createElement(Route, { name: "recover", path: "/recover", handler: Login }),
   React.createElement(Route, { name: "notfound", path: "/notfound", handler: NotFound }),
   React.createElement(NotFoundRoute, { handler: NotFound })
 );
@@ -29740,6 +29742,29 @@ var Login = (function (_React$Component) {
     if (window.redirect) {
       this.state.redirect = window.redirect;
     }
+
+    switch (window.location.pathname) {
+      case "/register":
+        this.state.initial = false;
+        this.state.social = false;
+        this.state.register = true;
+        break;
+      case "/recover":
+        this.state.initial = false;
+        this.state.social = false;
+        this.state.recover = true;
+        break;
+    }
+
+    if (window.errors && window.errors.length) {
+      this.state.errors = window.errors;
+
+      if (window.location.pathname === "/login") {
+        this.state.initial = false;
+        this.state.social = false;
+        this.state.manual = true;
+      }
+    }
   }
 
   _inherits(Login, _React$Component);
@@ -29747,22 +29772,22 @@ var Login = (function (_React$Component) {
   _createClass(Login, {
     onClickSocial: {
       value: function onClickSocial() {
-        this.setState({ initial: false, social: true, manual: false, register: false, recover: false });
+        this.setState({ initial: false, social: true, manual: false, register: false, recover: false, errors: [] });
       }
     },
     onClickManual: {
       value: function onClickManual() {
-        this.setState({ initial: false, social: false, manual: true, register: false, recover: false });
+        this.setState({ initial: false, social: false, manual: true, register: false, recover: false, errors: [] });
       }
     },
     onClickRegister: {
       value: function onClickRegister() {
-        this.setState({ social: false, manual: false, register: true, recover: false });
+        this.setState({ social: false, manual: false, register: true, recover: false, errors: [] });
       }
     },
     onClickRecover: {
       value: function onClickRecover() {
-        this.setState({ social: false, manual: false, register: false, recover: true });
+        this.setState({ social: false, manual: false, register: false, recover: true, errors: [] });
       }
     },
     render: {
@@ -29813,7 +29838,7 @@ var Login = (function (_React$Component) {
                   ),
                   React.createElement(
                     "a",
-                    { className: "col s6 social-button", href: uris.twitter, role: "button" },
+                    { className: "col s4 social-button", href: uris.twitter, role: "button" },
                     React.createElement(
                       "div",
                       { className: "twitter waves-effect waves-light" },
@@ -29822,11 +29847,20 @@ var Login = (function (_React$Component) {
                   ),
                   React.createElement(
                     "a",
-                    { className: "col s6 social-button", href: uris.facebook, role: "button" },
+                    { className: "col s4 social-button", href: uris.facebook, role: "button" },
                     React.createElement(
                       "div",
                       { className: "facebook waves-effect waves-light" },
                       "Facebook"
+                    )
+                  ),
+                  React.createElement(
+                    "a",
+                    { className: "col s4 social-button", href: uris.google, role: "button" },
+                    React.createElement(
+                      "div",
+                      { className: "google waves-effect waves-light" },
+                      "Google"
                     )
                   )
                 ) : React.createElement(
@@ -29860,15 +29894,15 @@ var Login = (function (_React$Component) {
                     "manual"
                   )
                 ) : null,
-                this.state.manual ? React.createElement(Manual, { uri: uris.manual,
+                this.state.manual ? React.createElement(Manual, { uri: uris.manual, errors: this.state.errors,
                   onBack: function (e) {
                     _this.onClickManual(e);
                   } }) : null,
-                this.state.register ? React.createElement(Register, { uri: uris.register,
+                this.state.register ? React.createElement(Register, { uri: uris.register, errors: this.state.errors,
                   onBack: function (e) {
                     _this.onClickManual(e);
                   } }) : null,
-                this.state.recover ? React.createElement(Recover, { uri: uris.recover,
+                this.state.recover ? React.createElement(Recover, { uri: uris.recover, errors: this.state.errors,
                   onBack: function (e) {
                     _this.onClickManual(e);
                   } }) : null,
@@ -29941,6 +29975,13 @@ var Manual = (function (_React$Component) {
             { className: "active" },
             "ingreso manual"
           ),
+          this.props.errors ? this.props.errors.map(function (err) {
+            return React.createElement(
+              "p",
+              null,
+              err
+            );
+          }) : null,
           React.createElement(
             "div",
             { className: "input-field col s12" },
@@ -30018,6 +30059,13 @@ var Manual = (function (_React$Component) {
             { className: "active" },
             "recuperar contraseña"
           ),
+          this.props.errors ? this.props.errors.map(function (err) {
+            return React.createElement(
+              "p",
+              null,
+              err
+            );
+          }) : null,
           React.createElement(
             "div",
             { className: "input-field col s12" },
@@ -30093,6 +30141,13 @@ var Manual = (function (_React$Component) {
             { className: "active" },
             "registro"
           ),
+          this.props.errors ? this.props.errors.map(function (err) {
+            return React.createElement(
+              "p",
+              null,
+              err
+            );
+          }) : null,
           React.createElement(
             "div",
             { className: "input-field col s12" },

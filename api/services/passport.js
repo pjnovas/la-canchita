@@ -1,6 +1,7 @@
 var path     = require('path')
   , url      = require('url')
-  , passport = require('passport');
+  , passport = require('passport')
+  , async = require('async');
 
 /**
  * Passport Service
@@ -96,17 +97,23 @@ passport.connect = function (req, query, profile, next) {
     return next(new Error('Neither a username nor email was available'));
   }
 
+  user.name = profile.displayName;
+
   switch (provider){
     case 'twitter':
-      user.name = profile.displayName;
       user.picture =
         profile.photos &&
         profile.photos.length &&
         profile.photos[0].value.replace('_normal', '_bigger') || '';
       break;
     case 'facebook':
-      user.name = profile.displayName;
       user.picture = "//graph.facebook.com/" + profile.id + "/picture?width=73&height=73";
+      break;
+    case 'google':
+      user.picture =
+        profile.photos &&
+        profile.photos.length &&
+        profile.photos[0].value || '';
       break;
   }
 
@@ -123,8 +130,60 @@ passport.connect = function (req, query, profile, next) {
       //           authentication provider.
       // Action:   Create a new user and assign them a passport.
       if (!passport) {
+
+        async.waterfall([
+
+          // check if user with same email already exists and assign new passport
+          function(done){
+            if (user.email){
+              User.findOne({ email: user.email }, done);
+              return;
+            }
+
+            done();
+          },
+
+          // if user was found with email, go on, else create one
+          function(user, done){
+
+            if (user){
+              return done(null, user);
+            }
+
+            User.create(user, function (err, user) {
+              if (err) {
+                if (err.code === 'E_VALIDATION') {
+                  if (err.invalidAttributes.email) {
+                    req.flash('error', 'Error.Passport.Email.Exists');
+                  }
+                  else {
+                    req.flash('error', 'Error.Passport.User.Exists');
+                  }
+                }
+              }
+
+              done(err, user)
+            });
+          },
+
+          // create a passport for the user
+          function(user, done){
+            query.user = user.id;
+            Passport.create(query, done);
+          }
+
+        ], function(err, user){
+          if (err) { // If error bail out
+            return next(err);
+          }
+
+          next(err, user);
+        });
+
+        /*
         User.create(user, function (err, user) {
           if (err) {
+            console.dir(err);
             if (err.code === 'E_VALIDATION') {
               if (err.invalidAttributes.email) {
                 req.flash('error', 'Error.Passport.Email.Exists');
@@ -148,6 +207,8 @@ passport.connect = function (req, query, profile, next) {
             next(err, user);
           });
         });
+        */
+
       }
       // Scenario: An existing user is trying to log in using an already
       //           connected passport.
