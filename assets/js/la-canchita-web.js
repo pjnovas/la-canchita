@@ -29010,7 +29010,7 @@ var RouteHandler = _reactRouter.RouteHandler;
 var Route = _reactRouter.Route;
 var NotFoundRoute = _reactRouter.NotFoundRoute;
 
-var Login = _interopRequire(require("./components/Login.jsx"));
+var Login = _interopRequire(require("./components/account/Login.jsx"));
 
 var Home = _interopRequire(require("./components/Home.jsx"));
 
@@ -29059,7 +29059,7 @@ if (window.user) {
 
 var routes = React.createElement(
   Route,
-  { handler: App, path: "/" },
+  { name: "root", handler: App, path: "/" },
   React.createElement(Route, { name: "home", path: "/", handler: HomeHandler }),
   React.createElement(Route, { name: "groups", path: "/", handler: HomeHandler }),
   React.createElement(Route, { name: "groupnew", path: "/groups/new", handler: GroupCreate }),
@@ -29071,7 +29071,7 @@ var routes = React.createElement(
   React.createElement(NotFoundRoute, { handler: NotFound })
 );
 
-window.app.router = Router.run(routes, function (Handler) {
+window.app.router = Router.run(routes, Router.HistoryLocation, function (Handler) {
   React.render(React.createElement(Handler, null), document.getElementById("app"));
 });
 
@@ -29092,7 +29092,7 @@ window.app.handleError = function (code, err) {
   }
 };
 
-},{"./components/Home.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/Home.jsx","./components/Login.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/Login.jsx","./components/NotFound.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/NotFound.jsx","./components/group/Create.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/Create.jsx","./components/group/Edit.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/Edit.jsx","./components/group/Index.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/Index.jsx","./components/group/View.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/View.jsx","react-router":"/home/pjnovas/projects/la-canchita-web/node_modules/react-router/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/actions/Group.js":[function(require,module,exports){
+},{"./components/Home.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/Home.jsx","./components/NotFound.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/NotFound.jsx","./components/account/Login.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/account/Login.jsx","./components/group/Create.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/Create.jsx","./components/group/Edit.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/Edit.jsx","./components/group/Index.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/Index.jsx","./components/group/View.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/View.jsx","react-router":"/home/pjnovas/projects/la-canchita-web/node_modules/react-router/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/actions/Group.js":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -29524,156 +29524,7 @@ var Home = (function (_React$Component) {
 
 module.exports = Home;
 
-},{"./Header.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/Header.jsx","react-router":"/home/pjnovas/projects/la-canchita-web/node_modules/react-router/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/Login.jsx":[function(require,module,exports){
-"use strict";
-
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var App = (function (_React$Component) {
-  function App(props) {
-    _classCallCheck(this, App);
-
-    _get(Object.getPrototypeOf(App.prototype), "constructor", this).call(this, props);
-
-    this.state = {};
-    if (window.redirect) {
-      this.state.redirect = window.redirect;
-    }
-  }
-
-  _inherits(App, _React$Component);
-
-  _createClass(App, {
-    render: {
-      value: function render() {
-
-        var uris = {
-          local: "/auth/local",
-          twitter: "/auth/twitter",
-          facebook: "/auth/facebook"
-        };
-
-        if (this.state.redirect) {
-          for (var p in uris) {
-            uris[p] += "?redirect=" + this.state.redirect;
-          }
-        }
-
-        return React.createElement(
-          "div",
-          { className: "login" },
-          React.createElement(
-            "div",
-            { className: "container" },
-            React.createElement(
-              "div",
-              { className: "row" },
-              React.createElement(
-                "form",
-                { className: "white col center s12 m6 z-depth-2", action: uris.local, method: "post" },
-                React.createElement(
-                  "h1",
-                  null,
-                  "app-name"
-                ),
-                React.createElement("div", { className: "divider" }),
-                React.createElement(
-                  "div",
-                  { className: "row" },
-                  React.createElement(
-                    "h3",
-                    null,
-                    "ingresar de una usando"
-                  )
-                ),
-                React.createElement(
-                  "div",
-                  { className: "row" },
-                  React.createElement(
-                    "a",
-                    { className: "col s6 social-button", href: uris.twitter, role: "button" },
-                    React.createElement(
-                      "div",
-                      { className: "twitter waves-effect waves-light" },
-                      "Twitter"
-                    )
-                  ),
-                  React.createElement(
-                    "a",
-                    { className: "col s6 social-button", href: uris.facebook, role: "button" },
-                    React.createElement(
-                      "div",
-                      { className: "facebook waves-effect waves-light" },
-                      "Facebook"
-                    )
-                  )
-                ),
-                React.createElement("div", { className: "divider" }),
-                React.createElement(
-                  "h3",
-                  null,
-                  "o con registro ",
-                  React.createElement(
-                    "a",
-                    { id: "toggle-manual", className: "waves-effect waves-teal btn-flat" },
-                    "manual"
-                  )
-                ),
-                React.createElement(
-                  "div",
-                  { id: "manual", className: "hide" },
-                  React.createElement(
-                    "div",
-                    { className: "input-field col s12" },
-                    React.createElement("input", { id: "identifier", type: "text", name: "identifier", required: true, className: "validate" }),
-                    React.createElement(
-                      "label",
-                      { htmlFor: "identifier" },
-                      "Usuario o email"
-                    )
-                  ),
-                  React.createElement(
-                    "div",
-                    { className: "input-field col s12" },
-                    React.createElement("input", { id: "password", type: "password", name: "password", className: "validate", required: true }),
-                    React.createElement(
-                      "label",
-                      { htmlFor: "password" },
-                      "Contraseña"
-                    )
-                  ),
-                  React.createElement(
-                    "a",
-                    { className: "forgot" },
-                    "me olvidé la contraseña"
-                  ),
-                  React.createElement("input", { type: "submit", value: "Ingresar", className: "btn btn-lg btn-primary btn-block" }),
-                  React.createElement(
-                    "a",
-                    { className: "signup" },
-                    "registrarse"
-                  )
-                )
-              )
-            )
-          )
-        );
-      }
-    }
-  });
-
-  return App;
-})(React.Component);
-
-module.exports = App;
-
-},{}],"/home/pjnovas/projects/la-canchita-web/src/components/NotFound.jsx":[function(require,module,exports){
+},{"./Header.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/Header.jsx","react-router":"/home/pjnovas/projects/la-canchita-web/node_modules/react-router/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/NotFound.jsx":[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -29855,7 +29706,475 @@ var ReactListener = (function (_React$Component) {
 
 module.exports = ReactListener;
 
-},{"./Events":"/home/pjnovas/projects/la-canchita-web/src/components/Events.js","shortid":"/home/pjnovas/projects/la-canchita-web/node_modules/shortid/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/controls/Button.js":[function(require,module,exports){
+},{"./Events":"/home/pjnovas/projects/la-canchita-web/src/components/Events.js","shortid":"/home/pjnovas/projects/la-canchita-web/node_modules/shortid/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/account/Login.jsx":[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var _forms = require("./forms");
+
+var Manual = _forms.Manual;
+var Recover = _forms.Recover;
+var Register = _forms.Register;
+
+var Login = (function (_React$Component) {
+  function Login(props) {
+    _classCallCheck(this, Login);
+
+    _get(Object.getPrototypeOf(Login.prototype), "constructor", this).call(this, props);
+
+    this.state = {
+      initial: true,
+      social: true,
+      manual: false,
+      recover: false,
+      register: false
+    };
+
+    if (window.redirect) {
+      this.state.redirect = window.redirect;
+    }
+  }
+
+  _inherits(Login, _React$Component);
+
+  _createClass(Login, {
+    onClickSocial: {
+      value: function onClickSocial() {
+        this.setState({ initial: false, social: true, manual: false, register: false, recover: false });
+      }
+    },
+    onClickManual: {
+      value: function onClickManual() {
+        this.setState({ initial: false, social: false, manual: true, register: false, recover: false });
+      }
+    },
+    onClickRegister: {
+      value: function onClickRegister() {
+        this.setState({ social: false, manual: false, register: true, recover: false });
+      }
+    },
+    onClickRecover: {
+      value: function onClickRecover() {
+        this.setState({ social: false, manual: false, register: false, recover: true });
+      }
+    },
+    render: {
+      value: function render() {
+        var _this = this;
+
+        var uris = {
+          manual: "/auth/local",
+          register: "/auth/local/register",
+          recover: "/auth/local/recover",
+
+          twitter: "/auth/twitter",
+          facebook: "/auth/facebook",
+          google: "/auth/google"
+        };
+
+        if (this.state.redirect) {
+          for (var p in uris) {
+            uris[p] += "?redirect=" + this.state.redirect;
+          }
+        }
+
+        return React.createElement(
+          "div",
+          { className: "login" },
+          React.createElement(
+            "div",
+            { className: "container" },
+            React.createElement(
+              "div",
+              { className: "row" },
+              React.createElement(
+                "div",
+                { className: "white col center s12 m6 z-depth-2 holder" },
+                React.createElement(
+                  "h1",
+                  null,
+                  "app-name"
+                ),
+                React.createElement("div", { className: "divider" }),
+                this.state.social ? React.createElement(
+                  "div",
+                  { className: "row" },
+                  React.createElement(
+                    "h3",
+                    { className: "active" },
+                    "ingresar con tu red social"
+                  ),
+                  React.createElement(
+                    "a",
+                    { className: "col s6 social-button", href: uris.twitter, role: "button" },
+                    React.createElement(
+                      "div",
+                      { className: "twitter waves-effect waves-light" },
+                      "Twitter"
+                    )
+                  ),
+                  React.createElement(
+                    "a",
+                    { className: "col s6 social-button", href: uris.facebook, role: "button" },
+                    React.createElement(
+                      "div",
+                      { className: "facebook waves-effect waves-light" },
+                      "Facebook"
+                    )
+                  )
+                ) : React.createElement(
+                  "div",
+                  { className: "row no-margin" },
+                  React.createElement(
+                    "h3",
+                    null,
+                    "ingresar con",
+                    React.createElement(
+                      "a",
+                      { onClick: function (e) {
+                          _this.onClickSocial(e);
+                        },
+                        className: "waves-effect waves-blue blue-text btn-flat" },
+                      "tu red social"
+                    )
+                  )
+                ),
+                React.createElement("div", { className: "divider" }),
+                this.state.social ? React.createElement(
+                  "h3",
+                  null,
+                  "o con registro",
+                  React.createElement(
+                    "a",
+                    { onClick: function (e) {
+                        _this.onClickManual(e);
+                      },
+                      className: "waves-effect waves-blue blue-text btn-flat" },
+                    "manual"
+                  )
+                ) : null,
+                this.state.manual ? React.createElement(Manual, { uri: uris.manual,
+                  onBack: function (e) {
+                    _this.onClickManual(e);
+                  } }) : null,
+                this.state.register ? React.createElement(Register, { uri: uris.register,
+                  onBack: function (e) {
+                    _this.onClickManual(e);
+                  } }) : null,
+                this.state.recover ? React.createElement(Recover, { uri: uris.recover,
+                  onBack: function (e) {
+                    _this.onClickManual(e);
+                  } }) : null,
+                this.state.manual ? React.createElement(
+                  "div",
+                  { className: "row no-margin" },
+                  React.createElement(
+                    "div",
+                    { className: "col s12" },
+                    React.createElement(
+                      "a",
+                      { className: "btn waves-effect waves-blue blue left signup",
+                        onClick: function (e) {
+                          _this.onClickRegister(e);
+                        } },
+                      "registro"
+                    ),
+                    React.createElement(
+                      "a",
+                      { className: "waves-effect waves-blue btn-flat right blue-text forgot",
+                        onClick: function (e) {
+                          _this.onClickRecover(e);
+                        } },
+                      "recuperar contraseña"
+                    )
+                  )
+                ) : null
+              )
+            )
+          )
+        );
+      }
+    }
+  });
+
+  return Login;
+})(React.Component);
+
+module.exports = Login;
+
+},{"./forms":"/home/pjnovas/projects/la-canchita-web/src/components/account/forms.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/account/Manual.jsx":[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Manual = (function (_React$Component) {
+  function Manual(props) {
+    _classCallCheck(this, Manual);
+
+    _get(Object.getPrototypeOf(Manual.prototype), "constructor", this).call(this, props);
+  }
+
+  _inherits(Manual, _React$Component);
+
+  _createClass(Manual, {
+    render: {
+      value: function render() {
+
+        return React.createElement(
+          "form",
+          { className: "row", action: this.props.uri, method: "post" },
+          React.createElement(
+            "h3",
+            { className: "active" },
+            "ingreso manual"
+          ),
+          React.createElement(
+            "div",
+            { className: "input-field col s12" },
+            React.createElement("input", { id: "identifier", type: "text", name: "identifier", required: true, className: "validate" }),
+            React.createElement(
+              "label",
+              { htmlFor: "identifier" },
+              "Usuario o email"
+            )
+          ),
+          React.createElement(
+            "div",
+            { className: "input-field col s12" },
+            React.createElement("input", { id: "password", type: "password", name: "password", className: "validate", required: true }),
+            React.createElement(
+              "label",
+              { htmlFor: "password" },
+              "Contraseña"
+            )
+          ),
+          React.createElement(
+            "div",
+            { className: "col s12" },
+            React.createElement(
+              "button",
+              { className: "btn btn-large waves-effect waves-light right", type: "submit" },
+              "Ingresar",
+              React.createElement(
+                "i",
+                { className: "material-icons right" },
+                "send"
+              )
+            )
+          )
+        );
+      }
+    }
+  });
+
+  return Manual;
+})(React.Component);
+
+module.exports = Manual;
+
+},{}],"/home/pjnovas/projects/la-canchita-web/src/components/account/Recover.jsx":[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Manual = (function (_React$Component) {
+  function Manual(props) {
+    _classCallCheck(this, Manual);
+
+    _get(Object.getPrototypeOf(Manual.prototype), "constructor", this).call(this, props);
+  }
+
+  _inherits(Manual, _React$Component);
+
+  _createClass(Manual, {
+    render: {
+      value: function render() {
+        var _this = this;
+
+        return React.createElement(
+          "form",
+          { className: "row", action: this.props.uri, method: "post" },
+          React.createElement(
+            "h3",
+            { className: "active" },
+            "recuperar contraseña"
+          ),
+          React.createElement(
+            "div",
+            { className: "input-field col s12" },
+            React.createElement("input", { id: "email", type: "text", name: "email", required: true, className: "validate" }),
+            React.createElement(
+              "label",
+              { htmlFor: "email" },
+              "email"
+            )
+          ),
+          React.createElement(
+            "div",
+            { className: "col s12" },
+            React.createElement(
+              "button",
+              { className: "btn btn-large waves-effect waves-light right", type: "submit" },
+              "Enviar",
+              React.createElement(
+                "i",
+                { className: "material-icons right" },
+                "send"
+              )
+            ),
+            React.createElement(
+              "a",
+              { className: "waves-effect waves-blue btn-flat blue-text left ",
+                onClick: function (e) {
+                  _this.props.onBack(e);
+                } },
+              "volver"
+            )
+          )
+        );
+      }
+    }
+  });
+
+  return Manual;
+})(React.Component);
+
+module.exports = Manual;
+
+},{}],"/home/pjnovas/projects/la-canchita-web/src/components/account/Register.jsx":[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Manual = (function (_React$Component) {
+  function Manual(props) {
+    _classCallCheck(this, Manual);
+
+    _get(Object.getPrototypeOf(Manual.prototype), "constructor", this).call(this, props);
+  }
+
+  _inherits(Manual, _React$Component);
+
+  _createClass(Manual, {
+    render: {
+      value: function render() {
+        var _this = this;
+
+        return React.createElement(
+          "form",
+          { className: "row", action: this.props.uri, method: "post" },
+          React.createElement(
+            "h3",
+            { className: "active" },
+            "registro"
+          ),
+          React.createElement(
+            "div",
+            { className: "input-field col s12" },
+            React.createElement("input", { id: "username", type: "text", name: "username", required: true, className: "validate" }),
+            React.createElement(
+              "label",
+              { htmlFor: "username" },
+              "Usuario"
+            )
+          ),
+          React.createElement(
+            "div",
+            { className: "input-field col s12" },
+            React.createElement("input", { id: "email", type: "text", name: "email", required: true, className: "validate" }),
+            React.createElement(
+              "label",
+              { htmlFor: "email" },
+              "Email"
+            )
+          ),
+          React.createElement(
+            "div",
+            { className: "input-field col s12" },
+            React.createElement("input", { id: "password", type: "password", name: "password", className: "validate", required: true }),
+            React.createElement(
+              "label",
+              { htmlFor: "password" },
+              "Contraseña"
+            )
+          ),
+          React.createElement(
+            "div",
+            { className: "col s12" },
+            React.createElement(
+              "button",
+              { className: "btn btn-large waves-effect waves-light right", type: "submit" },
+              "Registrarse",
+              React.createElement(
+                "i",
+                { className: "material-icons right" },
+                "send"
+              )
+            ),
+            React.createElement(
+              "a",
+              { className: "waves-effect waves-blue btn-flat blue-text left ",
+                onClick: function (e) {
+                  _this.props.onBack(e);
+                } },
+              "volver"
+            )
+          )
+        );
+      }
+    }
+  });
+
+  return Manual;
+})(React.Component);
+
+module.exports = Manual;
+
+},{}],"/home/pjnovas/projects/la-canchita-web/src/components/account/forms.js":[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Manual = _interopRequire(require("./Manual.jsx"));
+
+var Register = _interopRequire(require("./Register.jsx"));
+
+var Recover = _interopRequire(require("./Recover.jsx"));
+
+exports.Manual = Manual;
+exports.Register = Register;
+exports.Recover = Recover;
+
+},{"./Manual.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/account/Manual.jsx","./Recover.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/account/Recover.jsx","./Register.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/account/Register.jsx"}],"/home/pjnovas/projects/la-canchita-web/src/components/controls/Button.js":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };

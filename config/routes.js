@@ -38,7 +38,7 @@ module.exports.routes = {
 
   'get /login': 'AuthController.login',
   'get /logout': 'AuthController.logout',
-  'get /register': 'AuthController.register',
+  //'get /register': 'AuthController.register',
 
   'post /auth/local': 'AuthController.callback',
   'post /auth/local/:action': 'AuthController.callback',
@@ -58,6 +58,11 @@ module.exports.routes = {
   //'post /api/users/me/picture': 'UserController.uploadPicture',
 
   // Group
+
+  'get /groups/:gid': 'WebAppController.index',
+  'get /groups/:gid/edit': 'WebAppController.index',
+  'get /groups/new': 'WebAppController.index',
+
 
   'post /api/groups/:gid/picture': 'GroupController.uploadPicture',
 
