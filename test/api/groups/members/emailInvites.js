@@ -149,9 +149,9 @@ describe('GET /v/invite/:token', function() {
       },
 
       function(_done){ // user sends an invitation expired
-
+        var email = 'other@e-mail.com';
         //create an expired token
-        sendInvitesBy(userIdx, gid, ['other@e-mail.com'], 200, function(err, res){
+        sendInvitesBy(userIdx, gid, [email], 200, function(err, res){
           if (err) _done(err);
 
           var today = new Date();
@@ -159,7 +159,7 @@ describe('GET /v/invite/:token', function() {
           var yesterday = new Date(today.getTime() - aDay);
 
           Invite
-            .update({ email: 'other@e-mail.com' }, { expires: yesterday })
+            .update({ email: email }, { expires: yesterday })
             .exec(function(err, invite){
               if (err) _done(err);
               expect(invite).to.be.an('object');
@@ -170,7 +170,15 @@ describe('GET /v/invite/:token', function() {
                 .expect(302)
                 .end(function(err, res){
                   expect(res.headers.location).to.be.equal('/v/expired');
-                  _done();
+
+                  Invite
+                    .findOne({ email: email })
+                    .exec(function(err, invite){
+                      if (err) _done(err);
+                      expect(invite).to.not.be.ok();
+                      _done();
+                    });
+
                 });
 
           });

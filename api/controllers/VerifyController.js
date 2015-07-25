@@ -25,7 +25,13 @@ module.exports = {
           if (!invite) return done('not-found');
 
           var today = new Date();
-          if (invite.expires < today) return done('expired');
+          if (invite.expires < today) {
+            Invite.destroy({ id: invite.id }).exec(function(err){
+              done('expired');
+            });
+
+            return;
+          }
 
           done(null, invite);
         },
