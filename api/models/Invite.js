@@ -12,11 +12,12 @@ module.exports = {
 
   attributes: {
 
+    token: { type: 'string' }, // auto-generated code for verification
     email: { type: 'email' },
 
     group: { model: 'Group', required: true },
 
-    invitedBy: { model: 'Membership' },
+    invitedBy: { model: 'User' },
 
     expires: {
       type: 'date',

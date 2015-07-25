@@ -1,4 +1,6 @@
 
+var hat = require('hat');
+
 module.exports = {
 
   find: function(req, res, next){
@@ -19,15 +21,78 @@ module.exports = {
 
       // validations
       function(done){
-        var users = req.body.users || (req.body.user && [req.body.user]);
-        var emails = req.body.emails || [];
+        var users = [];
 
-        if (emails.length + users.length > 10){
+        if (req.body.users){
+          users = req.body.users;
+        }
+        else if (req.body.user){
+          users = [req.body.user];
+        }
+
+        req.invites = {
+          users: _.uniq(users),
+          emails: _.uniq(req.body.emails) || []
+        };
+
+        if (req.invites.emails.length + req.invites.users.length > 10){
           res.forbidden('Cannot invite more than 10 for once');
           return done('exited');
         }
 
         done();
+      },
+
+      // find users by invite emails to avoid email invitations to existant users
+      function(done){
+        if (req.invites.emails.length === 0){
+          return done();
+        }
+
+        User
+          .find({ email: req.invites.emails })
+          .exec(function(err, _users){
+
+            _users.forEach(function(user){
+              var idx = req.invites.emails.indexOf(user.email);
+              req.invites.emails.splice(idx, 1);
+              req.invites.users.push(user.id);
+            });
+
+            req.invites.emails = _.uniq(req.invites.emails);
+            req.invites.users = _.uniq(req.invites.users);
+
+            done();
+          });
+      },
+
+      // Validate emails and create Invite tokens
+      function(done){
+        var emails = req.invites.emails || [];
+
+        if (emails.length === 0){
+          return done();
+        }
+
+        Invite
+          .create(
+            emails.map(function(email){
+              return {
+                token: hat(),
+                email: email,
+                group: groupId,
+                invitedBy: req.user.id
+              };
+            })
+          ).exec(function(err, invites){
+            //TODO: send emails
+            done(err);
+          });
+      },
+
+      // check if there is a need to continue
+      function(done){
+        done(req.invites.users.length === 0 ? 'no-users' : null);
       },
 
       // Find Group
@@ -38,7 +103,7 @@ module.exports = {
       // Create Memberships
       function(group, done){
         if (!group) return res.notFound();
-        var users = req.body.users || (req.body.user && [req.body.user]);
+        var users = req.invites.users;
 
         // remove existant users
         group.members.forEach(function(member){
@@ -49,8 +114,7 @@ module.exports = {
         });
 
         if (users.length === 0){
-          res.conflict('All users invited are already members.');
-          return done('exited');
+          return done('no-users');
         }
 
         var invites = users.map(function(uid){
@@ -81,6 +145,7 @@ module.exports = {
     ], function(err, members){
       if (err) {
         if (err === 'exited') return;
+        if (err === 'no-users') return res.json([]);
         return next(err);
       }
 

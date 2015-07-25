@@ -160,20 +160,73 @@ describe('POST /groups/:id/members', function() {
   });
 
   it('Allow multiples ROLE [owner]', function (done) {
+    var userIdx = 0;
     var gid = groups[2].id;
     var uids = [userAgents[3].user.id, userAgents[4].user.id];
-    var emails = ['t1@t.com', 't2@t.com'];
+    var emails = ['t1@t.com', 't2@t.com', 'user5@example.com'];
 
-    sendInvitesBy(0, gid, uids, emails, 200, function(err, res){
+    uids.push(userAgents[5].user.id); // invited by email
+
+    sendInvitesBy(userIdx, gid, uids, emails, 200, function(err, res){
       if (err) done(err);
-      checkUpdates(res.body, gid, uids, 0, done);
+      expect(res.body.length).to.be.equal(3);
+
+      checkUpdates(res.body, gid, uids, userIdx, function(){
+
+        // validate token invites generation for emails
+
+        var today = new Date();
+        var aWeek = 7 * 24 * 60 * 60 * 1000;
+        var nextWeek = new Date(today.getTime() + aWeek);
+
+        Invite
+          .find({ email: emails })
+          .exec(function(err, invites){
+            expect(err).to.not.be.ok();
+            expect(invites.length).to.be.equal(2);
+
+            invites.forEach(function(invite){
+              expect(invite.expires).to.be.greaterThan(today);
+              expect(invite.expires).to.be.lessThan(nextWeek);
+              expect(invite.group).to.be.equal(gid);
+              expect(invite.invitedBy).to.be.equal(userAgents[userIdx].user.id);
+              expect(invite.token.length).to.be.greaterThan(0);
+            });
+
+            expect(invites[0].token).to.not.be.equal(invites[1].token);
+
+            done();
+          });
+
+      });
+    });
+
+  });
+
+  it('Allow multiples ROLE [owner] - only emails', function (done) {
+    var userIdx = 0;
+    var gid = groups[2].id;
+    var emails = ['t100@t.com', 't200@t.com'];
+
+    sendInvitesBy(userIdx, gid, [], emails, 200, function(err, res){
+      if (err) done(err);
+      expect(res.body.length).to.be.equal(0);
+
+      Invite
+        .find({ email: emails })
+        .exec(function(err, invites){
+          expect(err).to.not.be.ok();
+          expect(invites.length).to.be.equal(2);
+          done();
+        });
+
     });
 
   });
 
   it('Allow multiples ROLE [admin]', function (done) {
     var gid = groups[2].id;
-    var uids = [userAgents[5].user.id, userAgents[6].user.id];
+    var uids = [userAgents[6].user.id, userAgents[7].user.id];
     var emails = ['t3@t.com', 't4@t.com'];
 
     sendInvitesBy(1, gid, uids, emails, 200, function(err, res){
@@ -185,7 +238,7 @@ describe('POST /groups/:id/members', function() {
 
   it('Allow multiples ROLE [moderator]', function (done) {
     var gid = groups[2].id;
-    var uids = [userAgents[7].user.id, userAgents[8].user.id];
+    var uids = [userAgents[8].user.id, userAgents[9].user.id];
     var emails = ['t5@t.com', 't6@t.com', 't7@t.com'];
 
     sendInvitesBy(2, gid, uids, emails, 200, function(err, res){
@@ -228,12 +281,20 @@ describe('POST /groups/:id/members', function() {
     sendInviteBy(7, groups[0].id, 12, 404, done);
   });
 
-  it('User is already a member - Conflict', function (done) {
-    sendInviteBy(0, groups[0].id, 2, 409, done);
+  it('User is already a member - OK no content', function (done) {
+    sendInviteBy(0, groups[0].id, 2, 200, function(err, res){
+      if (err) done(err);
+      expect(res.body.length).to.be.equal(0);
+      done();
+    });
   });
 
-  it('User is already invited - Conflict', function (done) {
-    sendInviteBy(0, groups[0].id, 4, 409, done);
+  it('User is already invited - OK no content', function (done) {
+    sendInviteBy(0, groups[0].id, 4, 200, function(err, res){
+      if (err) done(err);
+      expect(res.body.length).to.be.equal(0);
+      done();
+    });
   });
 
 });

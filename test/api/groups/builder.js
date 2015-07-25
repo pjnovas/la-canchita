@@ -44,9 +44,21 @@ module.exports = {
 
   clean: function(done){
 
-    Membership.destroy({}).exec(function(){
-      Group.destroy({}).exec(done);
-    });
+    var models = [
+      Invite,
+      Meeting,
+      Membership,
+      Group
+    ];
+
+    async.series(
+      models.map(function(model){
+        return function(_done){
+          model.destroy({}).exec(_done);
+        };
+      })
+    , done);
+
   }
 
 };
