@@ -2,7 +2,7 @@
 describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function() {
 
   // Group ----------------------------
-
+/*
   require('./findAll');
 
   require('./findOne');
@@ -10,10 +10,10 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
   require('./destroy');
   require('./update');
   require('./picture');
-
+*/
   require('./members');
 
-  require('./meetings');
+  //require('./meetings');
 
   // TODO:
   /*

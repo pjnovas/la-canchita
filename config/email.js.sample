@@ -1,0 +1,11 @@
+
+module.exports.email = {
+  service: 'Gmail',
+  auth: {
+    user: 'myemailaddress@gmail.com',
+    pass: 'mypassword'
+  },
+  templateDir: 'views/emailTemplates',
+  from: 'noreply@hydra.com',
+  testMode: true
+};

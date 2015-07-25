@@ -42,6 +42,7 @@ assets/images/groups/**/*
 config/local.js
 config/passport.js
 config/connections.js
+config/email.js
 
 
 

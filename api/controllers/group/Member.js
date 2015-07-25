@@ -125,8 +125,17 @@ module.exports = {
               };
             })
           ).exec(function(err, invites){
-            //TODO: send emails
-            done(err);
+
+            Invite
+              .find({ id: invites.map(function(inv){ return inv.id; }) })
+              .populateAll()
+              .exec(function(err, invites){
+                sails.services.email.sendInvites(invites, function(err){
+                  if (err) console.dir(err);
+                  done(); // avoid break if invitation emails fails
+                });
+              });
+
           });
       },
 
