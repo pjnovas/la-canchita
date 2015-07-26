@@ -147,6 +147,9 @@ module.exports = {
               return res.forbidden('cannot_destroy_group_with_more_than_1_owners');
             }
 
+            //TODO: remove group picture
+            //TODO: clear relations ( members, meetings, invites, etc)
+
             group.destroy(function(err){
               if (err) return next(err);
               res.status(204);
@@ -204,6 +207,50 @@ module.exports = {
   uploadPicture: function (req, res) {
 
     var gid = req.params.gid;
+
+    Group
+      .findOne({ id: gid })
+      .exec(function (err, group){
+
+        if (err) return next(err);
+        if (!group) return res.notFound();
+
+        sails.services.image
+          .upload(req, 'group', gid, function(err, filename){
+            if (err == 'no-file'){
+              return res.badRequest('No file was uploaded');
+            }
+            if (err == 'no-file'){
+              return res.badRequest('only one file is allowed');
+            }
+
+            function updateGroup(){
+              group.picture = filename;
+
+              group.save(function (err, lgroup){
+                if (err) return next(err);
+                res.json({ picture: lgroup.picture });
+              });
+            }
+
+            if (group.picture){
+
+              sails.services.image
+                .remove('group', group.picture, function(err){
+                  updateGroup();
+                });
+
+              return;
+            }
+
+            updateGroup();
+
+          });
+      });
+
+
+
+    /*
     var picsDir = require('path').resolve(sails.config.appPath, 'assets/images/groups');
     var picname = gid + '_' + moment().unix() + '.jpg';
 
@@ -248,6 +295,8 @@ module.exports = {
         });
 
     });
+    */
+
   },
 
 

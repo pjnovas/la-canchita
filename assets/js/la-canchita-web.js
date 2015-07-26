@@ -30037,16 +30037,16 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var Manual = (function (_React$Component) {
-  function Manual(props) {
-    _classCallCheck(this, Manual);
+var Recover = (function (_React$Component) {
+  function Recover(props) {
+    _classCallCheck(this, Recover);
 
-    _get(Object.getPrototypeOf(Manual.prototype), "constructor", this).call(this, props);
+    _get(Object.getPrototypeOf(Recover.prototype), "constructor", this).call(this, props);
   }
 
-  _inherits(Manual, _React$Component);
+  _inherits(Recover, _React$Component);
 
-  _createClass(Manual, {
+  _createClass(Recover, {
     render: {
       value: function render() {
         var _this = this;
@@ -30103,10 +30103,10 @@ var Manual = (function (_React$Component) {
     }
   });
 
-  return Manual;
+  return Recover;
 })(React.Component);
 
-module.exports = Manual;
+module.exports = Recover;
 
 },{}],"/home/pjnovas/projects/la-canchita-web/src/components/account/Register.jsx":[function(require,module,exports){
 "use strict";
@@ -30119,16 +30119,16 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var Manual = (function (_React$Component) {
-  function Manual(props) {
-    _classCallCheck(this, Manual);
+var Register = (function (_React$Component) {
+  function Register(props) {
+    _classCallCheck(this, Register);
 
-    _get(Object.getPrototypeOf(Manual.prototype), "constructor", this).call(this, props);
+    _get(Object.getPrototypeOf(Register.prototype), "constructor", this).call(this, props);
   }
 
-  _inherits(Manual, _React$Component);
+  _inherits(Register, _React$Component);
 
-  _createClass(Manual, {
+  _createClass(Register, {
     render: {
       value: function render() {
         var _this = this;
@@ -30205,10 +30205,10 @@ var Manual = (function (_React$Component) {
     }
   });
 
-  return Manual;
+  return Register;
 })(React.Component);
 
-module.exports = Manual;
+module.exports = Register;
 
 },{}],"/home/pjnovas/projects/la-canchita-web/src/components/account/forms.js":[function(require,module,exports){
 "use strict";

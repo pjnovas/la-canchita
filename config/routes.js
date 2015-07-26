@@ -53,6 +53,8 @@ module.exports.routes = {
 
   // Users
 
+  'get /profile': 'WebAppController.index',
+
   'get /api/users/search': 'UserController.search',
   'get /api/users/me': 'UserController.me',
   'put /api/users/me': 'UserController.updateMe',
@@ -63,7 +65,6 @@ module.exports.routes = {
   'get /groups/:gid': 'WebAppController.index',
   'get /groups/:gid/edit': 'WebAppController.index',
   'get /groups/new': 'WebAppController.index',
-
 
   'post /api/groups/:gid/picture': 'GroupController.uploadPicture',
 
