@@ -248,55 +248,6 @@ module.exports = {
           });
       });
 
-
-
-    /*
-    var picsDir = require('path').resolve(sails.config.appPath, 'assets/images/groups');
-    var picname = gid + '_' + moment().unix() + '.jpg';
-
-    req.file('image').upload({
-      saveAs: picname,
-      maxBytes: 300000, // ~300KB
-      dirname: picsDir
-    }, function (err, uploadedFiles) {
-      if (err) return next(err);
-
-      if (uploadedFiles.length === 0){
-        return res.badRequest('No file was uploaded');
-      }
-
-      if (uploadedFiles.length > 1){
-        return res.badRequest('only one file is allowed');
-      }
-
-      Group
-        .findOne({ id: gid })
-        .exec(function (err, group){
-          if (err) return next(err);
-          if (!group) return res.notFound();
-
-          if (group.picture){
-            // remove last picture
-            require('fs').unlink(picsDir + '/' + group.picture, function(err){
-              if (err) {
-                console.log('ERROR ON Removing previous Group Picture > ');
-                console.dir(err);
-              }
-            });
-          }
-
-          group.picture = picname;
-
-          group.save(function (err, lgroup){
-            if (err) return next(err);
-            res.json({ picture: lgroup.picture });
-          });
-
-        });
-
-    });
-    */
-
   },
 
 

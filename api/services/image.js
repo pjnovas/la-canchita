@@ -2,7 +2,8 @@ var
   path = require('path'),
   async = require('async'),
   fs = require('fs'),
-  moment = require('moment');
+  moment = require('moment'),
+  mime = require('mime');
 
 var image = {};
 
@@ -32,8 +33,32 @@ image.remove = function(type, filename, done){
 
 image.upload = function(req, type, id, done){
 
-  var picname = id + '_' + moment().unix() + '.jpg'; //TODO: remove extension
-  var loaded = false;
+  var images = [];
+
+  var streamOpts = {
+    dirname: dirs[type],
+    maxBytes: 300000, // ~300KB
+    saveAs: function(file) {
+      var ct = file && file.headers && file.headers['content-type'] || '';
+      var ext = ct && '.' + mime.extension(ct) || path.extname(file.filename);
+
+      return id + '_' + moment().unix() + ext;
+    },
+    completed: function(fileData, next) {
+      images.push(fileData);
+      next();
+    }
+  };
+
+  req.file('image').upload(sails.services.uploader(streamOpts), function (err, files) {
+    if (err) return done(err);
+    done(null, images[0].localName);
+  });
+
+};
+
+/*
+image.upload = function(req, type, id, done){
 
   var filer = req.file('image').upload({
     saveAs: picname,
@@ -61,5 +86,6 @@ image.upload = function(req, type, id, done){
   });
 
 };
+*/
 
 module.exports = image;
