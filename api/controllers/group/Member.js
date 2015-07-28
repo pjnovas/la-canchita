@@ -153,16 +153,23 @@ module.exports = {
       function(group, done){
         if (!group) return res.notFound();
         var users = req.invites.users;
+        req.invites.reinvite = [];
 
         // remove existant users
         group.members.forEach(function(member){
           var idx = users.indexOf(member.user);
           if (idx >= 0){
+
+            if (['rejected', 'removed'].indexOf(member.state) > -1) {
+              // re invite removed or rejected members
+              req.invites.reinvite.push(member);
+            }
+
             users.splice(idx, 1);
           }
         });
 
-        if (users.length === 0){
+        if (req.invites.reinvite.length === 0 && users.length === 0){
           return done('no-users');
         }
 
@@ -188,6 +195,32 @@ module.exports = {
 
         group.save(function(err, group){
           done(err, members);
+        });
+      },
+
+      // save reinvites
+      function(members, done){
+        var invites = req.invites.reinvite;
+
+        if (!invites.length){
+          return done(null, members);
+        }
+
+        async.series(
+          invites.map(function(member){
+
+            return function(_done){
+
+              Membership.update({ id: member.id }, {
+                invitedBy: req.groupMember.id,
+                state: 'pending',
+                role: 'member'
+              }).exec(function(err, updates){ _done(err, updates[0]); });
+
+            };
+          })
+        ,function(err, updated){
+          done(err, (members || []).concat(updated || []));
         });
       }
 

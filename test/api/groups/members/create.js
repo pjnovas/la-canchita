@@ -66,6 +66,23 @@ describe('POST /groups/:id/members', function() {
         role: 'moderator',
         state: 'active'
       }]
+    }, { // invite removed or rejected
+      title: 'Group Awesome 4',
+      description: 'My cool group 4',
+      picture: 'http://pic.com/pic2.png',
+      members: [{
+        user: userAgents[0].user.id,
+        role: 'owner',
+        state: 'active'
+      },{
+        user: userAgents[5].user.id,
+        role: 'moderator',
+        state: 'rejected'
+      },{
+        user: userAgents[6].user.id,
+        role: 'moderator',
+        state: 'removed'
+      }]
     }];
 
     builder.create(groups_data, function(err, _groups){
@@ -94,6 +111,7 @@ describe('POST /groups/:id/members', function() {
 
   function checkUpdates(ms, gid, uids, index, done){
     expect(ms).to.be.an('array');
+    expect(ms.length).to.be.greaterThan(0);
 
     if (!Array.isArray(uids)){
       uids = [uids];
@@ -373,6 +391,34 @@ describe('POST /groups/:id/members', function() {
       if (err) done(err);
       expect(res.body.length).to.be.equal(0);
       done();
+    });
+  });
+
+  it('User is rejected - OK - Re-Invite', function (done) {
+    var gid = groups[3].id;
+    var uid = userAgents[5].user.id;
+
+    expect(groups[3].members[1].state).to.be.equal('rejected');
+    expect(groups[3].members[1].user).to.be.equal(uid);
+
+    sendInviteBy(0, gid, uid, 200, function(err, res){
+      if (err) done(err);
+      expect(res.body.length).to.be.equal(1);
+      checkUpdates(res.body, gid, uid, 0, done);
+    });
+  });
+
+  it('User is removed - OK - Re-Invite', function (done) {
+    var gid = groups[3].id;
+    var uid = userAgents[6].user.id;
+
+    expect(groups[3].members[2].state).to.be.equal('removed');
+    expect(groups[3].members[2].user).to.be.equal(uid);
+
+    sendInviteBy(0, gid, uid, 200, function(err, res){
+      if (err) done(err);
+      expect(res.body.length).to.be.equal(1);
+      checkUpdates(res.body, gid, uid, 0, done);
     });
   });
 
