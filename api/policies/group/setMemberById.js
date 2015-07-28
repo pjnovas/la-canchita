@@ -15,7 +15,9 @@ module.exports = function(req, res, next) {
     .exec(function(err, member){
       if (err) return next(err);
 
-      //TODO: NotFound
+      if (!member){
+        return res.notFound('Requested member not found');
+      }
 
       req.requestedMember = member;
       next();
