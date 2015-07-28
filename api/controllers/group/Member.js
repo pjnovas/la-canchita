@@ -231,7 +231,22 @@ module.exports = {
         return next(err);
       }
 
-      res.json(members);
+      // fetch and assign member users
+      var memberIds = members.map(function(member){ return member.id; });
+
+      Membership
+        .find({ id: memberIds })
+        .populate('user')
+        .exec(function(err, members){
+          if (err) return next(err);
+
+          members.forEach(function(member){
+            member.user = _.pick(member.user, ['id', 'name', 'picture']);
+          });
+
+          res.json(members);
+        });
+
     });
   },
 

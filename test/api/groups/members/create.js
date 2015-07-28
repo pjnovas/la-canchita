@@ -102,11 +102,18 @@ describe('POST /groups/:id/members', function() {
     expect(m).to.be.an('object');
 
     expect(m.id).to.be.ok();
-    expect(m.user).to.be.equal(uid);
     expect(m.group).to.be.equal(gid);
-
     expect(m.role).to.be.equal('member');
     expect(m.state).to.be.equal('pending');
+
+    expect(m.user).to.be.an('object');
+    expect(m.user.id).to.be.equal(uid);
+    expect(m.user.name).to.be.ok();
+    expect(m.user.picture).to.be.ok();
+
+    expect(m.user.username).to.not.be.ok();
+    expect(m.user.email).to.not.be.ok();
+    expect(m.user.passports).to.not.be.ok();
   }
 
   function checkUpdates(ms, gid, uids, index, done){
