@@ -81,29 +81,16 @@ module.exports = {
       function (done){
         Group
           .findOne({ id: req.params.id })
-          .populate('members')
           .exec(done);
       },
 
-      // fetch & fill users members
+      // set member in the group
       function (group, done){
-        var userIds = _.pluck(group.members, 'user');
-        User
-          .find()
-          .where({ id: userIds })
-          .exec(function(err, users){
-
-            if (err) return done(err);
-
-            var usersObj = _.indexBy(users, 'id');
-
-            _.forEach(group.members, function(member) {
-              member.user = _.pick(usersObj[member.user], ['id', 'name', 'picture']);
-            });
-
-            done(err, group);
-          });
-      },
+        group = group.toJSON();
+        group.member = req.groupMember;
+        group.member.user = _.pick(group.member.user, ['id', 'name', 'picture']);
+        done(null, group);
+      }
 
     ], function(err, group){
       if (err) return next(err);

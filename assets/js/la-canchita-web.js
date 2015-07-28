@@ -29107,11 +29107,20 @@ var builder = _interopRequire(require("./builder"));
 
 var actions = builder(GroupConstants);
 
-actions.custom = function (data) {
+actions.accepted = function (id, member) {
 
   AppDispatcher.dispatch({
-    type: GroupConstants.CUSTOM,
-    data: data
+    type: GroupConstants.ACCEPTED,
+    id: id,
+    member: member
+  });
+};
+
+actions.declined = function (id) {
+
+  AppDispatcher.dispatch({
+    type: GroupConstants.DECLINED,
+    id: id
   });
 };
 
@@ -31066,11 +31075,17 @@ module.exports = Groups;
 },{"../Header.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/Header.jsx","./List.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/group/List.jsx"}],"/home/pjnovas/projects/la-canchita-web/src/components/group/Item.jsx":[function(require,module,exports){
 "use strict";
 
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var MemberActions = _interopRequire(require("../../actions/Member"));
+
+var Icon = require("../controls").Icon;
 
 var Link = require("react-router").Link;
 
@@ -31086,9 +31101,23 @@ var GroupItem = (function (_React$Component) {
   _inherits(GroupItem, _React$Component);
 
   _createClass(GroupItem, {
+    onAcceptClick: {
+      value: function onAcceptClick() {
+        MemberActions.accept(this.props.model.id);
+      }
+    },
+    onDeclineClick: {
+      value: function onDeclineClick() {
+        MemberActions.decline(this.props.model.id);
+      }
+    },
     render: {
       value: function render() {
+        var _this = this;
+
         var model = this.props.model;
+
+        var isInvite = model.member.state === "pending";
 
         return React.createElement(
           "div",
@@ -31096,6 +31125,16 @@ var GroupItem = (function (_React$Component) {
           React.createElement(
             "div",
             { className: "card small" },
+            isInvite ? React.createElement(
+              "div",
+              { className: "card-tag invite" },
+              React.createElement(Icon, { name: "arrow_forward" }),
+              React.createElement(
+                "span",
+                null,
+                "Invitación"
+              )
+            ) : null,
             React.createElement(
               "div",
               { className: "card-image" },
@@ -31118,9 +31157,28 @@ var GroupItem = (function (_React$Component) {
             React.createElement(
               "div",
               { className: "card-action" },
-              React.createElement(
+              isInvite ? React.createElement(
+                "div",
+                null,
+                React.createElement(
+                  "a",
+                  { className: "left muted",
+                    onClick: function (e) {
+                      _this.onDeclineClick(e);
+                    } },
+                  "ignorar"
+                ),
+                React.createElement(
+                  "a",
+                  { className: "right",
+                    onClick: function (e) {
+                      _this.onAcceptClick(e);
+                    } },
+                  "aceptar"
+                )
+              ) : React.createElement(
                 Link,
-                { to: "group", params: { groupId: model.id } },
+                { className: "right", to: "group", params: { groupId: model.id } },
                 "Abrir"
               )
             )
@@ -31137,7 +31195,7 @@ module.exports = GroupItem;
 
 GroupItem.displayName = "GroupItem";
 
-},{"react-router":"/home/pjnovas/projects/la-canchita-web/node_modules/react-router/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/group/List.jsx":[function(require,module,exports){
+},{"../../actions/Member":"/home/pjnovas/projects/la-canchita-web/src/actions/Member.js","../controls":"/home/pjnovas/projects/la-canchita-web/src/components/controls/index.js","react-router":"/home/pjnovas/projects/la-canchita-web/node_modules/react-router/lib/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/group/List.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -31185,9 +31243,23 @@ var GroupList = (function (_ReactListener) {
         this.setState({ groups: groups });
       }
     },
+    onChange: {
+      value: function onChange(groups, group) {
+        this.setState({ groups: groups });
+      }
+    },
+    onRemove: {
+      value: function onRemove(groups, id) {
+        this.setState({ groups: groups });
+      }
+    },
     render: {
       value: function render() {
         var _this = this;
+
+        var groups = this.state.groups.filter(function (g) {
+          return ["active", "pending"].indexOf(g.member.state) > -1;
+        });
 
         var list = (function () {
 
@@ -31199,8 +31271,8 @@ var GroupList = (function (_ReactListener) {
             );
           }
 
-          if (_this.state.groups.length) {
-            return _this.state.groups.map(function (model) {
+          if (groups.length) {
+            return groups.map(function (model) {
               return React.createElement(GroupItem, { key: model.id, model: model });
             });
           }
@@ -31279,6 +31351,9 @@ var GroupView = (function (_ReactListener) {
 
     this.state.id = this.props.params.groupId;
     this.store = GroupStore;
+
+    this.editors = ["owner", "admin"];
+    this.destroyers = ["owner"];
   }
 
   _inherits(GroupView, _ReactListener);
@@ -31293,7 +31368,7 @@ var GroupView = (function (_ReactListener) {
     onFind: {
       value: function onFind(group) {
         _get(Object.getPrototypeOf(GroupView.prototype), "onFind", this).call(this);
-        this.setState(group);
+        this.setState({ group: group, me: group.member });
       }
     },
     onDestroyClick: {
@@ -31310,9 +31385,11 @@ var GroupView = (function (_ReactListener) {
       value: function render() {
         var _this = this;
 
+        var model = this.state.group || {};
+
         var style = {};
-        if (this.state.picture) {
-          style = { backgroundImage: "url(/images/groups/" + this.state.picture + ")" };
+        if (model.picture) {
+          style = { backgroundImage: "url(/images/groups/" + model.picture + ")" };
         }
 
         var navs = [];
@@ -31340,6 +31417,10 @@ var GroupView = (function (_ReactListener) {
           text: "Configurar"
         }];
 
+        var myRole = this.state.me && this.state.me.role || "member";
+        var canEdit = this.editors.indexOf(myRole) > -1;
+        var canRemove = this.destroyers.indexOf(myRole) > -1;
+
         return React.createElement(
           "div",
           { className: "groups view" },
@@ -31364,17 +31445,17 @@ var GroupView = (function (_ReactListener) {
                   React.createElement(
                     "h1",
                     null,
-                    this.state.title
+                    model.title
                   )
                 ),
                 React.createElement(
                   "p",
                   { className: "flow-text description" },
-                  this.state.description
+                  model.description
                 ),
-                React.createElement(ButtonAction, { icon: "mode_edit",
-                  to: "groupedit", params: { groupId: this.state.id } }),
-                React.createElement(
+                canEdit ? React.createElement(ButtonAction, { icon: "mode_edit",
+                  to: "groupedit", params: { groupId: this.state.id } }) : null,
+                canRemove ? React.createElement(
                   "div",
                   { className: "row" },
                   React.createElement(
@@ -31386,7 +31467,7 @@ var GroupView = (function (_ReactListener) {
                         _this.onDestroyClick();
                       } })
                   )
-                )
+                ) : null
               ),
               React.createElement(
                 "div",
@@ -31421,31 +31502,82 @@ icon: 'mode_edit'
 },{"../../actions/Group":"/home/pjnovas/projects/la-canchita-web/src/actions/Group.js","../../stores/Group":"/home/pjnovas/projects/la-canchita-web/src/stores/Group.js","../Header.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/Header.jsx","../ReactListener":"/home/pjnovas/projects/la-canchita-web/src/components/ReactListener.js","../controls":"/home/pjnovas/projects/la-canchita-web/src/components/controls/index.js","../member/List.jsx":"/home/pjnovas/projects/la-canchita-web/src/components/member/List.jsx"}],"/home/pjnovas/projects/la-canchita-web/src/components/member/Item.jsx":[function(require,module,exports){
 "use strict";
 
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
+var MemberStore = _interopRequire(require("../../stores/Member"));
+
+var Icon = require("../controls").Icon;
+
 var MemberItem = (function (_React$Component) {
-  function MemberItem() {
+  function MemberItem(props) {
     _classCallCheck(this, MemberItem);
 
-    if (_React$Component != null) {
-      _React$Component.apply(this, arguments);
-    }
+    _get(Object.getPrototypeOf(MemberItem.prototype), "constructor", this).call(this, props);
+
+    this.roles = ["owner", "admin", "moderator", "member"];
+
+    this.roleName = {
+      owner: "Creador",
+      admin: "Admin",
+      moderator: "Moderador",
+      member: "Jugador"
+    };
+
+    this.kickers = ["owner", "admin"];
   }
 
   _inherits(MemberItem, _React$Component);
 
   _createClass(MemberItem, {
+    componentDidMount: {
+      value: function componentDidMount() {
+        $(React.findDOMNode(this.refs.roles)).dropdown({
+          inDuration: 300,
+          outDuration: 225,
+          constrain_width: false,
+          hover: false,
+          gutter: 0,
+          belowOrigin: false
+        });
+      }
+    },
     render: {
       value: function render() {
+        var _this = this;
+
         var model = this.props.model;
+        var myRole = this.props.myRole || "member";
+
+        var isMe = model.user.id == window.user.id;
+        var myRoleIdx = this.roles.indexOf(myRole);
+        var mRoleIdx = this.roles.indexOf(model.role);
+
+        var canKick = false;
+        if (!isMe && this.kickers.indexOf(myRole) > -1) {
+          canKick = this.roles.indexOf(model.role) > myRoleIdx;
+        }
+
+        var changeRoles = [];
+        if (mRoleIdx !== myRoleIdx) {
+          changeRoles = this.roles.filter(function (role) {
+            return model.role !== role && _this.roles.indexOf(role) > myRoleIdx;
+          });
+        }
+
+        var roleDDL = "roles-ddl-" + model.id;
+        var roleName = this.roleName[model.role];
 
         return React.createElement(
           "li",
-          { className: "collection-item avatar" },
+          { className: "collection-item avatar " + (isMe ? "me" : "") },
           React.createElement("img", { src: model.user.picture, className: "circle" }),
           React.createElement(
             "span",
@@ -31455,16 +31587,42 @@ var MemberItem = (function (_React$Component) {
           React.createElement(
             "p",
             null,
-            model.role
+            roleName
           ),
-          React.createElement(
+          !isMe && myRole !== "member" && changeRoles.length ? React.createElement(
             "a",
-            { href: "#!", className: "secondary-content" },
-            React.createElement(
-              "i",
-              { className: "material-icons" },
-              "grade"
-            )
+            { ref: "roles", "data-activates": roleDDL, className: "dropdown-button secondary-content" },
+            React.createElement(Icon, { name: "more_vert" })
+          ) : null,
+          React.createElement(
+            "ul",
+            { id: roleDDL, className: "dropdown-content" },
+            changeRoles.map(function (role) {
+              return React.createElement(
+                "li",
+                null,
+                React.createElement(
+                  "a",
+                  { onClick: function (e) {
+                      _this.props.changeRole(model.id, role);
+                    } },
+                  _this.roleName[role]
+                )
+              );
+            }),
+            canKick ? React.createElement("li", { className: "divider" }) : null,
+            canKick ? React.createElement(
+              "li",
+              null,
+              React.createElement(
+                "a",
+                { className: "red-text",
+                  onClick: function (e) {
+                    _this.props.kickMember(model.id);
+                  } },
+                "Eliminar"
+              )
+            ) : null
           )
         );
       }
@@ -31478,7 +31636,7 @@ module.exports = MemberItem;
 
 MemberItem.displayName = "MemberItem";
 
-},{}],"/home/pjnovas/projects/la-canchita-web/src/components/member/List.jsx":[function(require,module,exports){
+},{"../../stores/Member":"/home/pjnovas/projects/la-canchita-web/src/stores/Member.js","../controls":"/home/pjnovas/projects/la-canchita-web/src/components/controls/index.js"}],"/home/pjnovas/projects/la-canchita-web/src/components/member/List.jsx":[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -31513,6 +31671,7 @@ var MemberList = (function (_ReactListener) {
     this.state.members = [];
 
     this.store = MemberStore;
+    this.inviters = ["owner", "admin", "moderator"];
   }
 
   _inherits(MemberList, _ReactListener);
@@ -31532,6 +31691,16 @@ var MemberList = (function (_ReactListener) {
     },
     onInvite: {
       value: function onInvite(members) {
+        this.setState({ members: members });
+      }
+    },
+    onSetrole: {
+      value: function onSetrole(members) {
+        this.setState({ members: members });
+      }
+    },
+    onKick: {
+      value: function onKick(members) {
         this.setState({ members: members });
       }
     },
@@ -31565,14 +31734,40 @@ var MemberList = (function (_ReactListener) {
         MemberActions.invite(this.state.gid, { users: users, emails: emails });
       }
     },
+    kickMember: {
+      value: function kickMember(mid) {
+        MemberActions.kick(this.state.gid, id);
+      }
+    },
+    changeRole: {
+      value: function changeRole(id, role) {
+        MemberActions.setRole(this.state.gid, { id: id, role: role });
+      }
+    },
     render: {
       value: function render() {
         var _this = this;
 
         var list = this.state.members;
-        var skipIds = list.map(function (member) {
+
+        var active = list.filter(function (member) {
+          return member.state === "active";
+        });
+
+        var pending = list.filter(function (member) {
+          return member.state === "pending";
+        });
+
+        var skipIds = active.concat(pending).map(function (member) {
           return member.user.id;
         });
+
+        var me = active.find(function (member) {
+          return member.user.id === window.user.id;
+        });
+
+        var myRole = me && me.role || "member";
+        var canInvite = this.inviters.indexOf(myRole) > -1;
 
         return React.createElement(
           "div",
@@ -31591,14 +31786,36 @@ var MemberList = (function (_ReactListener) {
             React.createElement(
               "ul",
               { className: "collection" },
-              this.state.members.map(function (member) {
-                return React.createElement(MemberItem, { key: member.id, model: member });
+              active.map(function (member) {
+                return React.createElement(MemberItem, {
+                  key: member.id, model: member, myRole: myRole,
+                  kickMember: function (mid) {
+                    _this.kickMember(mid);
+                  },
+                  changeRole: function (mid, role) {
+                    _this.changeRole(mid, role);
+                  } });
               })
             ),
-            React.createElement(ButtonAction, { icon: "person_add",
-              onClick: function (e) {
+            pending.length ? React.createElement(
+              "div",
+              null,
+              React.createElement(
+                "span",
+                { className: "category-title" },
+                "Invitados"
+              ),
+              React.createElement(
+                "ul",
+                { className: "collection invites" },
+                pending.map(function (member) {
+                  return React.createElement(MemberItem, { key: member.id, model: member });
+                })
+              )
+            ) : null,
+            canInvite ? React.createElement(ButtonAction, { icon: "person_add", onClick: function (e) {
                 _this.showInvite(e);
-              } })
+              } }) : null
           )
         );
       }
@@ -31978,7 +32195,7 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 
 var builder = _interopRequire(require("./builder"));
 
-module.exports = builder("GROUP", ["CUSTOM"], true);
+module.exports = builder("GROUP", ["ACCEPTED", "DECLINED"], true);
 
 },{"./builder":"/home/pjnovas/projects/la-canchita-web/src/constants/builder.js"}],"/home/pjnovas/projects/la-canchita-web/src/constants/Member.js":[function(require,module,exports){
 "use strict";
@@ -31987,7 +32204,7 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 
 var builder = _interopRequire(require("./builder"));
 
-module.exports = builder("MEMBER", ["FIND", "JOIN", "LEAVE", "INVITE", "SETROLE", "KICK"]);
+module.exports = builder("MEMBER", ["FIND", "ACCEPT", "DECLINE", "INVITE", "SETROLE", "KICK"]);
 
 },{"./builder":"/home/pjnovas/projects/la-canchita-web/src/constants/builder.js"}],"/home/pjnovas/projects/la-canchita-web/src/constants/User.js":[function(require,module,exports){
 "use strict";
@@ -32072,7 +32289,7 @@ var GroupStore = (function (_ListStore) {
     this.uri = "/api/groups/";
     this.type = "GROUP";
 
-    this.events = this.events.concat([]);
+    this.events = this.events.concat(["change", "remove"]);
   }
 
   _inherits(GroupStore, _ListStore);
@@ -32084,27 +32301,16 @@ var GroupStore = (function (_ListStore) {
         _get(Object.getPrototypeOf(GroupStore.prototype), "dispatchCallback", this).call(this, payload);
 
         switch (payload.type) {
-          case GroupConstants.CUSTOM:
-            //something
+          case GroupConstants.ACCEPTED:
+            var group = this.get(payload.id);
+            group.member = payload.member;
+            this.trigger("change", this.get(), group);
+            break;
+          case GroupConstants.DECLINED:
+            this.remove(payload.id);
+            this.trigger("remove", this.get(), payload.id);
             break;
         };
-
-        /* DEFAULTS
-        switch (payload.type) {
-          case GroupConstants.RECIEVE:
-            this.add(payload.data);
-            break;
-          case GroupConstants.CREATE:
-            this.create(payload.data);
-            break;
-          case GroupConstants.UPDATE:
-            this.update(payload.data);
-            break;
-          case GroupConstants.DESTROY:
-            this.destroy(payload.data);
-            break;
-        }
-        */
       }
     },
     sendImage: {
@@ -32180,8 +32386,6 @@ var GroupStore = (function (_ListStore) {
 })(ListStore);
 
 module.exports = new GroupStore();
-
-// custom events here
 
 },{"../constants/Group":"/home/pjnovas/projects/la-canchita-web/src/constants/Group.js","./ListStore":"/home/pjnovas/projects/la-canchita-web/src/stores/ListStore.js","superagent":"/home/pjnovas/projects/la-canchita-web/node_modules/superagent/lib/client.js"}],"/home/pjnovas/projects/la-canchita-web/src/stores/ListStore.js":[function(require,module,exports){
 "use strict";
@@ -32298,6 +32502,11 @@ var ListStore = (function (_EventEmitter) {
       value: function set(item) {
         // TODO: merge item ?
         this.add(item);
+      }
+    },
+    remove: {
+      value: function remove(id) {
+        this.list["delete"](id);
       }
     },
     find: {
@@ -32454,7 +32663,7 @@ var MemberStore = (function (_ListStore) {
 
     this.events = ["error"];
 
-    ["find", "join", "leave", "invite", "setrole", "kick"].forEach(function (event) {
+    ["find", "accept", "decline", "invite", "setrole", "kick"].forEach(function (event) {
       _this.events.push("before:" + event);
       _this.events.push(event);
     });
@@ -32483,19 +32692,19 @@ var MemberStore = (function (_ListStore) {
             this.find(payload.gid);
             break;
           case MemberConstants.ACCEPT:
-
+            this.accept(payload.gid);
             break;
           case MemberConstants.DECLINE:
-
+            this.decline(payload.gid);
             break;
           case MemberConstants.INVITE:
             this.invite(payload.gid, payload.data);
             break;
           case MemberConstants.SETROLE:
-
+            this.setRole(payload.gid, payload.data);
             break;
           case MemberConstants.KICK:
-
+            this.kick(payload.gid);
             break;
         };
       }
@@ -32571,6 +32780,71 @@ var MemberStore = (function (_ListStore) {
 
           _this.add(gid, res.body);
           _this.emit("invite", _this.get(gid));
+        });
+      }
+    },
+    accept: {
+      value: function accept(gid) {
+        var _this = this;
+
+        this.emit("before:accept");
+
+        request.post(this.getURI(gid) + "me").end(function (err, res) {
+          if (_this.errorHandler(err, "accept")) {
+            return;
+          }
+
+          _this.add(gid, res.body);
+          _this.emit("accept", _this.get(gid));
+        });
+      }
+    },
+    decline: {
+      value: function decline(gid) {
+        var _this = this;
+
+        this.emit("before:decline");
+
+        request.del(this.getURI(gid) + "me").end(function (err, res) {
+          if (_this.errorHandler(err, "decline")) {
+            return;
+          }
+
+          _this.emit("decline", _this.get(gid));
+        });
+      }
+    },
+    setRole: {
+      value: function setRole(gid, data) {
+        var _this = this;
+
+        this.emit("before:setrole");
+
+        request.put(this.getURI(gid) + data.id).send({ role: data.role }).end(function (err, res) {
+          if (_this.errorHandler(err, "setrole")) {
+            return;
+          }
+
+          var members = _this.getGroup(gid);
+          members.get(data.id).role = data.role;
+          _this.emit("setrole", _this.get(gid));
+        });
+      }
+    },
+    kick: {
+      value: function kick(gid, id) {
+        var _this = this;
+
+        this.emit("before:kick");
+
+        request.del(this.getURI(gid) + id).end(function (err, res) {
+          if (_this.errorHandler(err, "kick")) {
+            return;
+          }
+
+          var members = _this.getGroup(gid);
+          members["delete"](id);
+          _this.emit("kick", _this.get(gid));
         });
       }
     }

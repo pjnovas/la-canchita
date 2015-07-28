@@ -60,10 +60,14 @@ describe('GET /groups/:id', function() {
 
   function checkGroup(group){
     expect(group).to.be.an('object');
-    expect(group.members).to.be.an('array');
-    expect(group.members.length).to.be.equal(7);
 
-    var aUser = group.members[0].user;
+    expect(group.members).to.not.be.ok();
+    expect(group.meetings).to.not.be.ok();
+
+    expect(group.member.role).to.be.equal('owner');
+    expect(group.member.state).to.be.equal('active');
+
+    var aUser = group.member.user;
     var user = userAgents[0].user;
 
     expect(aUser).to.be.an('object');
