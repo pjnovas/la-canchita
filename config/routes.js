@@ -80,6 +80,10 @@ module.exports.routes = {
 
   // Group Meetings
 
+  'get /meetings/:mid': 'WebAppController.index',
+  'get /meetings/:mid/edit': 'WebAppController.index',
+  'get /meetings/:gid/new': 'WebAppController.index',
+
   'get /api/groups/:gid/meetings': 'GroupController.getMeetings',
   'post /api/groups/:gid/meetings': 'GroupController.createMeeting',
   'put /api/groups/:gid/meetings/:meetingId': 'GroupController.changeMeeting',
