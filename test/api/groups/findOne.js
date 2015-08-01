@@ -58,6 +58,24 @@ describe('GET /groups/:id', function() {
 
   after(builder.clean);
 
+  function checkUser(aUser, user){
+    expect(aUser).to.be.an('object');
+
+    if (user){
+      expect(aUser.id).to.be.equal(user.id);
+    }
+    else {
+      expect(aUser.id).to.be.ok();
+    }
+
+    expect(aUser.name).to.be.ok();
+    expect(aUser.picture).to.be.ok();
+
+    expect(aUser.username).to.not.be.ok();
+    expect(aUser.email).to.not.be.ok();
+    expect(aUser.passports).to.not.be.ok();
+  }
+
   function checkGroup(group){
     expect(group).to.be.an('object');
 
@@ -67,17 +85,7 @@ describe('GET /groups/:id', function() {
     expect(group.member.role).to.be.equal('owner');
     expect(group.member.state).to.be.equal('active');
 
-    var aUser = group.member.user;
-    var user = userAgents[0].user;
-
-    expect(aUser).to.be.an('object');
-    expect(aUser.id).to.be.equal(user.id);
-    expect(aUser.name).to.be.ok();
-    expect(aUser.picture).to.be.ok();
-
-    expect(aUser.username).to.not.be.ok();
-    expect(aUser.email).to.not.be.ok();
-    expect(aUser.passports).to.not.be.ok();
+    checkUser(group.member.user, userAgents[0].user);
   }
 
   it('Allow ROLE [owner]', function (done) {

@@ -21,7 +21,8 @@ describe('GET /groups', function() {
       }, {
         user: userAgents[3].user.id,
         role: 'member',
-        state: 'pending'
+        state: 'pending',
+        invitedBy: userAgents[0].user.id
       }]
     }, {
       title: 'Group Awesome 2',
@@ -82,8 +83,26 @@ describe('GET /groups', function() {
         var group = res.body[0];
         expect(group.id).to.be.equal(groups[0].id);
 
+        expect(group.count.members).to.be.equal(3);
+        expect(group.count.meetings).to.be.equal(0);
+
         expect(group.member.role).to.be.equal('member');
         expect(group.member.state).to.be.equal('pending');
+        expect(group.member.createdAt).to.be.ok();
+        expect(group.member.updatedAt).to.be.ok();
+
+        expect(group.member.invitedBy).to.be.an('object');
+        expect(group.member.invitedBy.id).to.be.ok();
+
+        var aUser = group.member.invitedBy.user;
+        expect(aUser).to.be.an('object');
+        expect(aUser.id).to.be.equal(userAgents[0].user.id);
+        expect(aUser.name).to.be.ok();
+        expect(aUser.picture).to.be.ok();
+
+        expect(aUser.username).to.not.be.ok();
+        expect(aUser.email).to.not.be.ok();
+        expect(aUser.passports).to.not.be.ok();
 
         done();
       });

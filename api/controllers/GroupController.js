@@ -18,7 +18,10 @@ module.exports = {
 
       // find user memberships
       function(done){
-        Membership.find({ user: req.user.id }, done);
+        Membership
+          .find({ user: req.user.id })
+          .populate('invitedBy')
+          .exec(done);
       },
 
       // find groups for those memberships
@@ -35,19 +38,24 @@ module.exports = {
         Group
           .find({ id: gids })
           .populateAll()
-          .exec(done);
+          .exec(function(err, groups){
+            done(err, memberships, groups);
+          });
       },
 
       // prepare groups data
-      function(groups, done){
+      function(ownMembers, groups, done){
         var result = groups.map(function(group){
           var g = group.toJSON();
 
-          var members = g.members.filter(function(member){
-            return (member.user === req.user.id);
+          var members = ownMembers.filter(function(member){
+            return (member.group === group.id);
           });
 
           g.member = {
+            createdAt: members[0].createdAt,
+            updatedAt: members[0].updatedAt,
+            invitedBy: members[0].invitedBy,
             role: members[0].role,
             state: members[0].state
           };
@@ -65,6 +73,37 @@ module.exports = {
 
         done(null, result);
       },
+
+      // set invitor users
+      function(groups, done){
+
+        var uids = groups.map(function(group){
+          return group.member.invitedBy && group.member.invitedBy.user;
+        });
+
+        User.find({ id: uids }).exec(function(err, users){
+          if (err) return done(err, groups);
+
+          groups.forEach(function(group){
+
+            if (group.member.invitedBy){
+
+              var found = users.filter(function(user){
+                return group.member.invitedBy.user === user.id;
+              });
+
+              if (found.length){
+                var u = found[0].toJSON();
+                group.member.invitedBy.user = _.pick(u, ['id', 'name', 'picture']);
+              }
+            }
+
+          });
+
+          done(null, groups);
+        });
+
+      }
 
     ], function(err, groups){
       if (err) return next(err);
