@@ -43,6 +43,6 @@ describe('(~˘▾˘)~  API  ~(˘▾˘~)', function() {
   });
 
   require('./users');
-  require('./groups');
+  //require('./groups');
 
 });

@@ -120,6 +120,11 @@ describe('\nUser ( ͡° ͜ʖ ͡°)\n', function() {
           if (err) return done(err);
           expect(res.body).to.be.an('object');
           expect(res.body.id).to.be.equal(userAgents[0].user.id);
+
+          expect(res.body.passports).to.be.an('array');
+          expect(res.body.passports.length).to.be.equal(1);
+          expect(res.body.passports[0]).to.be.equal('local');
+
           done();
         });
 

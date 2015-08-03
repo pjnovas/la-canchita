@@ -11,9 +11,18 @@ module.exports = {
 
     User
       .findOne({ id: req.user.id })
+      .populate('passports')
       .exec(function(err, user){
         if (err) return next(err);
         if (!user) return res.notFound();
+
+        var passports = user.passports;
+        var user = user.toJSON();
+
+        user.passports = passports.map(function(passport){
+          return passport.provider || passport.protocol;
+        });
+
         res.json(user);
       });
   },
