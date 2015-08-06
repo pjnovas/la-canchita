@@ -62,9 +62,13 @@ module.exports.routes = {
 
   // Group
 
+  'get /groups': 'WebAppController.index',
+  'get /groups/new': 'WebAppController.index',
   'get /groups/:gid': 'WebAppController.index',
   'get /groups/:gid/edit': 'WebAppController.index',
-  'get /groups/new': 'WebAppController.index',
+  'get /groups/:gid/members': 'WebAppController.index',
+  'get /groups/:gid/meetings': 'WebAppController.index',
+  'get /groups/:gid/settings': 'WebAppController.index',
 
   'post /api/groups/:gid/picture': 'GroupController.uploadPicture',
 
