@@ -53,6 +53,18 @@ describe('POST /groups/:id/meetings', function() {
     expect(m.place).to.be.equal('Some cool place');
     expect(new Date(m.when)).to.be.greaterThan(new Date()); // defaults to next week
 
+    expect(m.duration).to.be.an('object');
+    expect(m.duration.times).to.be.equal(5);
+    expect(m.duration.period).to.be.equal('hours');
+
+    expect(m.confirmation).to.be.equal(true);
+    expect(m.confirmStart).to.be.an('object');
+    expect(m.confirmStart.times).to.be.equal(1);
+    expect(m.confirmStart.period).to.be.equal('weeks');
+    expect(m.confirmEnd).to.be.an('object');
+    expect(m.confirmEnd.times).to.be.equal(2);
+    expect(m.confirmEnd.period).to.be.equal('days');
+
     getMemberId(groups[0].id, userAgents[index].user.id, function(err, creator){
       expect(m.createdBy).to.be.equal(creator.id);
       done();
@@ -65,7 +77,11 @@ describe('POST /groups/:id/meetings', function() {
       .send({
         title: 'test title',
         info: 'test info',
-        place: 'Some cool place'
+        place: 'Some cool place',
+        confirmation: true,
+        confirmStart: { times: 1, period: 'weeks' },
+        confirmEnd: { times: 2, period: 'days' },
+        duration: { times: 5, period: 'hours' }
       })
       .expect(expected)
       .end(done);

@@ -18,14 +18,25 @@ module.exports = function(req, res, next) {
   }
 
   var now = moment();
-  var cStart = moment(meeting.confirmationStart);
-  var cEnd = moment(meeting.confirmationEnd);
 
-  if (cStart.isValid() && now < cStart){
+  var cStart = null;
+  var cEnd = null;
+  var mStart = meeting.confirmStart;
+  var mEnd = meeting.confirmEnd;
+
+  if (mStart && mStart.times && mStart.period){
+    cStart = moment(meeting.when).subtract(mStart.times, mStart.period);
+  }
+
+  if (mEnd && mEnd.times && mEnd.period){
+    cEnd = moment(meeting.when).subtract(mEnd.times, mEnd.period);
+  }
+
+  if (cStart && cStart.isValid() && now < cStart){
     return res.forbidden('confirmation_is_not_open_yet');
   }
 
-  if (cEnd.isValid() && now > cEnd){
+  if (cEnd && cEnd.isValid() && now > cEnd){
     return res.forbidden('confirmation_has_closed');
   }
 

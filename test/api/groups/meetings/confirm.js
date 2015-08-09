@@ -84,8 +84,8 @@ describe('POST /meetings/:id/confirmed/me', function() {
         title: 'Meeting 4',
         when: moment().add(5, 'days').toDate(),
         confirmation: true,
-        confirmationStart: moment().subtract(1, 'days').toDate(), // yestarday
-        confirmationEnd: moment().add(1, 'days').toDate(), // tomorrow
+        confirmStart: { times: 6, period: 'days' }, // yestarday
+        confirmEnd: { times: 4, period: 'days' }, // tomorrow
         assistants: [  groups[0].members[4] ]
       },{
         group: gid,
@@ -93,8 +93,8 @@ describe('POST /meetings/:id/confirmed/me', function() {
         title: 'Meeting 5',
         when: moment().add(5, 'days').toDate(),
         confirmation: true,
-        confirmationStart: moment().subtract(3, 'days').toDate(),
-        confirmationEnd: moment().subtract(2, 'days').toDate(),
+        confirmStart: { times: 8, period: 'days' },
+        confirmEnd: { times: 7, period: 'days' },
         assistants: [  groups[0].members[5] ]
       },{
         group: gid,
@@ -102,8 +102,8 @@ describe('POST /meetings/:id/confirmed/me', function() {
         title: 'Meeting 6',
         when: moment().add(5, 'days').toDate(),
         confirmation: true,
-        confirmationStart: moment().add(1, 'days').toDate(), // tomorrow
-        confirmationEnd: moment().add(2, 'days').toDate(), // after tomorrow
+        confirmStart: { times: 4, period: 'days' }, // tomorrow
+        confirmEnd: { times: 3, period: 'days' }, // after tomorrow
         assistants: [  groups[0].members[6] ]
       }];
 
@@ -182,11 +182,11 @@ describe('POST /meetings/:id/confirmed/me', function() {
     sendConfirm(4, 0, 4, 204, done);
   });
 
-  it('Disallow to Confirm after the confirmation date [confirmationEnd]', function (done) {
+  it('Disallow to Confirm after the confirmation date [confirmEnd]', function (done) {
     sendConfirm(5, 0, 5, 403, done);
   });
 
-  it('Disallow to Confirm before the confirmation date [confirmationStart]', function (done) {
+  it('Disallow to Confirm before the confirmation date [confirmStart]', function (done) {
     sendConfirm(6, 0, 6, 403, done);
   });
 

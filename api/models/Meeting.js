@@ -8,6 +8,8 @@
 
 module.exports = {
 
+  schema: true,
+
   attributes: {
 
     group: { model: 'Group', required: true },
@@ -26,11 +28,13 @@ module.exports = {
       }
     },
 
+    duration: { type: 'json'/*, defaultsTo: { times: 1, period: 'hours' } */},
+
     replacements: { type: 'boolean' },
 
     confirmation: { type: 'boolean' },
-    confirmStart: { type: 'date' },
-    confirmEnd: { type: 'date' },
+    confirmStart: { type: 'json'/*, defaultsTo: { times: 2, period: 'days' } */},
+    confirmEnd: { type: 'json'/*, defaultsTo: { times: 2, period: 'hours' } */},
 
     min: { type: 'integer', defaultsTo: 0 }, // 0 - no limit
     max: { type: 'integer', defaultsTo: 0 }, // 0 - no limit
@@ -39,7 +43,6 @@ module.exports = {
     confirmed : { collection: 'Membership' },
 
     //alerts: { type: 'array' }, // hooks, emails, etc > New Model for this
-
   },
 
 };
