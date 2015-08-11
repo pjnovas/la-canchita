@@ -99,6 +99,7 @@ module.exports.policies = {
     // Meetings
 
     'getMeetings': group.isMember,
+    'getFullMeeting': meeting.isMember,
     'createMeeting': group.checkRole,
     'changeMeeting': group.checkRole,
     'removeMeeting': group.canRemoveMeeting,

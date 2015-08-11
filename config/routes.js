@@ -93,6 +93,8 @@ module.exports.routes = {
   'put /api/groups/:gid/meetings/:meetingId': 'GroupController.changeMeeting',
   'delete /api/groups/:gid/meetings/:meetingId': 'GroupController.removeMeeting',
 
+  'get /api/meetings/:meetingId': 'GroupController.getFullMeeting',
+
   'post /api/meetings/:meetingId/assistants/me': 'GroupController.joinMeeting',
   'delete /api/meetings/:meetingId/assistants/me': 'GroupController.leaveMeeting',
   'post /api/meetings/:meetingId/confirmed/me': 'GroupController.confirmMeeting',

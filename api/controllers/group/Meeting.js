@@ -12,6 +12,21 @@ module.exports = {
       });
   },
 
+  findOne: function(req, res, next){
+    var meeting = req.requestedMeeting;
+    var gmember = req.groupMember;
+    var group = meeting.group.toJSON();
+
+    group.member = gmember.toJSON();
+    group.member.user = _.pick(group.member.user, ['id', 'name', 'picture']);
+
+    delete group.member.group;
+    
+    meeting.group = group;
+
+    res.send(meeting);
+  },
+
   create: function (req, res, next){
     var groupId = req.params.gid;
 

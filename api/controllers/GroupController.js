@@ -291,6 +291,7 @@ module.exports = {
   // Meetings
 
   getMeetings: MeetingController.find,
+  getFullMeeting: MeetingController.findOne,
   createMeeting: MeetingController.create,
   removeMeeting: MeetingController.remove,
   changeMeeting: MeetingController.change,

@@ -2,6 +2,7 @@
 describe('Meetings', function() {
 
   require('./findAll'); // retrieve meetings of a group
+  require('./findOne'); // retrieve a meeting
 
   require('./create'); // create a Meeting
   require('./change'); // update a Meeting
