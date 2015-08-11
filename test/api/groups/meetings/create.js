@@ -51,6 +51,9 @@ describe('POST /groups/:id/meetings', function() {
     expect(m.title).to.be.equal('test title');
     expect(m.info).to.be.equal('test info');
     expect(m.place).to.be.equal('Some cool place');
+    expect(m.location).to.be.an('array');
+    expect(m.location[0]).to.be.equal(-10.50);
+    expect(m.location[1]).to.be.equal(-34.88);
     expect(new Date(m.when)).to.be.greaterThan(new Date()); // defaults to next week
 
     expect(m.duration).to.be.an('object');
@@ -78,6 +81,7 @@ describe('POST /groups/:id/meetings', function() {
         title: 'test title',
         info: 'test info',
         place: 'Some cool place',
+        location: [ -10.50, -34.88 ],
         confirmation: true,
         confirmStart: { times: 1, period: 'weeks' },
         confirmEnd: { times: 2, period: 'days' },

@@ -17,7 +17,9 @@ module.exports = {
 
     title: { type: 'string' },
     info: { type: 'string' },
+
     place: { type: 'string' },
+    location: { type: 'array' }, // [ lat, lng ] | ie: [ -73.97, 40.77 ]
 
     when: {
       type: 'date',
