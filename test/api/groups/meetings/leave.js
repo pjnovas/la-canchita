@@ -1,7 +1,7 @@
 
 var builder = require('../builder');
 
-describe('DELETE /meetings/:id/assistants/me', function() {
+describe('DELETE /meetings/:id/attendees/me', function() {
 
   var groups;
 
@@ -38,34 +38,43 @@ describe('DELETE /meetings/:id/assistants/me', function() {
         group: gid,
         createdBy: groups[0].members[0].id,
         title: 'Meeting 0',
-        assistants: [  groups[0].members[0] ]
       },{
         group: gid,
         createdBy: groups[0].members[1].id,
         title: 'Meeting 1',
         max: 2,
-        assistants: [  groups[0].members[1] ]
       },{
         group: gid,
         createdBy: groups[0].members[2].id,
         title: 'Meeting 2',
         when: new Date(),
-        assistants: [  groups[0].members[2] ]
       },{
         group: gid,
         createdBy: groups[0].members[3].id,
         title: 'Meeting 3',
-        assistants: [  groups[0].members[3] ],
-        confirmed: [  groups[0].members[3] ],
       }];
 
       async.series(
 
-        meetings.map(function(mdata){
+        meetings.map(function(mdata, i){
 
           return function(_done){
             Meeting.create(mdata, function(err, meeting){
-              Meeting.findOne({ id: meeting.id }).populateAll().exec(_done);
+
+              var att = {
+                user: groups[0].members[i].user,
+                meeting: meeting.id
+              };
+
+              if (i === 3) { att.isConfirmed = true; }
+
+              meeting.attendees.add(att);
+
+              meeting.save(function(err, meeting){
+                if (err) throw err;
+                Meeting.findOne({ id: meeting.id }).populateAll().exec(_done);
+              });
+
             });
           };
 
@@ -91,16 +100,21 @@ describe('DELETE /meetings/:id/assistants/me', function() {
     var mid = group.meetings[mIndex].id;
 
     userAgents[index]
-      .delete('/api/meetings/' + mid + '/assistants/me')
+      .delete('/api/meetings/' + mid + '/attendees/me')
       .expect(expected)
-      .end(done);
+      .end(function(err, res){
+        if (expected === 204){
+          expect(err).to.not.be.ok();
+        }
+        done();
+      });
   }
 
-  it('Allow a member to Leave as assistant', function (done) {
+  it('Allow a member to Leave as attendee', function (done) {
     sendLeave(0, 0, 0, 204, done);
   });
 
-  it('Disallow a member to Leave as assistant if is not one - Conflict', function (done) {
+  it('Disallow a member to Leave as attendee if is not one - Conflict', function (done) {
     sendLeave(0, 0, 1, 409, done);
   });
 

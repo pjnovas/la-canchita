@@ -55,6 +55,11 @@ describe('GET /meetings/:id', function() {
       groups[0].meetings.add([{
         createdBy: groups[0].members[0].id,
         title: 'Meeting 0',
+        attendees: [{
+          user: userAgents[0].user.id
+        }, {
+          user: userAgents[1].user.id
+        }]
       }]);
 
       groups[0].save(function(err, group){
@@ -105,8 +110,11 @@ describe('GET /meetings/:id', function() {
     expect(m.id).to.be.ok();
     expect(m.title).to.be.ok();
 
-    expect(m.assistants).to.be.an('array');
-    expect(m.confirmed).to.be.an('array');
+    expect(m.attendees).to.be.an('array');
+    expect(m.attendees.length).to.be.equal(2);
+    m.attendees.forEach(function(att, i){
+      checkUser(att.user, userAgents[i].user);
+    });
 
     expect(m.group).to.be.an('object');
     checkGroup(m.group, uidx);

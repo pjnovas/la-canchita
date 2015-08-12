@@ -95,10 +95,10 @@ module.exports.routes = {
 
   'get /api/meetings/:meetingId': 'GroupController.getFullMeeting',
 
-  'post /api/meetings/:meetingId/assistants/me': 'GroupController.joinMeeting',
-  'delete /api/meetings/:meetingId/assistants/me': 'GroupController.leaveMeeting',
+  'post /api/meetings/:meetingId/attendees/me': 'GroupController.joinMeeting',
+  'delete /api/meetings/:meetingId/attendees/me': 'GroupController.leaveMeeting',
   'post /api/meetings/:meetingId/confirmed/me': 'GroupController.confirmMeeting',
-  //'post /api/meetings/:meetingId/attended/me': 'GroupController.attendedMeeting',
+  //'post /api/meetings/:meetingId/attendance': 'GroupController.attendanceMeeting',
 
   /***************************************************************************
   *                                                                          *

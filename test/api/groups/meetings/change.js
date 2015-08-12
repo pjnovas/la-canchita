@@ -82,7 +82,8 @@ describe('PUT /groups/:id/meetings/:id', function() {
       .send({
         title: 'Meeting updated',
         group: 2, // try to hack the group
-        createdBy: 5 // try to hack the createdBy
+        createdBy: 5, // try to hack the createdBy
+        attendees: [{ user: userAgents[0].user.id }] // try to hack attendees
       })
       .expect(expected)
       .end(function(err, res){
@@ -95,6 +96,7 @@ describe('PUT /groups/:id/meetings/:id', function() {
         expect(res.body.title).to.be.equal('Meeting updated');
         expect(res.body.group.id).to.be.equal(gid);
         expect(res.body.createdBy.user).to.be.equal(userAgents[mIndex].user.id);
+        expect(res.body.attendees.length).to.be.equal(0);
         done();
       });
   }

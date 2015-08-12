@@ -21,10 +21,23 @@ module.exports = {
     group.member.user = _.pick(group.member.user, ['id', 'name', 'picture']);
 
     delete group.member.group;
-    
     meeting.group = group;
 
-    res.send(meeting);
+    var attendeeIds = meeting.attendees.map(function(attendee){ return attendee.id; });
+
+    Attendee
+      .find({ id: attendeeIds })
+      .populate('user')
+      .exec(function(err, attendees){
+        if (err) return next(err);
+
+        attendees.forEach(function(attendees){
+          attendees.user = _.pick(attendees.user, ['id', 'name', 'picture']);
+        });
+
+        meeting.attendees = attendees;
+        res.send(meeting);
+      });
   },
 
   create: function (req, res, next){
@@ -70,8 +83,7 @@ module.exports = {
     delete req.body.id;
     delete req.body.createdBy;
     delete req.body.group;
-    delete req.body.assistants;
-    delete req.body.confirmed;
+    delete req.body.attendees;
 
     Meeting.update(query, req.body).exec(function(err, updated){
       if (err) return next(err);
@@ -96,36 +108,56 @@ module.exports = {
   join: function(req, res, next){
     var meeting = req.requestedMeeting;
 
-    meeting.assistants.add(req.groupMember);
+    Attendee.create({
+      user: req.groupMember.user,
+      meeting: meeting.id
+    }, function(err, attendee){
+      meeting.attendees.add(attendee);
 
-    meeting.save(function(err, _meeting){
-      if (err) return next(err);
-      res.status(204);
-      res.end();
+      meeting.save(function(err, _meeting){
+        if (err) return next(err);
+        res.json(attendee);
+      });
     });
+
   },
 
   leave: function(req, res, next){
     var meeting = req.requestedMeeting;
 
-    meeting.assistants.remove(req.groupMember.id);
+    var attendee = meeting.attendees.filter(function(attendee){
+      return (attendee.user === req.groupMember.user.id);
+    })[0];
+
+    meeting.attendees.remove(attendee.id);
 
     meeting.save(function(err, _meeting){
       if (err) return next(err);
-      res.status(204);
-      res.end();
+
+      attendee.destroy(function(err){
+        if (err) return next(err);
+        res.status(204);
+        res.end();
+      });
+
     });
   },
 
   confirm: function(req, res, next){
     var meeting = req.requestedMeeting;
 
-    meeting.confirmed.add(req.groupMember);
+    var attendee = meeting.attendees.filter(function(attendee){
+      return (attendee.user === req.groupMember.user.id);
+    })[0];
 
-    meeting.save(function(err, _meeting){
+    attendee.isConfirmed = true;
+    attendee.confirmedAt = new Date();
+
+    attendee.save(function(err, _attendee){
       if (err) return next(err);
-      res.status(204);
-      res.end();
+      var att = _attendee.toJSON();
+      att.user = _.pick(att.user, ['id', 'name', 'picture']);
+      res.json(att);
     });
   },
 

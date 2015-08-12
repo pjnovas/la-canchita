@@ -13,20 +13,16 @@ module.exports = function(req, res, next) {
 
   var meeting = req.requestedMeeting;
 
-  var isAssistant = meeting.assistants.some(function(member){
-    return (member.id === req.groupMember.id);
+  var found = meeting.attendees.filter(function(attendee){
+    return (attendee.user === req.groupMember.user.id);
   });
 
-  if (!isAssistant){
-    return res.conflict('member_is_not_assistant');
+  if (found.length === 0){
+    return res.conflict('user_is_not_attending');
   }
 
-  var hasConfirmed = meeting.confirmed.some(function(member){
-    return (member.id === req.groupMember.id);
-  });
-
-  if (hasConfirmed){
-    return res.conflict('cannot_remove_confirmed_members');
+  if (found[0].isConfirmed){
+    return res.conflict('cannot_remove_confirmed_users');
   }
 
   next();

@@ -11,20 +11,20 @@ module.exports = function(req, res, next) {
 
   var meeting = req.requestedMeeting;
 
-  var isAssistant = meeting.assistants.some(function(member){
-    return (member.id === req.groupMember.id);
+  var isAttendee = meeting.attendees.some(function(attendee){
+    return (attendee.user === req.groupMember.user.id);
   });
 
-  if (isAssistant){
-    return res.conflict('member_already_joined');
+  if (isAttendee){
+    return res.conflict('user_already_joined');
   }
 
   if (meeting.max === 0){ // no limit
     return next();
   }
 
-  if (!meeting.replacements && meeting.assistants.length >= meeting.max){
-    return res.forbidden('meeting_has_no_more_room_for_assitants');
+  if (!meeting.replacements && meeting.attendees.length >= meeting.max){
+    return res.forbidden('meeting_has_no_more_room_for_attendees');
   }
 
   next();

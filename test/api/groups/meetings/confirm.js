@@ -51,33 +51,25 @@ describe('POST /meetings/:id/confirmed/me', function() {
         group: gid,
         createdBy: groups[0].members[0].id,
         title: 'Meeting 0',
-        confirmation: true,
-        assistants: [  groups[0].members[0] ]
+        confirmation: true
       },{
         group: gid,
         createdBy: groups[0].members[1].id,
         title: 'Meeting 1',
         confirmation: true,
         replacement: true,
-        max: 2,
-        assistants: [
-          groups[0].members[0],
-          groups[0].members[1],
-          groups[0].members[2]
-        ]
+        max: 2
       },{
         group: gid,
         createdBy: groups[0].members[2].id,
         title: 'Meeting 2',
         confirmation: true,
-        when: moment().toDate(),
-        assistants: [  groups[0].members[2] ]
+        when: moment().toDate()
       },{
         group: gid,
         createdBy: groups[0].members[3].id,
-        title: 'Meeting 3',
+        title: 'Meeting 3'
         // not enabled confirmation
-        assistants: [  groups[0].members[3] ]
       },{
         group: gid,
         createdBy: groups[0].members[4].id,
@@ -85,8 +77,7 @@ describe('POST /meetings/:id/confirmed/me', function() {
         when: moment().add(5, 'days').toDate(),
         confirmation: true,
         confirmStart: { times: 6, period: 'days' }, // yestarday
-        confirmEnd: { times: 4, period: 'days' }, // tomorrow
-        assistants: [  groups[0].members[4] ]
+        confirmEnd: { times: 4, period: 'days' } // tomorrow
       },{
         group: gid,
         createdBy: groups[0].members[5].id,
@@ -94,8 +85,7 @@ describe('POST /meetings/:id/confirmed/me', function() {
         when: moment().add(5, 'days').toDate(),
         confirmation: true,
         confirmStart: { times: 8, period: 'days' },
-        confirmEnd: { times: 7, period: 'days' },
-        assistants: [  groups[0].members[5] ]
+        confirmEnd: { times: 7, period: 'days' }
       },{
         group: gid,
         createdBy: groups[0].members[6].id,
@@ -103,17 +93,44 @@ describe('POST /meetings/:id/confirmed/me', function() {
         when: moment().add(5, 'days').toDate(),
         confirmation: true,
         confirmStart: { times: 4, period: 'days' }, // tomorrow
-        confirmEnd: { times: 3, period: 'days' }, // after tomorrow
-        assistants: [  groups[0].members[6] ]
+        confirmEnd: { times: 3, period: 'days' } // after tomorrow
       }];
 
       async.series(
 
-        meetings.map(function(mdata){
+        meetings.map(function(mdata, i){
 
           return function(_done){
             Meeting.create(mdata, function(err, meeting){
-              Meeting.findOne({ id: meeting.id }).populateAll().exec(_done);
+
+              if (i === 1) {
+                meeting.attendees.add({
+                  user: groups[0].members[0].user,
+                  meeting: meeting.id
+                });
+                meeting.attendees.add({
+                  user: groups[0].members[1].user,
+                  meeting: meeting.id
+                });
+                meeting.attendees.add({
+                  user: groups[0].members[2].user,
+                  meeting: meeting.id
+                });
+              }
+              else {
+                var att = {
+                  user: groups[0].members[i].user,
+                  meeting: meeting.id
+                };
+
+                meeting.attendees.add(att);
+              }
+
+              meeting.save(function(err, meeting){
+                if (err) throw err;
+                Meeting.findOne({ id: meeting.id }).populateAll().exec(_done);
+              });
+
             });
           };
 
@@ -141,11 +158,21 @@ describe('POST /meetings/:id/confirmed/me', function() {
     userAgents[index]
       .post('/api/meetings/' + mid + '/confirmed/me')
       .expect(expected)
-      .end(done);
+      .end(function(err, res){
+        if (expected === 200){
+          expect(err).to.not.be.ok();
+          expect(res.body).to.be.an('object');
+          expect(res.body.id).to.be.ok();
+          expect(res.body.user.id).to.be.equal(userAgents[index].user.id);
+          expect(res.body.isConfirmed).to.be.equal(true);
+          expect(new Date(res.body.confirmedAt)).to.be.lessThan((new Date()));
+        }
+        done();
+      });
   }
 
   it('Allow a member to Confirm as assistant', function (done) {
-    sendConfirm(0, 0, 0, 204, done);
+    sendConfirm(0, 0, 0, 200, done);
   });
 
   it('Disallow a member to Confirm if is not as assistant', function (done) {
@@ -153,8 +180,10 @@ describe('POST /meetings/:id/confirmed/me', function() {
   });
 
   it('Disallow to Confirn as assistant twice - Conflict', function (done) {
-    sendConfirm(0, 0, 0, 204, function(){
-      sendConfirm(0, 0, 0, 409, done);
+    sendConfirm(0, 0, 0, 200, function(){
+      sendConfirm(0, 0, 0, 409, function(){
+        done();
+      });
     });
   });
 
@@ -167,9 +196,9 @@ describe('POST /meetings/:id/confirmed/me', function() {
   });
 
   it('Allow to Confirm more than max if it has replacement', function (done) {
-    sendConfirm(0, 0, 1, 204, function(){
-      sendConfirm(1, 0, 1, 204, function(){
-        sendConfirm(2, 0, 1, 204, done);
+    sendConfirm(0, 0, 1, 200, function(){
+      sendConfirm(1, 0, 1, 200, function(){
+        sendConfirm(2, 0, 1, 200, done);
       });
     });
   });
@@ -179,7 +208,7 @@ describe('POST /meetings/:id/confirmed/me', function() {
   });
 
   it('Allow to Confirm in bewtween dates of confirmations', function (done) {
-    sendConfirm(4, 0, 4, 204, done);
+    sendConfirm(4, 0, 4, 200, done);
   });
 
   it('Disallow to Confirm after the confirmation date [confirmEnd]', function (done) {

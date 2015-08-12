@@ -14,6 +14,7 @@ module.exports = {
 
     group: { model: 'Group', required: true },
     createdBy: { model: 'Membership' },
+    attendees: { collection: 'Attendee', via: 'meeting' },
 
     title: { type: 'string' },
     info: { type: 'string' },
@@ -41,11 +42,6 @@ module.exports = {
     min: { type: 'integer', defaultsTo: 0 }, // 0 - no limit
     max: { type: 'integer', defaultsTo: 0 }, // 0 - no limit
 
-    assistants : { collection: 'Membership' },
-    confirmed : { collection: 'Membership' },
-
-    //alerts: { type: 'array' }, // hooks, emails, etc > New Model for this
   },
 
 };
-

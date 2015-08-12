@@ -1,7 +1,7 @@
 
 var builder = require('../builder');
 
-describe('POST /meetings/:id/assistants/me', function() {
+describe('POST /meetings/:id/attendees/me', function() {
 
   var groups;
 
@@ -75,37 +75,45 @@ describe('POST /meetings/:id/assistants/me', function() {
     var mid = group.meetings[mIndex].id;
 
     userAgents[index]
-      .post('/api/meetings/' + mid + '/assistants/me')
+      .post('/api/meetings/' + mid + '/attendees/me')
       .expect(expected)
-      .end(done);
+      .end(function(err, res){
+        if (expected === 200){
+          expect(err).to.not.be.ok();
+          expect(res.body).to.be.an('object');
+          expect(res.body.id).to.be.ok();
+          expect(res.body.user).to.be.equal(userAgents[index].user.id);
+        }
+        done();
+      });
   }
 
-  it('Allow a member to Join as assistant', function (done) {
-    sendJoin(0, 0, 0, 204, done);
+  it('Allow a member to Join as attendee', function (done) {
+    sendJoin(0, 0, 0, 200, done);
   });
 
-  it('Disallow to Join as assistant twice - Conflict', function (done) {
-    sendJoin(0, 0, 0, 204, function(){
+  it('Disallow to Join as attendee twice - Conflict', function (done) {
+    sendJoin(0, 0, 0, 200, function(){
       sendJoin(0, 0, 0, 409, done);
     });
   });
 
-  it('Disallow a NON member to Join as assistant', function (done) {
+  it('Disallow a NON member to Join as attendee', function (done) {
     sendJoin(10, 0, 0, 404, done);
   });
 
   it('Disallow to Join more than max - Conflict', function (done) {
-    sendJoin(0, 0, 1, 204, function(){
-      sendJoin(1, 0, 1, 204, function(){
+    sendJoin(0, 0, 1, 200, function(){
+      sendJoin(1, 0, 1, 200, function(){
         sendJoin(2, 0, 1, 403, done);
       });
     });
   });
 
   it('Allow to Join more than max if it has replacements', function (done) {
-    sendJoin(0, 0, 2, 204, function(){
-      sendJoin(1, 0, 2, 204, function(){
-        sendJoin(2, 0, 2, 204, done);
+    sendJoin(0, 0, 2, 200, function(){
+      sendJoin(1, 0, 2, 200, function(){
+        sendJoin(2, 0, 2, 200, done);
       });
     });
   });

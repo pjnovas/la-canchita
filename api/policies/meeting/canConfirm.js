@@ -40,20 +40,16 @@ module.exports = function(req, res, next) {
     return res.forbidden('confirmation_has_closed');
   }
 
-  var isAssistant = meeting.assistants.some(function(member){
-    return (member.id === req.groupMember.id);
+  var found = meeting.attendees.filter(function(attendee){
+    return (attendee.user === req.groupMember.user.id);
   });
 
-  if (!isAssistant){
-    return res.conflict('member_is_not_assistant');
+  if (found.length === 0){
+    return res.conflict('user_is_not_attending');
   }
 
-  var hasConfirmed = meeting.confirmed.some(function(member){
-    return (member.id === req.groupMember.id);
-  });
-
-  if (hasConfirmed){
-    return res.conflict('member_has_already_confirmed');
+  if (found[0].isConfirmed){
+    return res.conflict('user_has_already_confirmed');
   }
 
   next();
