@@ -172,7 +172,22 @@ passport.connect = function (req, query, profile, next) {
           // create a passport for the user
           function(user, done){
             query.user = user.id;
-            Passport.create(query, done);
+
+            Passport.create(query, function (err, passport) {
+              // If a passport wasn't created, bail out
+              if (err) {
+                return next(err);
+              }
+
+              User.findOne(passport.user.id, function(err, _user){
+                if (err) return next(err);
+
+                _user.name = _user.name || user.name;
+                _user.picture = _user.picture || user.picture;
+
+                _user.save(next);
+              });
+            });
           }
 
         ], function(err, user){

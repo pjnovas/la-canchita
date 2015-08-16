@@ -15,7 +15,9 @@ module.exports = function(req, res, next) {
     .exec(function(err, meeting){
       if (err) return next(err);
 
-      //TODO: NotFound
+      if (!meeting){
+        return res.notFound('Requested meeting was not found');
+      }
 
       req.group = meeting.group;
       req.requestedMeeting = meeting;

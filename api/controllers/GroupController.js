@@ -28,7 +28,7 @@ module.exports = {
       function(memberships, done){
         if (!memberships || !memberships.length){
           // if user has no memberships wont be groups
-          return done(null, []);
+          return done('exited');
         }
 
         var gids = memberships.map(function(m){
@@ -71,7 +71,7 @@ module.exports = {
           return g;
         });
 
-        done(null, result);
+        done(null, result || []);
       },
 
       // set invitor users
@@ -106,7 +106,9 @@ module.exports = {
       }
 
     ], function(err, groups){
-      if (err) return next(err);
+      if (err && err !== 'exited') {
+        return next(err);
+      }
       res.json(groups || []);
     });
 
