@@ -101,6 +101,23 @@ module.exports.routes = {
   'post /api/meetings/:meetingId/confirmed/me': 'GroupController.confirmMeeting',
   //'post /api/meetings/:meetingId/attendance': 'GroupController.attendanceMeeting',
 
+  // WebSockets
+  'post /ws/groups/:gid': function(req, res) {
+    sails.hooks.ws.join("groups", req.param('gid'), req, res);
+  },
+
+  'del /ws/groups/:gid': function(req, res) {
+    sails.hooks.ws.leave("groups", req.param('gid'), req, res);
+  },
+
+  'post /ws/meetings/:mid': function(req, res) {
+    sails.hooks.ws.join("meetings", req.param('mid'), req, res);
+  },
+
+  'del /ws/meetings/:mid': function(req, res) {
+    sails.hooks.ws.leave("meetings", req.param('mid'), req, res);
+  }
+
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

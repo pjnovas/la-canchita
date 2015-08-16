@@ -73,6 +73,7 @@ module.exports = {
     ], function(err, meeting){
       if (err) return next(err);
       res.json(meeting);
+      sails.services.notifications.group(groupId, "new_meeting", meeting, req.user);
     });
   },
 
@@ -91,16 +92,21 @@ module.exports = {
       Meeting.findOne(query).populateAll().exec(function(err, meeting){
         if (err) return next(err);
         res.json(meeting);
+
+        sails.services.notifications.meeting(req.params.meetingId, "update", meeting, req.user);
       });
     });
 
   },
 
   remove: function(req, res, next){
+    var mid = req.requestedMeeting.id;
 
     req.requestedMeeting.destroy(function(err){
       res.status(204);
       res.end();
+
+      sails.services.notifications.meeting(mid, "remove", { id: mid }, req.user);
     });
 
   },
@@ -116,7 +122,11 @@ module.exports = {
 
       meeting.save(function(err, _meeting){
         if (err) return next(err);
+
+        attendee.user = _.pick(req.groupMember.user, ['id', 'name', 'picture']);
         res.json(attendee);
+
+        sails.services.notifications.meeting(meeting.id, "join", attendee, req.user);
       });
     });
 
@@ -129,6 +139,7 @@ module.exports = {
       return (attendee.user === req.groupMember.user.id);
     })[0];
 
+    var attId = attendee.id;
     meeting.attendees.remove(attendee.id);
 
     meeting.save(function(err, _meeting){
@@ -138,6 +149,8 @@ module.exports = {
         if (err) return next(err);
         res.status(204);
         res.end();
+
+        sails.services.notifications.meeting(meeting.id, "leave", { id: attId }, req.user);
       });
 
     });
@@ -156,8 +169,10 @@ module.exports = {
     attendee.save(function(err, _attendee){
       if (err) return next(err);
       var att = _attendee.toJSON();
-      att.user = _.pick(att.user, ['id', 'name', 'picture']);
+      att.user = _.pick(req.groupMember.user, ['id', 'name', 'picture']);
       res.json(att);
+
+      sails.services.notifications.meeting(meeting.id, "confirm", att, req.user);
     });
   },
 

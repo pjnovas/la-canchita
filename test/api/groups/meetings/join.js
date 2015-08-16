@@ -82,7 +82,7 @@ describe('POST /meetings/:id/attendees/me', function() {
           expect(err).to.not.be.ok();
           expect(res.body).to.be.an('object');
           expect(res.body.id).to.be.ok();
-          expect(res.body.user).to.be.equal(userAgents[index].user.id);
+          expect(res.body.user.id).to.be.equal(userAgents[index].user.id);
         }
         done();
       });
