@@ -1,7 +1,7 @@
 
 var builder = require('../builder');
 
-describe('DELETE /groups/:id/meetings/:id', function() {
+describe('DELETE /meetings/:id', function() {
 
   var groups;
 
@@ -78,7 +78,7 @@ describe('DELETE /groups/:id/meetings/:id', function() {
     var mid = group.meetings[mIndex].id;
 
     userAgents[index]
-      .delete('/api/groups/' + gid + '/meetings/' + mid)
+      .delete('/api/meetings/' + mid)
       .expect(expected)
       .end(function(err, res){
         if (err) return done(err);

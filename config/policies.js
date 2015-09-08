@@ -24,10 +24,12 @@ group.isMember = isAuth.concat([ 'group/isMember' ]);
 group.checkRole = group.isMember.concat([ 'group/checkRole' ]);
 
 group.canChangeMember = group.checkRole.concat([ 'group/setMemberById', 'group/canChangeMember' ]);
-group.canRemoveMeeting = group.checkRole.concat([ 'meeting/setMeetingById', 'group/canRemoveMeeting' ]);
 
 var meeting = {};
 meeting.isMember = isAuth.concat([ 'meeting/setMeetingById' ]).concat(group.isMember);
+meeting.canUpdate = meeting.isMember.concat([group.checkRole]);
+meeting.canRemove = meeting.isMember.concat([group.checkRole, 'group/canRemoveMeeting' ]);
+
 meeting.isOpen = meeting.isMember.concat([ 'meeting/isOpen' ]);
 
 meeting.join = meeting.isOpen.concat([ 'meeting/canJoin' ]);
@@ -101,8 +103,8 @@ module.exports.policies = {
     'getMeetings': group.isMember,
     'getFullMeeting': meeting.isMember,
     'createMeeting': group.checkRole,
-    'changeMeeting': group.checkRole,
-    'removeMeeting': group.canRemoveMeeting,
+    'changeMeeting': meeting.canUpdate,
+    'removeMeeting': meeting.canRemove,
 
     'joinMeeting': meeting.join,
     'leaveMeeting': meeting.leave,

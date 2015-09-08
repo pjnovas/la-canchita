@@ -1,7 +1,7 @@
 
 var builder = require('../builder');
 
-describe('PUT /groups/:id/meetings/:id', function() {
+describe('PUT /meetings/:id', function() {
 
   var groups;
 
@@ -78,7 +78,7 @@ describe('PUT /groups/:id/meetings/:id', function() {
     var mid = group.meetings[mIndex].id;
 
     userAgents[index]
-      .put('/api/groups/' + gid + '/meetings/' + mid)
+      .put('/api/meetings/' + mid)
       .send({
         title: 'Meeting updated',
         group: 2, // try to hack the group
