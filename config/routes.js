@@ -41,6 +41,8 @@ module.exports.routes = {
   'get /register': 'AuthController.register',
   'get /recover': 'AuthController.recover',
 
+  'get /notfound': 'WebAppController.index',
+
   'post /auth/local': 'AuthController.callback',
   'post /auth/local/:action': 'AuthController.callback',
 
