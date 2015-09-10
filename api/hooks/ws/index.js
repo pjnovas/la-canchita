@@ -23,7 +23,13 @@ module.exports = function WS(sails) {
   var rooms = ["groups", "meetings"];
   var events = { // events to broadcast > if is not here will ignore
     "groups": [
-      "new_meeting"
+      "update",
+      "remove",
+      "new_members",
+      "update_member",
+      "new_meeting",
+      "update_meeting",
+      "remove_meeting"
     ],
     "meetings": [
       "update",

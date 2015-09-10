@@ -154,6 +154,8 @@ module.exports = {
         group.save(function(err, group){
           if (err) return next(err);
           res.json(group);
+
+          sails.services.notifications.group(req.params.id, "update", group, req.user);
         });
       });
   },
@@ -182,6 +184,7 @@ module.exports = {
               if (err) return next(err);
               res.status(204);
               res.end();
+              sails.services.notifications.group(req.params.id, "remove", { id: req.params.id }, req.user);
             });
           });
       });

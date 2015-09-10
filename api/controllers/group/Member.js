@@ -160,7 +160,7 @@ module.exports = {
           var idx = users.indexOf(member.user);
           if (idx >= 0){
 
-            if (['rejected', 'removed'].indexOf(member.state) > -1) {
+            if (['rejected', 'removed', 'left'].indexOf(member.state) > -1) {
               // re invite removed or rejected members
               req.invites.reinvite.push(member);
             }
@@ -245,6 +245,7 @@ module.exports = {
           });
 
           res.json(members);
+          sails.services.notifications.group(groupId, "new_members", members, req.user);
         });
 
     });
@@ -253,6 +254,8 @@ module.exports = {
   remove: function(req, res, next){
     var member = req.requestedMember;
 
+    // Don't destroy any member
+    /*
     if (member.state === 'pending' || member.state === 'rejected'){
       // user wasn't a member yet
       member.destroy(function(err){
@@ -262,6 +265,7 @@ module.exports = {
 
       return;
     }
+    */
 
     member.state = 'removed';
     member.removedBy = req.groupMember.id;
@@ -269,6 +273,7 @@ module.exports = {
     member.save(function(err, member){
       if (err) return next(err);
       res.json(member);
+      sails.services.notifications.group(req.requestedMember.group.id, "update_member", member, req.user);
     });
   },
 
@@ -279,6 +284,7 @@ module.exports = {
     member.save(function(err, member){
       if (err) return next(err);
       res.json(member);
+      sails.services.notifications.group(req.requestedMember.group.id, "update_member", member, req.user);
     });
 
   },
@@ -294,6 +300,7 @@ module.exports = {
     member.save(function(err, member){
       if (err) return next(err);
       res.json(member);
+      sails.services.notifications.group(req.groupMember.group.id, "update_member", member, req.user);
     });
 
   },
@@ -310,6 +317,7 @@ module.exports = {
       if (err) return next(err);
       res.status(204);
       res.end();
+      sails.services.notifications.group(req.groupMember.group.id, "update_member", member, req.user);
     });
 
   },

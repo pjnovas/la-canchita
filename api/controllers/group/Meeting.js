@@ -94,6 +94,7 @@ module.exports = {
         res.json(meeting);
 
         sails.services.notifications.meeting(req.params.meetingId, "update", meeting, req.user);
+        sails.services.notifications.group(meeting.group.id, "update_meeting", meeting, req.user);
       });
     });
 
@@ -101,12 +102,14 @@ module.exports = {
 
   remove: function(req, res, next){
     var mid = req.requestedMeeting.id;
+    var gid = req.requestedMeeting.group.id;
 
     req.requestedMeeting.destroy(function(err){
       res.status(204);
       res.end();
 
       sails.services.notifications.meeting(mid, "remove", { id: mid }, req.user);
+      sails.services.notifications.group(gid, "remove_meeting", { id: mid }, req.user);
     });
 
   },
