@@ -154,12 +154,12 @@ describe('DELETE /groups/:id/members/:id', function() {
     sendRemove(5, groups[0].id, 6, 403, done);
   });
 
-  it('Allow STATE [pending] - Physical remove', function (done) {
-    sendRemove(2, groups[0].id, 7, 204, done);
+  it('Allow STATE [pending] - NON Physical remove', function (done) {
+    sendRemove(2, groups[0].id, 7, 200, done);
   });
 
-  it('Allow STATE [rejected] - Physical remove', function (done) {
-    sendRemove(2, groups[0].id, 8, 204, done);
+  it('Allow STATE [rejected] - NON Physical remove', function (done) {
+    sendRemove(2, groups[0].id, 8, 200, done);
   });
 
   it('Disallow STATE [removed] - NotFound', function (done) {

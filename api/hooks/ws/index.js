@@ -20,6 +20,7 @@ var _ = require('lodash');
 module.exports = function WS(sails) {
 
   var self;
+  var suscribers = {};
   var rooms = ["groups", "meetings"];
   var events = { // events to broadcast > if is not here will ignore
     "groups": [
@@ -60,6 +61,31 @@ module.exports = function WS(sails) {
     return true;
   }
 
+  function hasUserId(req, res){
+    var uid = req.body.uid;
+    if (!uid){
+      res.status(400).send({ error: "expected user id" });
+      return false;
+    }
+
+    return true;
+  }
+
+  function removeSocketSuscriber(socketId){
+    for(var uid in suscribers){
+      var idx = suscribers[uid].indexOf(socketId);
+
+      if (idx > -1){
+        suscribers[uid].splice(idx, 1);
+
+        if (!suscribers[uid].length){
+          delete suscribers[uid];
+        }
+        break;
+      }
+    }
+  }
+
   return {
 
     /**
@@ -82,6 +108,15 @@ module.exports = function WS(sails) {
      */
     initialize: function (cb) {
       self = this;
+
+      sails.io.on('connection', function(socket) {
+        // New Socket!
+        socket.on('disconnect', function(){
+          // Socket disconnected
+          removeSocketSuscriber(sails.sockets.id(socket));
+        });
+      });
+
       // TODO: Async initialization
       return cb();
     },
@@ -140,6 +175,49 @@ module.exports = function WS(sails) {
         id: id,
         data: data
       });
+    },
+
+    suscribeNotis: function(req, res){
+      if (!isValidRequest(req, res) || !hasUserId(req, res)){
+        return;
+      }
+
+      var uid = req.body.uid;
+
+      suscribers[uid] = suscribers[uid] || [];
+      suscribers[uid].push(sails.sockets.id(req.socket));
+
+      res.json({ joined: true });
+    },
+
+    unsuscribeNotis: function(req, res){
+      if (!isValidRequest(req, res) || !hasUserId(req, res)){
+        return;
+      }
+
+      var uid = req.body.uid;
+      var socketId = sails.sockets.id(req.socket);
+
+      var idx = suscribers[uid].indexOf(socketId);
+
+      if (idx > -1){
+        suscribers[uid].splice(idx, 1);
+
+        if (!suscribers[uid].length){
+          delete suscribers[uid];
+        }
+      }
+
+      res.json({ left: true });
+    },
+
+    emitToUser: function (uid, event, data, user){
+      if (suscribers.hasOwnProperty(uid)){
+        sails.sockets.emit(suscribers[uid], event, {
+          data: data,
+          user: user && _.pick(user, ['id', 'name', 'picture'])
+        });
+      }
     }
 
   };

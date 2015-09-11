@@ -127,7 +127,7 @@ describe('POST /groups/:id/members', function() {
     getMemberId(gid, userAgents[index].user.id, function(err, inviter){
 
       ms.forEach(function(m, i){
-        expect(m.invitedBy).to.be.equal(inviter.id);
+        expect(m.invitedBy.id).to.be.equal(inviter.id);
         checkUpdate(m, gid, uids[i], index);
       });
 

@@ -16,6 +16,7 @@ module.exports = {
 
   create: function(req, res, next){
     var groupId = req.params.gid;
+    var _group;
 
     async.waterfall([
 
@@ -194,6 +195,7 @@ module.exports = {
         });
 
         group.save(function(err, group){
+          _group = group.toJSON();
           done(err, members);
         });
       },
@@ -237,15 +239,17 @@ module.exports = {
       Membership
         .find({ id: memberIds })
         .populate('user')
+        .populate('invitedBy')
         .exec(function(err, members){
           if (err) return next(err);
 
           members.forEach(function(member){
             member.user = _.pick(member.user, ['id', 'name', 'picture']);
+            member.invitedBy.user = _.pick(req.user, ['id', 'name', 'picture']);
           });
 
           res.json(members);
-          sails.services.notifications.group(groupId, "new_members", members, req.user);
+          sails.services.notifications.invites(_group, members, req.user);
         });
 
     });
@@ -253,19 +257,6 @@ module.exports = {
 
   remove: function(req, res, next){
     var member = req.requestedMember;
-
-    // Don't destroy any member
-    /*
-    if (member.state === 'pending' || member.state === 'rejected'){
-      // user wasn't a member yet
-      member.destroy(function(err){
-        res.status(204);
-        res.end();
-      });
-
-      return;
-    }
-    */
 
     member.state = 'removed';
     member.removedBy = req.groupMember.id;

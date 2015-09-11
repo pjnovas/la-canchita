@@ -105,6 +105,14 @@ module.exports.routes = {
   //'post /api/meetings/:meetingId/attendance': 'GroupController.attendanceMeeting',
 
   // WebSockets
+  'post /ws/notifications': function(req, res) {
+    sails.hooks.ws.suscribeNotis(req, res);
+  },
+
+  'del /ws/notifications': function(req, res) {
+    sails.hooks.ws.unsuscribeNotis(req, res);
+  },
+
   'post /ws/groups/:gid': function(req, res) {
     sails.hooks.ws.join("groups", req.param('gid'), req, res);
   },
