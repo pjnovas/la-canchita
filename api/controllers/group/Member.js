@@ -249,6 +249,8 @@ module.exports = {
           });
 
           res.json(members);
+
+          sails.services.notifications.group(groupId, "new_members", members, req.user);
           sails.services.notifications.invites(_group, members, req.user);
         });
 
