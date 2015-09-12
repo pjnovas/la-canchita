@@ -47,6 +47,15 @@ describe('GET /groups/:id', function() {
         role: 'owner',
         state: 'active'
       }]
+    },{
+      title: 'Group Awesome REMOVED',
+      description: 'My cool group',
+      removed: true,
+      members: [{
+        user: userAgents[0].user.id,
+        role: 'owner',
+        state: 'active'
+      }]
     }];
 
     builder.create(groups_data, function(err, _groups){
@@ -121,6 +130,14 @@ describe('GET /groups/:id', function() {
     userAgents[3]
       .get('/api/groups/' + groups[0].id)
       .expect(200)
+      .end(done);
+  });
+
+  it('Disallow any if is removed', function (done) {
+
+    userAgents[0]
+      .get('/api/groups/' + groups[2].id)
+      .expect(404)
       .end(done);
   });
 

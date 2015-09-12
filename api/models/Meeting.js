@@ -42,6 +42,8 @@ module.exports = {
     min: { type: 'integer', defaultsTo: 0 }, // 0 - no limit
     max: { type: 'integer', defaultsTo: 0 }, // 0 - no limit
 
+    cancelled: { type: 'boolean', defaultsTo: false },
+
   },
 
 };

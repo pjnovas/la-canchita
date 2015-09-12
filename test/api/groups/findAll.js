@@ -42,6 +42,16 @@ describe('GET /groups', function() {
         role: 'owner',
         state: 'active'
       }]
+    }, {
+      title: 'Other Awesome REMOVED',
+      description: 'My cool group 4',
+      picture: 'http://pic.com/pic4.png',
+      removed: true,
+      members: [{
+        user: userAgents[0].user.id,
+        role: 'owner',
+        state: 'active'
+      }]
     }];
 
     builder.create(groups_data, function(err, _groups){

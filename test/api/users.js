@@ -141,7 +141,8 @@ describe('\nUser ( ͡° ͜ʖ ͡°)\n', function() {
         .send({
           name: 'Crazy User',
           email: 'some@example.com',
-          username: 'xxx-yyy'
+          username: 'xxx-yyy',
+          plan: 2,
         })
         .expect(200)
         .end(function(err, res){
@@ -153,6 +154,7 @@ describe('\nUser ( ͡° ͜ʖ ͡°)\n', function() {
           expect(res.body.email).to.be.equal('some@example.com');
 
           // not allowed
+          expect(res.body.plan).to.be.equal(0);
           expect(res.body.username).to.be.equal(userAgents[0].user.username);
           done();
         });

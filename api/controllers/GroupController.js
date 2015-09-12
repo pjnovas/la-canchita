@@ -5,6 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+var _ = require('lodash');
 var moment = require('moment');
 
 var MemberController = require('./group/Member');
@@ -37,6 +38,7 @@ module.exports = {
 
         Group
           .find({ id: gids })
+          .where({ removed: false })
           .populateAll()
           .exec(function(err, groups){
             done(err, memberships, groups);
@@ -127,6 +129,12 @@ module.exports = {
 
       // set member in the group
       function (group, done){
+
+        if (group.removed){
+          done('removed');
+          return;
+        }
+
         group = group.toJSON();
         group.member = req.groupMember;
         group.member.user = _.pick(group.member.user, ['id', 'name', 'picture']);
@@ -134,7 +142,12 @@ module.exports = {
       }
 
     ], function(err, group){
-      if (err) return next(err);
+      if (err === 'removed') {
+        res.notFound('group not found');
+        return;
+      }
+      else if (err) return next(err);
+
       res.json(group);
     });
 
@@ -161,32 +174,62 @@ module.exports = {
   },
 
   destroy: function(req, res, next){
+    var gid = req.params.id;
 
     Group
-      .findOne({ id: req.params.id })
+      .findOne({ id: gid })
+      .populateAll()
       .exec(function(err, group){
         if (err) return next(err);
         if (!group) return res.notFound();
 
-        Membership
-          .find({ group: req.params.id, role: 'owner' })
-          .exec(function(err, owners){
-            if (err) return next(err);
+        function ready(err){
+          if (err) return next(err);
+          res.status(204);
+          res.end();
+          sails.services.notifications.group(gid, "remove", { id: gid }, req.user);
+        }
 
-            if (owners.length > 1){
-              return res.forbidden('cannot_destroy_group_with_more_than_1_owners');
+        function removeGroup(){
+          async.series([
+            // destroy members
+            function(done){
+              Membership.destroy({ group: gid }).exec(done);
+            },
+
+            // destroy meetings
+            function(done){
+              Meeting.destroy({ group: gid }).exec(done);
+            },
+
+            // remove picture file
+            function(done){
+              if (group.picture){
+                sails.services.image.remove('group', group.picture, done);
+                return;
+              }
+              done();
+            },
+
+            // destroy group
+            function(done){
+              group.destroy(done);
             }
+          ], ready);
+        }
 
-            //TODO: remove group picture
-            //TODO: clear relations ( members, meetings, invites, etc)
+        if (group.members.length === 1 || !group.meetings || group.meetings.length === 0){
+          // destroy groups with only owner as member or no meetings
+          return removeGroup();
+        }
 
-            group.destroy(function(err){
-              if (err) return next(err);
-              res.status(204);
-              res.end();
-              sails.services.notifications.group(req.params.id, "remove", { id: req.params.id }, req.user);
-            });
-          });
+        var owners = _.filter(group.members, function(m){ return m.role === 'owner'; });
+        if (owners.length > 1){
+          return res.forbidden('cannot_destroy_group_with_more_than_1_owners');
+        }
+
+        group.removed = true;
+        group.save(ready);
       });
   },
 

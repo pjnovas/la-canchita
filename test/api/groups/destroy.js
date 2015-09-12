@@ -10,7 +10,6 @@ describe('DELETE /groups/:id', function() {
     var groups_data = [{
       title: 'Group Awesome',
       description: 'My cool group',
-      picture: 'http://pic.com/pic.png',
       members: [{
         user: userAgents[0].user.id,
         role: 'owner',
@@ -31,7 +30,6 @@ describe('DELETE /groups/:id', function() {
     }, {
       title: 'Group Awesome 2',
       description: 'My cool group 2',
-      picture: 'http://pic.com/pic2.png',
       members: [{
         user: userAgents[4].user.id,
         role: 'owner',
@@ -41,11 +39,51 @@ describe('DELETE /groups/:id', function() {
         role: 'owner',
         state: 'active'
       }]
+    }, {
+      title: 'Group Awesome 3',
+      description: 'My cool group 3',
+      members: [{
+        user: userAgents[4].user.id,
+        role: 'owner',
+        state: 'active'
+      }]
     }];
 
     builder.create(groups_data, function(err, _groups){
       groups = _groups;
-      done();
+
+      groups[0].meetings.add([{
+        createdBy: groups[0].members[0].id,
+        title: 'Meeting 0',
+      },{
+        createdBy: groups[0].members[1].id,
+        title: 'Meeting 1',
+      }]);
+
+      groups[1].meetings.add([{
+        createdBy: groups[1].members[0].id,
+        title: 'Meeting 0',
+      },{
+        createdBy: groups[1].members[0].id,
+        title: 'Meeting 1',
+      }]);
+
+      groups[2].meetings.add([{
+        createdBy: groups[2].members[0].id,
+        title: 'Meeting 0',
+      },{
+        createdBy: groups[2].members[0].id,
+        title: 'Meeting 1',
+      }]);
+
+      groups[0].save(function(err, group){
+        groups[1].save(function(err, group){
+          groups[2].save(function(err, group){
+            done();
+          });
+        });
+      });
+
     });
 
   });
@@ -60,11 +98,7 @@ describe('DELETE /groups/:id', function() {
         if (err) return done(err);
         if (expected !== 204) return done();
 
-        Group.findOne({ id: gid }, function(err, group){
-          if (err) return done(err);
-          expect(group).to.not.be.ok();
-          done();
-        });
+        done();
       });
   }
 
@@ -84,8 +118,27 @@ describe('DELETE /groups/:id', function() {
     sendDeleteBy(4, groups[0].id, 404, done);
   });
 
-  it('Allow ROLE [owner] with no other Owners in the group', function (done) {
-    sendDeleteBy(0, groups[0].id, 204, done);
+  it('Allow ROLE [owner] with more than 1 member - logical remove', function (done) {
+    var gid = groups[0].id;
+    sendDeleteBy(0, gid, 204, function(){
+      Group.findOne({ id: gid }, function(err, group){
+        if (err) return done(err);
+        expect(group).to.be.ok();
+        expect(group.removed).to.be.equal(true);
+        done();
+      });
+    });
+  });
+
+  it('Allow ROLE [owner] with only itself as member - physical remove', function (done) {
+    var gid = groups[2].id;
+    sendDeleteBy(4, gid, 204, function(){
+      Group.findOne({ id: gid }, function(err, group){
+        if (err) return done(err);
+        expect(group).to.not.be.ok();
+        done();
+      });
+    });
   });
 
   it('Disallow ROLE [owner] with other Owners in the group', function (done) {

@@ -18,6 +18,7 @@ module.exports = {
     members : { collection: 'Membership', via: 'group' },
     meetings : { collection: 'Meeting', via: 'group' },
 
+    removed: { type: 'boolean', defaultsTo: false }
+
   }
 };
-
