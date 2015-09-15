@@ -104,9 +104,7 @@ var AuthController = {
   },
 
   recoverPassword: function(req, res){
-    passport.recover(req, res, function (err, user, challenges, statuses) {
-      
-    });
+    passport.recover(req, res);
   },
 
   /**

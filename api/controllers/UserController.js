@@ -80,6 +80,40 @@ module.exports = {
         );
 
       });
-  }
+  },
+
+  changePassword: function(req, res, next){
+    var actual = req.body.actual;
+    var change = req.body.change;
+
+    Passport.findOne({
+      protocol : 'local'
+    , user     : req.user.id
+    }, function (err, passport) {
+      if (err) return next(err);
+
+      if (!passport) {
+        return res.notFound();
+      }
+
+      passport.validatePassword(actual, function (err, res) {
+        if (err) {
+          return next(err);
+        }
+
+        if (!res) {
+          res.badRequest('Error.Passport.Password.Wrong');
+        } else {
+          passport.password = change;
+          passport.save(function(err){
+            if (err) return res.serverError();
+            res.status(204);
+            res.end();
+          });
+        }
+      });
+
+    });
+  },
 
 };

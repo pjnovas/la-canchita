@@ -72,8 +72,9 @@ module.exports.policies = {
     'me': isAuth,
     'updateMe': isAuth,
     'search': isAuth,
+    'changePassword': isAuth,
 
-    'find': isAuth, //TODO: REMOVE THIS POLICY
+    'find': isAuth,
   },
 
   'GroupController': {
