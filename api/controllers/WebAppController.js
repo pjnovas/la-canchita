@@ -12,7 +12,8 @@ module.exports = {
     if (req.session.authenticated){
 
       res.view('index', {
-        user: req.user
+        user: req.user,
+				errors: req.flash('error')
       });
 
       return;
@@ -23,8 +24,8 @@ module.exports = {
     }
 */
     res.view('index', {
-      redirect: req.session.redirect
+      redirect: req.session.redirect,
+			errors: req.flash('error')
     });
   }
 };
-

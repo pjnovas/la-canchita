@@ -69,7 +69,7 @@ module.exports = {
 
       ], function(err){
         if (err === 'not-found')
-          return res.redirect('/v/not-found');
+          return res.redirect('/v/notfound');
 
         if (err === 'expired')
           return res.redirect('/v/expired');
@@ -85,6 +85,107 @@ module.exports = {
 
     req.session.redirect = req.path;
     res.redirect('/');
+  },
+
+  recoverPassword: function(req, res){
+
+    async.waterfall([
+
+      function(done){ // find the user token
+        UserToken
+          .findOne({ token: req.params.token })
+          .populateAll()
+          .exec(done);
+      },
+
+      function(userToken, done){ // validate token
+        if (!userToken) return done('not-found');
+
+        var today = new Date();
+        if (userToken.expires < today) {
+          UserToken.destroy({ id: userToken.id }).exec(function(err){
+            done('expired');
+          });
+
+          return;
+        }
+
+        done(null, userToken);
+      },
+
+    ], function(err, userToken){
+      if (err === 'not-found')
+        return res.redirect('/v/notfound');
+
+      if (err === 'expired')
+        return res.redirect('/v/expired');
+
+      //TODO: handle error
+
+      res.redirect('/newpassword/' + userToken.token);
+    });
+  },
+
+  newPassword: function(req, res){
+    var password = req.body.password;
+    var cpassword = req.body.cpassword;
+    var token = req.params.token;
+
+    if (password !== cpassword){
+      req.flash('error', 'Error.Passport.Password.NotMatch');
+      res.redirect('/newpassword/' + token);
+      return;
+    }
+
+    async.waterfall([
+
+      function(done){ // find the user token
+        UserToken
+          .findOne({ token: token })
+          .populateAll()
+          .exec(done);
+      },
+
+      function(userToken, done){ // validate token
+        if (!userToken) return done('not-found');
+
+        var today = new Date();
+        if (userToken.expires < today) {
+          UserToken.destroy({ id: userToken.id }).exec(function(err){
+            done('expired');
+          });
+
+          return;
+        }
+
+        done(null, userToken);
+      },
+
+      function(userToken, done){ // update user with new password
+        Passport.findOne({
+          protocol : 'local',
+          user     : userToken.user.id
+        }, function (err, passport) {
+          passport.password = password;
+          passport.save(function(err){ done(err); });
+        });
+      },
+
+      function(done){ // destroy token
+        UserToken.destroy({ token: token }).exec(done);
+      }
+
+    ], function(err){
+      if (err === 'not-found')
+        return res.redirect('/v/notfound');
+
+      if (err === 'expired')
+        return res.redirect('/v/expired');
+
+      //TODO: handle error
+
+      res.redirect('/login');
+    });
   },
 
   verifyEmail: function(req, res){
@@ -105,4 +206,3 @@ module.exports = {
   }
 
 };
-

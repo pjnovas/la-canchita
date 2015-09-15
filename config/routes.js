@@ -52,6 +52,13 @@ module.exports.routes = {
 
   'get /v/invite/:token': 'VerifyController.verifyInvite',
   'get /v/email/:token': 'VerifyController.verifyEmail',
+  'get /v/recover/:token': 'VerifyController.recoverPassword',
+
+  'get /newpassword/:token': 'WebAppController.index',
+  'post /v/newpassword/:token': 'VerifyController.newPassword',
+
+  'get /v/notfound': 'WebAppController.index',
+  'get /v/expired': 'WebAppController.index',
 
   // Users
 

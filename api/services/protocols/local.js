@@ -1,5 +1,6 @@
 var validator = require('validator');
 var crypto    = require('crypto');
+var hat       = require('hat');
 
 /**
  * Local Authentication Protocol
@@ -43,44 +44,138 @@ exports.register = function (req, res, next) {
     return next(new Error('No password was entered.'));
   }
 
-  User.create({
-    username : username
-  , email    : email
-  }, function (err, user) {
-    if (err) {
-      if (err.code === 'E_VALIDATION') {
-        if (err.invalidAttributes.email) {
-          req.flash('error', 'Error.Passport.Email.Exists');
-        } else {
-          req.flash('error', 'Error.Passport.User.Exists');
-        }
+  // MUST reachout database cause Waterline validation doesn't work
+  User
+    .findOne().where({ or: [{ username: username }, { email: email }] })
+    .exec(function(err, found){
+      if (err){
+        req.flash('error', 'Error.Passport.Generic');
+        return next(err);
       }
 
+      if (found){
+        if (found.username === username){
+          req.flash('error', 'Error.Passport.User.Exists');
+        }
+        else {
+          req.flash('error', 'Error.Passport.Email.Exists');
+        }
+
+        return next(err);
+      }
+
+      // otherwise > all good, create the user
+
+      User.create({
+        username : username
+      , email    : email
+      }, function (err, user) {
+        if (err) {
+          if (err.code === 'E_VALIDATION') {
+            if (err.invalidAttributes.email) {
+              req.flash('error', 'Error.Passport.Email.Exists');
+            } else {
+              req.flash('error', 'Error.Passport.User.Exists');
+            }
+          }
+          else {
+            req.flash('error', 'Error.Passport.Generic');
+          }
+
+          return next(err);
+        }
+
+        // Generating accessToken for API authentication
+        var token = crypto.randomBytes(48).toString('base64');
+
+        Passport.create({
+          protocol    : 'local'
+        , password    : password
+        , user        : user.id
+        , accessToken : token
+        }, function (err, passport) {
+          if (err) {
+            if (err.code === 'E_VALIDATION') {
+              req.flash('error', 'Error.Passport.Password.Invalid');
+            }
+
+            return user.destroy(function (destroyErr) {
+              next(destroyErr || err);
+            });
+          }
+
+          next(null, user);
+        });
+      });
+
+    });
+
+};
+
+/**
+ * Recover password
+ *
+ *
+ *
+ * @param {Object}   req
+ * @param {Object}   res
+ * @param {Function} next
+ */
+exports.recover = function (req, res, next) {
+  var email = req.param('email');
+
+  function sendRecover(userToken){
+    sails.services.email.sendRecover(userToken, function(err){
+      if (err) return next(null, false);
+      req.flash('success', 'Success.Passport.Recover.CheckEmail');
+      return next();
+    });
+  }
+
+  User.findOne({ email: email }, function (err, user) {
+    if (err) {
       return next(err);
     }
 
-    // Generating accessToken for API authentication
-    var token = crypto.randomBytes(48).toString('base64');
+    if (!user) {
+      req.flash('error', 'Error.Passport.Email.NotFound');
+      return next(null, false);
+    }
 
-    Passport.create({
-      protocol    : 'local'
-    , password    : password
-    , user        : user.id
-    , accessToken : token
-    }, function (err, passport) {
-      if (err) {
-        if (err.code === 'E_VALIDATION') {
-          req.flash('error', 'Error.Passport.Password.Invalid');
+    UserToken
+      .findOne().where({ user: user.id, type: 'password' })
+      .exec(function(err, userToken){
+        if (err) {
+          return next(null, false);
         }
 
-        return user.destroy(function (destroyErr) {
-          next(destroyErr || err);
-        });
-      }
+        if (userToken){ // there is already a token
 
-      next(null, user);
-    });
+          var oneDay = 24 * 60 * 60 * 1000;
+          userToken.expires = new Date(now.getTime() + oneDay);
+          userToken.save(function(err){
+            if (err) return next(null, false);
+            userToken.user = user;
+            sendRecover(userToken);
+          });
+
+          return;
+        }
+
+        UserToken.create({
+          user: user.id,
+          type: 'password',
+          token: hat()
+        }, function(err, userToken){
+          if (err) return next(null, false);
+          userToken.user = user;
+          sendRecover(userToken);
+        });
+
+      });
+
   });
+
 };
 
 /**
@@ -137,6 +232,11 @@ exports.login = function (req, identifier, password, next) {
   var isEmail = validator.isEmail(identifier)
     , query   = {};
 
+  if (!password){
+    req.flash('error', 'Error.Passport.Password.NotSet');
+    return next(null, false);
+  }
+
   if (isEmail) {
     query.email = identifier;
   }
@@ -164,6 +264,7 @@ exports.login = function (req, identifier, password, next) {
     , user     : user.id
     }, function (err, passport) {
       if (passport) {
+
         passport.validatePassword(password, function (err, res) {
           if (err) {
             return next(err);
@@ -176,11 +277,12 @@ exports.login = function (req, identifier, password, next) {
             return next(null, user);
           }
         });
+
+        return;
       }
-      else {
-        req.flash('error', 'Error.Passport.Password.NotSet');
-        return next(null, false);
-      }
+
+      req.flash('error', 'Error.Passport.Password.NotSet');
+      return next(null, false);
     });
   });
 };

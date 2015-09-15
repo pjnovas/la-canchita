@@ -3,6 +3,7 @@ var path = require('path');
 var async = require('async');
 
 var email = {};
+var signature = "La Canchita";
 
 email.initialize = function(){
 
@@ -10,6 +11,23 @@ email.initialize = function(){
     = path.resolve(sails.config.appPath, sails.config.email.templateDir);
 
   sails.config.email.testMode = (process.env.NODE_ENV === 'test') ? true : false;
+
+};
+
+email.sendRecover = function(userToken, done){
+
+  sails.hooks.email.send("recover", {
+    link: sails.getBaseurl() + "/v/recover/" + userToken.token,
+    user: userToken.user,
+    signature: signature
+  }, {
+    to: userToken.user.email,
+    subject: "Recuperar contraseña"
+  }, done);
+
+};
+
+email.sendEmailVerification = function(user, done){
 
 };
 
@@ -24,7 +42,7 @@ email.sendInvites = function(invites, done){
           link: sails.getBaseurl() + "/v/invite/" + invite.token,
           from: invite.invitedBy.name,
           group: invite.group.title,
-          signature: "La Canchita"
+          signature: signature
         }, {
           to: invite.email,
           subject: "Te invitaron a un Grupo"

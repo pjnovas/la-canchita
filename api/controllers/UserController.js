@@ -12,6 +12,7 @@ module.exports = {
     User
       .findOne({ id: req.user.id })
       .populate('passports')
+      .populate('settings')
       .exec(function(err, user){
         if (err) return next(err);
         if (!user) return res.notFound();
@@ -31,6 +32,8 @@ module.exports = {
 
     User
       .findOne({ id: req.user.id })
+      .populate('passports')
+      .populate('settings')
       .exec(function(err, user){
         if (err) return next(err);
         if (!user) return res.notFound();
@@ -38,8 +41,22 @@ module.exports = {
         user.name = req.body.name || user.name;
         user.email = req.body.email || user.email;
 
+        user.priority = req.body.priority || user.priority;
+        user.priority2 = req.body.priority2 || user.priority2;
+        user.priority3 = req.body.priority3 || user.priority3;
+
+        user.leg = req.body.leg || user.leg;
+
         user.save(function(err, user){
           if (err) return next(err);
+
+          var passports = user.passports;
+          var user = user.toJSON();
+
+          user.passports = passports.map(function(passport){
+            return passport.provider || passport.protocol;
+          });
+
           res.json(user);
         });
 
@@ -66,4 +83,3 @@ module.exports = {
   }
 
 };
-

@@ -198,35 +198,6 @@ passport.connect = function (req, query, profile, next) {
           next(err, user);
         });
 
-        /*
-        User.create(user, function (err, user) {
-          if (err) {
-            console.dir(err);
-            if (err.code === 'E_VALIDATION') {
-              if (err.invalidAttributes.email) {
-                req.flash('error', 'Error.Passport.Email.Exists');
-              }
-              else {
-                req.flash('error', 'Error.Passport.User.Exists');
-              }
-            }
-
-            return next(err);
-          }
-
-          query.user = user.id;
-
-          Passport.create(query, function (err, passport) {
-            // If a passport wasn't created, bail out
-            if (err) {
-              return next(err);
-            }
-
-            next(err, user);
-          });
-        });
-        */
-
       }
       // Scenario: An existing user is trying to log in using an already
       //           connected passport.
@@ -329,6 +300,11 @@ passport.callback = function (req, res, next) {
   // Passport.js wasn't really built for local user registration, but it's nice
   // having it tied into everything else.
   if (provider === 'local' && action !== undefined) {
+    if (action === 'recover') {
+      this.protocols.local.recover(req, res, next);
+      return;
+    }
+
     if (action === 'register' && !req.user) {
       this.protocols.local.register(req, res, next);
     }

@@ -103,6 +103,12 @@ var AuthController = {
     });
   },
 
+  recoverPassword: function(req, res){
+    passport.recover(req, res, function (err, user, challenges, statuses) {
+      
+    });
+  },
+
   /**
    * Create a third-party authentication endpoint
    *
