@@ -190,9 +190,17 @@ var AuthController = {
           return;
         }
 
+        // check if is new user
+        var now = new Date();
+        var twoHs = 2 * 60 * 60 * 1000;
+
+        if (user.createdAt < new Date(now.getTime() + twoHs)){
+          return res.redirect('/profile');
+        }
+
         // Upon successful login, send the user to the homepage were req.user
         // will be available.
-        res.redirect('/');
+        res.redirect('/groups');
       });
     });
   },

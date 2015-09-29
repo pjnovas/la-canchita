@@ -11,8 +11,7 @@ module.exports = {
 
     User
       .findOne({ id: req.user.id })
-      .populate('passports')
-      .populate('settings')
+      .populateAll()
       .exec(function(err, user){
         if (err) return next(err);
         if (!user) return res.notFound();
@@ -32,8 +31,7 @@ module.exports = {
 
     User
       .findOne({ id: req.user.id })
-      .populate('passports')
-      .populate('settings')
+      .populateAll()
       .exec(function(err, user){
         if (err) return next(err);
         if (!user) return res.notFound();

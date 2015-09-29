@@ -1,7 +1,8 @@
 var path     = require('path')
   , url      = require('url')
   , passport = require('passport')
-  , async = require('async');
+  , async = require('async')
+  , gravatar = require('gravatar');
 
 /**
  * Passport Service
@@ -117,6 +118,10 @@ passport.connect = function (req, query, profile, next) {
       break;
   }
 
+  if (!user.picture && user.email){
+    user.picture = gravatar.url(user.email, {s: '73'}) || '';
+  }
+
   Passport.findOne({
     provider   : provider
   , identifier : query.identifier.toString()
@@ -135,10 +140,25 @@ passport.connect = function (req, query, profile, next) {
 
           // check if user with same email already exists and assign new passport
           function(done){
-            if (user.email){
-              User.findOne({ email: user.email }, function(err, user){
+            if (user.username || user.email){
+              User
+              .findOne().where({ or: [{ username: user.username }, { email: user.email }] })
+              .exec(function(err, found){
                 if (err) return done(err);
-                done(null, null);
+
+                if (found.username === user.username){
+                  if (user.email){ // it has email so clear username
+                    user.username = null;
+                    user.id = found.id;
+                  }
+                  else { // cannot register because a username is already there and we cannot check if is himself
+                    req.flash('error', 'Error.Passport.User.Exists');
+                    return next(new Error('Error.Passport.User.Exists'));
+                  }
+                }
+
+                user.id = found.id;
+                done(null, user);
               });
               return;
             }
@@ -147,13 +167,13 @@ passport.connect = function (req, query, profile, next) {
           },
 
           // if user was found with email, go on, else create one
-          function(user, done){
+          function(_user, done){
 
-            if (user){
-              return done(null, user);
+            if (_user){
+              return done(null, _user);
             }
 
-            User.create(user, function (err, user) {
+            User.create(user, function (err, _user) {
               if (err) {
                 if (err.code === 'E_VALIDATION') {
                   if (err.invalidAttributes.email) {
@@ -165,7 +185,7 @@ passport.connect = function (req, query, profile, next) {
                 }
               }
 
-              done(err, user)
+              done(err, _user)
             });
           },
 
@@ -176,16 +196,47 @@ passport.connect = function (req, query, profile, next) {
             Passport.create(query, function (err, passport) {
               // If a passport wasn't created, bail out
               if (err) {
-                return next(err);
+                return done(err);
               }
 
-              User.findOne(passport.user.id, function(err, _user){
-                if (err) return next(err);
+              User.findOne(user.id, function(err, _user){
+                if (err) {
+                  return done(err);
+                }
 
                 _user.name = _user.name || user.name;
                 _user.picture = _user.picture || user.picture;
 
-                _user.save(next);
+                _user.save(function(err, _userSaved){
+                  done(err, _userSaved);
+                });
+              });
+            });
+          },
+
+          // create a settings for the user
+          function(user, done){
+            var uid = user.id;
+
+            UserSettings.findOne({ user: uid }, function(err, found){ // check if user already have settings
+              if (err) {
+                return done(err);
+              }
+
+              if (found){
+                user.settings = found;
+                return done(null, user);
+              }
+
+              UserSettings.create({ user: uid }, function (err, settings) {
+                if (err) {
+                  return done(err);
+                }
+
+                user.settings = settings.id;
+                user.save(function(err, u){
+                  done(null, user);
+                });
               });
             });
           }

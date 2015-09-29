@@ -1,6 +1,7 @@
 var validator = require('validator');
 var crypto    = require('crypto');
 var hat       = require('hat');
+var gravatar = require('gravatar');
 
 /**
  * Local Authentication Protocol
@@ -69,6 +70,8 @@ exports.register = function (req, res, next) {
       User.create({
         username : username
       , email    : email
+      , name     : username
+      , picture: gravatar.url(email, {s: '73'}) || ''
       }, function (err, user) {
         if (err) {
           if (err.code === 'E_VALIDATION') {
@@ -104,7 +107,18 @@ exports.register = function (req, res, next) {
             });
           }
 
-          next(null, user);
+          // Set default user settings
+          UserSettings.create({ user: user.id }, function (err, settings) {
+            if (err) {
+              return next(err);
+            }
+
+            user.settings = settings.id;
+            user.save(function(err, u){
+              next(null, user);
+            });
+          });
+
         });
       });
 
