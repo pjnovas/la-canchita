@@ -143,8 +143,17 @@ passport.connect = function (req, query, profile, next) {
           // check if user with same email already exists and assign new passport
           function(done){
             if (user.username || user.email){
-              User
-              .findOne().where({ or: [{ username: user.username }, { email: user.email }] })
+              var query = { or: [] };
+
+              if (user.username){
+                query.or.push({ username: user.username });
+              }
+
+              if (user.email){
+                query.or.push({ email: user.email });
+              }
+
+              User.findOne().where(query)
               .exec(function(err, found){
                 if (err) return done(err);
 
@@ -152,7 +161,7 @@ passport.connect = function (req, query, profile, next) {
                   return done(null, null);
                 }
 
-                if (found.username === user.username){
+                if (user.username && found.username === user.username){
                   if (user.email){ // it has email so clear username
                     user.username = null;
                     user.id = found.id;

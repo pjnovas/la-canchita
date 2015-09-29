@@ -49,6 +49,7 @@ var AuthController = {
     // Render the `auth/login.ext` view
     res.view('index', {
       providers : providers,
+      redirect: req.session.redirect,
       errors    : req.flash('error'),
       success: req.flash('success')
     });
@@ -94,6 +95,7 @@ var AuthController = {
    */
   register: function (req, res) {
     res.view('index', {
+      redirect: req.session && req.session.redirect,
       errors: req.flash('error'),
       success: req.flash('success')
     });
@@ -101,6 +103,7 @@ var AuthController = {
 
   recover: function (req, res) {
     res.view('index', {
+      redirect: req.session && req.session.redirect,
       errors: req.flash('error'),
       success: req.flash('success')
     });

@@ -30,6 +30,8 @@ exports.register = function (req, res, next) {
     , username = req.param('username')
     , password = req.param('password');
 
+  req.session.queries = req.query;
+
   if (!email) {
     req.flash('error', 'Error.Passport.Email.Missing');
     return next(new Error('No email was entered.'));
@@ -270,6 +272,8 @@ exports.connect = function (req, res, next) {
 exports.login = function (req, identifier, password, next) {
   var isEmail = validator.isEmail(identifier)
     , query   = {};
+
+  req.session.queries = req.query;
 
   if (!password){
     req.flash('error', 'Error.Passport.Password.NotSet');
