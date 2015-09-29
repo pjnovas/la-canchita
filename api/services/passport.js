@@ -146,6 +146,10 @@ passport.connect = function (req, query, profile, next) {
               .exec(function(err, found){
                 if (err) return done(err);
 
+                if (!found){
+                  return done(null, null);
+                }
+
                 if (found.username === user.username){
                   if (user.email){ // it has email so clear username
                     user.username = null;
