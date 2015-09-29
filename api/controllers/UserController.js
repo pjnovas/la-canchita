@@ -45,19 +45,57 @@ module.exports = {
 
         user.leg = req.body.leg || user.leg;
 
-        user.save(function(err, user){
-          if (err) return next(err);
+        var changedSettings = user.settings;
+        var dirtySettings = false;
 
-          var passports = user.passports;
-          var user = user.toJSON();
+        if (req.body.settings){
 
-          user.passports = passports.map(function(passport){
-            return passport.provider || passport.protocol;
+          var settings = [
+            "emails",
+            "invites",
+            "groups_change",
+            "groups_members",
+            "meetings_create",
+            "meetings_change",
+            "meetings_states",
+            "meetings_remove",
+          ];
+
+          settings.forEach(function(setting){
+            if (req.body.settings.hasOwnProperty(setting)){
+              user.settings[setting] = req.body.settings[setting];
+              dirtySettings = true;
+            }
+          });
+        }
+
+        function saveUserAndGoOn(){
+          user.save(function(err, user){
+            if (err) return next(err);
+
+            var passports = user.passports;
+            var user = user.toJSON();
+
+            user.passports = passports.map(function(passport){
+              return passport.provider || passport.protocol;
+            });
+
+            user.settings = changedSettings;
+
+            res.json(user);
+          });
+        }
+
+        if (dirtySettings){
+          user.settings.save(function(err, settings){
+            changedSettings = settings;
+            saveUserAndGoOn();
           });
 
-          res.json(user);
-        });
+          return;
+        }
 
+        saveUserAndGoOn();
       });
   },
 
