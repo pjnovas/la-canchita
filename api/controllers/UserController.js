@@ -5,6 +5,9 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+var validator = require('validator');
+var hat       = require('hat');
+
 module.exports = {
 
   me: function(req, res, next){
@@ -23,11 +26,22 @@ module.exports = {
           return passport.provider || passport.protocol;
         });
 
-        res.json(user);
+        UserToken
+          .findOne({ user: user.id, type: 'email' })
+          .exec(function(err, userToken){
+            if (err) console.dir(err);
+
+            if (userToken){
+              user.newEmail = userToken.email;
+            }
+
+            res.json(user);
+          });
       });
   },
 
   updateMe: function(req, res, next){
+    var changedEmail = false;
 
     User
       .findOne({ id: req.user.id })
@@ -37,7 +51,6 @@ module.exports = {
         if (!user) return res.notFound();
 
         user.name = req.body.name || user.name;
-        user.email = req.body.email || user.email;
 
         user.priority = req.body.priority || user.priority;
         user.priority2 = req.body.priority2 || user.priority2;
@@ -82,6 +95,10 @@ module.exports = {
 
             user.settings = changedSettings;
 
+            if (changedEmail){
+              user.newEmail = changedEmail;
+            }
+
             res.json(user);
           });
         }
@@ -94,6 +111,73 @@ module.exports = {
 
           return;
         }
+
+        // create a userToken with new email and set verified = false;
+        if (req.body.email && validator.isEmail(req.body.email) && req.body.email !== user.email){
+          // user has changed email
+
+          function sendEmailAndGoOn(userToken){
+            sails.services.email.sendEmailVerification(userToken, function(err){
+              user.verified = false;
+              changedEmail = userToken.email;
+              
+              saveUserAndGoOn();
+            });
+          }
+
+          var oneWeek = 7 * 24 * 60 * 60 * 1000;
+          var expire = new Date((new Date()).getTime() + oneWeek);
+
+          UserToken
+            .findOne({ user: user.id, type: 'email' })
+            .populateAll()
+            .exec(function(err, userToken){
+              if (userToken){ //found a userToken already so update it
+                userToken.email = req.body.email;
+                userToken.expires = expire;
+                userToken.save(function(err){
+                  sendEmailAndGoOn(userToken);
+                });
+
+                return;
+              }
+
+              UserToken.create({
+                user: user.id,
+                type: 'email',
+                email: req.body.email,
+                token: hat(),
+                expires: expire
+              }, function(err, userToken){
+                if (err) return next(null, false);
+                userToken.user = user;
+                sendEmailAndGoOn(userToken);
+              });
+
+            });
+
+          return;
+        }
+
+
+
+          UserToken.create({
+            user: user.id,
+            type: 'email',
+            email: req.body.email,
+            token: hat(),
+            expires: new Date((new Date()).getTime() + oneWeek)
+          }, function(err, userToken){
+            if (err) return next(null, false);
+            userToken.user = user;
+
+            sails.services.email.sendVerification(userToken, function(err){
+              if (err) console.dir('error on change password - send email for user ' + uer.id);
+
+              saveUserAndGoOn();
+            });
+
+          });
 
         saveUserAndGoOn();
       });
@@ -151,5 +235,44 @@ module.exports = {
 
     });
   },
+
+  sendEmailVerification: function(req, res, next){
+
+    function sendEmail(userToken){
+      sails.services.email.sendEmailVerification(userToken, function(err){
+        if (err) return next(err);
+        res.status(204);
+        res.end();
+      });
+    }
+
+    UserToken
+      .findOne({ user: req.user.id, type: 'email' })
+      .populateAll()
+      .exec(function(err, userToken){
+        if (err) return next(err);
+
+        if (userToken){
+
+          if (userToken.expires < (new Date())) {
+
+            var oneWeek = 7 * 24 * 60 * 60 * 1000;
+            userToken.expires = new Date((new Date()).getTime() + oneWeek);
+
+            userToken.save(function(err, _userToken){
+              if (err) return next(err);
+              sendEmail(userToken);
+            });
+
+            return;
+          }
+
+          return sendEmail(userToken);
+        }
+
+        console.dir('no token found from a request to Verify email from UserId ' + req.user.id);
+        next(new Error('verification not found'));
+      });
+  }
 
 };

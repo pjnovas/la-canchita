@@ -2,7 +2,8 @@ var path     = require('path')
   , url      = require('url')
   , passport = require('passport')
   , async = require('async')
-  , gravatar = require('gravatar');
+  , gravatar = require('gravatar')
+  , hat       = require('hat');
 
 /**
  * Passport Service
@@ -66,7 +67,8 @@ passport.protocols = require('./protocols');
  */
 passport.connect = function (req, query, profile, next) {
   var user = {}
-    , provider;
+    , provider
+    , newUser = false;
 
   // Get the authentication provider from the query.
   query.provider = req.param('provider');
@@ -188,6 +190,9 @@ passport.connect = function (req, query, profile, next) {
                   }
                 }
               }
+              else {
+                newUser = true;
+              }
 
               done(err, _user)
             });
@@ -247,10 +252,36 @@ passport.connect = function (req, query, profile, next) {
 
         ], function(err, user){
           if (err) { // If error bail out
+            newUser = false;
             return next(err);
           }
 
-          next(err, user);
+          if (newUser && user.email){
+            // Send email for Welcome and email verification
+            var oneWeek = 7 * 24 * 60 * 60 * 1000;
+
+            UserToken.create({
+              user: user.id,
+              type: 'email',
+              email: user.email,
+              token: hat(),
+              expires: new Date((new Date()).getTime() + oneWeek)
+            }, function(err, userToken){
+              if (err) return next(null, false);
+              userToken.user = user;
+
+              sails.services.email.sendWelcome(userToken, function(err){
+                if (err) return next(err, user);
+                req.flash('success', 'Success.Passport.Welcome.CheckEmail');
+                next(null, user);
+              });
+
+            });
+
+            return;
+          }
+
+          next(null, user);
         });
 
       }

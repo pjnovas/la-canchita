@@ -115,7 +115,32 @@ exports.register = function (req, res, next) {
 
             user.settings = settings.id;
             user.save(function(err, u){
-              next(null, user);
+              if (err) {
+                return next(err);
+              }
+
+              // send email verification and Welcome message
+
+              var oneWeek = 7 * 24 * 60 * 60 * 1000;
+
+              UserToken.create({
+                user: user.id,
+                type: 'email',
+                email: email,
+                token: hat(),
+                expires: new Date((new Date()).getTime() + oneWeek)
+              }, function(err, userToken){
+                if (err) return next(null, false);
+                userToken.user = user;
+
+                sails.services.email.sendWelcome(userToken, function(err){
+                  if (err) return next(err, user);
+                  req.flash('success', 'Success.Passport.Welcome.CheckEmail');
+                  next(null, user);
+                });
+
+              });
+
             });
           });
 
@@ -166,7 +191,7 @@ exports.recover = function (req, res, next) {
         if (userToken){ // there is already a token
 
           var oneDay = 24 * 60 * 60 * 1000;
-          userToken.expires = new Date(now.getTime() + oneDay);
+          userToken.expires = new Date((new Date()).getTime() + oneDay);
           userToken.save(function(err){
             if (err) return next(null, false);
             userToken.user = user;

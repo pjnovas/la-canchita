@@ -10,7 +10,19 @@ email.initialize = function(){
   sails.config.email.templateDir
     = path.resolve(sails.config.appPath, sails.config.email.templateDir);
 
-  sails.config.email.testMode = (process.env.NODE_ENV === 'test') ? true : false;
+  sails.config.email.testMode = (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') ? true : false;
+};
+
+email.sendWelcome = function(userToken, done){
+
+  sails.hooks.email.send("welcome", {
+    link: sails.getBaseurl() + "/v/email/" + userToken.token,
+    user: userToken.user,
+    signature: signature
+  }, {
+    to: userToken.email,
+    subject: "Bienvenido a " + signature
+  }, done);
 
 };
 
@@ -27,7 +39,16 @@ email.sendRecover = function(userToken, done){
 
 };
 
-email.sendEmailVerification = function(user, done){
+email.sendEmailVerification = function(userToken, done){
+
+  sails.hooks.email.send("verify", {
+    link: sails.getBaseurl() + "/v/email/" + userToken.token,
+    user: userToken.user,
+    signature: signature
+  }, {
+    to: userToken.email,
+    subject: "Verificación de email"
+  }, done);
 
 };
 

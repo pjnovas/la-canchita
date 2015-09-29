@@ -28,6 +28,7 @@ module.exports = {
     settings: { model: 'UserSettings', via: 'user' },
 
     plan: { type: 'integer', defaultsTo: 0 },
+    verified: { type: 'boolean', defaultsTo: false }, // is Email Verified
 
     // Football specifics
 

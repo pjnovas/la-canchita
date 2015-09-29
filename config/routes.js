@@ -68,6 +68,8 @@ module.exports.routes = {
   'get /api/users/me': 'UserController.me',
   'put /api/users/me': 'UserController.updateMe',
   'put /api/users/me/password': 'UserController.changePassword',
+  'put /api/users/me/sendverify': 'UserController.sendEmailVerification',
+
   //'post /api/users/me/picture': 'UserController.uploadPicture',
 
   // Group

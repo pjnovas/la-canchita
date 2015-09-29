@@ -32,6 +32,12 @@
     </script>
     <% } %>
 
+    <% if (typeof success != 'undefined') { %>
+    <script type='text/javascript'>
+      window.success =  <%- JSON.stringify(success) %>;
+    </script>
+    <% } %>
+
     <!--SCRIPTS-->
     <script src="/js/dependencies/sails.io.js"></script>
     <script src="/js/la-canchita-web.js"></script>

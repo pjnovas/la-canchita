@@ -16,6 +16,8 @@ module.exports = {
     token: { type: 'string' }, // auto-generated code for verification
     type: { type: 'string', enum: ['email', 'password'] },
 
+    email: { type: 'string' },
+
     expires: {
       type: 'date',
       defaultsTo: function(){

@@ -73,6 +73,7 @@ module.exports.policies = {
     'updateMe': isAuth,
     'search': isAuth,
     'changePassword': isAuth,
+    'sendEmailVerification': isAuth,
 
     'find': isAuth,
   },

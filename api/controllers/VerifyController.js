@@ -76,7 +76,7 @@ module.exports = {
 
         //TODO: handle error
 
-        res.redirect('/');
+        res.redirect('/groups');
       });
 
       //console.log('Verified Invite for ' + req.user.username);
@@ -84,7 +84,7 @@ module.exports = {
     }
 
     req.session.redirect = req.path;
-    res.redirect('/');
+    res.redirect('/login');
   },
 
   recoverPassword: function(req, res){
@@ -184,6 +184,7 @@ module.exports = {
 
       //TODO: handle error
 
+      req.flash('success', 'Success.Passport.Pasword.Updated');
       res.redirect('/login');
     });
   },
@@ -191,18 +192,59 @@ module.exports = {
   verifyEmail: function(req, res){
     req.session.redirect = '';
 
-    if (req.session.authenticated){
+    async.waterfall([
 
-      // make verification and go to profile with verification.
+      function(done){ // find the user token
+        UserToken
+          .findOne({ token: req.params.token })
+          .populateAll()
+          .exec(done);
+      },
 
-      console.log('Verified Email for ' + req.user.username);
+      function(userToken, done){ // validate token
+        if (!userToken) return done('not-found');
 
-      res.redirect('/');
-      return;
-    }
+        var today = new Date();
+        if (userToken.expires < today) {
+          UserToken.destroy({ id: userToken.id }).exec(function(err){
+            done('expired');
+          });
 
-    req.session.redirect = req.path;
-    res.redirect('/');
+          return;
+        }
+
+        done(null, userToken);
+      },
+
+      function(userToken, done){
+        User.findOne({ id: userToken.user.id }).exec(function(err, user){
+          if (err) return done(err);
+          if (!user) return done(new Error('user not found'));
+
+          user.email = userToken.email || user.email;
+          user.verified = true;
+
+          user.save(function(err, user){
+            if (err) return done(err);
+            UserToken.destroy({ id: userToken.id }).exec(done);
+          })
+        });
+      }
+
+    ], function(err){
+      if (err === 'not-found')
+        return res.redirect('/v/notfound');
+
+      if (err === 'expired')
+        return res.redirect('/v/expired');
+
+      if (err) console.dir(err);
+      //TODO: handle error
+
+      req.flash('success', 'Success.Passport.Email.Verified');
+      res.redirect('/profile');
+    });
+
   }
 
 };
