@@ -1,4 +1,6 @@
 
+var userAttendeeProps = ['id', 'name', 'picture', 'priority', 'priority2', 'priority3', 'leg'];
+
 module.exports = {
 
   find: function(req, res, next){
@@ -32,7 +34,7 @@ module.exports = {
         if (err) return next(err);
 
         attendees.forEach(function(attendees){
-          attendees.user = _.pick(attendees.user, ['id', 'name', 'picture']);
+          attendees.user = _.pick(attendees.user, userAttendeeProps);
         });
 
         meeting.attendees = attendees;
@@ -126,7 +128,7 @@ module.exports = {
       meeting.save(function(err, _meeting){
         if (err) return next(err);
 
-        attendee.user = _.pick(req.groupMember.user, ['id', 'name', 'picture']);
+        attendee.user = _.pick(req.groupMember.user, userAttendeeProps);
         res.json(attendee);
 
         sails.services.notifications.meeting(meeting.id, "join", attendee, req.user);
@@ -172,7 +174,7 @@ module.exports = {
     attendee.save(function(err, _attendee){
       if (err) return next(err);
       var att = _attendee.toJSON();
-      att.user = _.pick(req.groupMember.user, ['id', 'name', 'picture']);
+      att.user = _.pick(req.groupMember.user, userAttendeeProps);
       res.json(att);
 
       sails.services.notifications.meeting(meeting.id, "confirm", att, req.user);

@@ -120,7 +120,7 @@ module.exports = {
             sails.services.email.sendEmailVerification(userToken, function(err){
               user.verified = false;
               changedEmail = userToken.email;
-              
+
               saveUserAndGoOn();
             });
           }
@@ -158,26 +158,6 @@ module.exports = {
 
           return;
         }
-
-
-
-          UserToken.create({
-            user: user.id,
-            type: 'email',
-            email: req.body.email,
-            token: hat(),
-            expires: new Date((new Date()).getTime() + oneWeek)
-          }, function(err, userToken){
-            if (err) return next(null, false);
-            userToken.user = user;
-
-            sails.services.email.sendVerification(userToken, function(err){
-              if (err) console.dir('error on change password - send email for user ' + uer.id);
-
-              saveUserAndGoOn();
-            });
-
-          });
 
         saveUserAndGoOn();
       });
