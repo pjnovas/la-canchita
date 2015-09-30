@@ -27,10 +27,10 @@ group.canChangeMember = group.checkRole.concat([ 'group/setMemberById', 'group/c
 
 var meeting = {};
 meeting.isMember = isAuth.concat([ 'meeting/setMeetingById' ]).concat(group.isMember);
-meeting.canUpdate = meeting.isMember.concat([group.checkRole]);
-meeting.canRemove = meeting.isMember.concat([group.checkRole, 'group/canRemoveMeeting' ]);
-
 meeting.isOpen = meeting.isMember.concat([ 'meeting/isOpen' ]);
+
+meeting.canUpdate = meeting.isOpen.concat([group.checkRole]);
+meeting.canRemove = meeting.isOpen.concat([group.checkRole, 'group/canRemoveMeeting' ]);
 
 meeting.join = meeting.isOpen.concat([ 'meeting/canJoin' ]);
 meeting.leave = meeting.isOpen.concat([ 'meeting/canLeave' ]);

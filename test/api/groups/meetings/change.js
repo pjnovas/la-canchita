@@ -59,10 +59,18 @@ describe('PUT /meetings/:id', function() {
       },{
         createdBy: groups[0].members[5].id,
         title: 'Meeting 5',
+      }, {
+        createdBy: groups[0].members[2].id,
+        title: 'Meeting Past',
+        when: new Date()
+      }, {
+        createdBy: groups[0].members[2].id,
+        title: 'Meeting Cancelled',
+        cancelled: true
       }]);
 
       groups[0].save(function(err, group){
-        expect(group.meetings.length).to.be.equal(6);
+        expect(group.meetings.length).to.be.equal(8);
         groups[0] = group;
         done();
       });
@@ -123,6 +131,14 @@ describe('PUT /meetings/:id', function() {
 
   it('Disallow ROLE [member] to update a meetin - Forbidden', function (done) {
     sendUpdate(4, 0, 5, 403, done);
+  });
+
+  it('Disallow if meeting is in the past', function (done) {
+    sendUpdate(2, 0, 6, 403, done);
+  });
+
+  it('Disallow if meeting is cancelled', function (done) {
+    sendUpdate(2, 0, 7, 403, done);
   });
 
 });

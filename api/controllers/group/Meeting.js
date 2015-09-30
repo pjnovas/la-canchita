@@ -7,9 +7,17 @@ module.exports = {
 
     Meeting
       .find({ group: req.params.gid })
-      //.populateAll()
-      .exec(function(err, meetings){
+      .populate('attendees')
+      .exec(function(err, _meetings){
         if (err) return done(err);
+
+        var meetings = _meetings.map(function(meeting){
+          var m = meeting.toJSON();
+          m.attendance = meeting.attendees.length || 0;
+          delete m.attendees;
+          return m;
+        });
+
         res.json(meetings);
       });
   },
@@ -103,10 +111,28 @@ module.exports = {
   },
 
   remove: function(req, res, next){
-    var mid = req.requestedMeeting.id;
-    var gid = req.requestedMeeting.group.id;
+    var meeting = req.requestedMeeting;
+    var mid = meeting.id;
+    var gid = meeting.group.id;
 
-    req.requestedMeeting.destroy(function(err){
+    if (meeting.attendees.length > 1){
+      meeting.cancelled = true;
+
+      meeting.save(function(err, _meeting){
+        if (err) return next(err);
+
+        res.json(meeting);
+
+        sails.services.notifications.meeting(mid, "cancelled", { id: mid }, req.user);
+        sails.services.notifications.group(gid, "cancelled_meeting", { id: mid }, req.user);
+      });
+
+      return;
+    }
+
+    meeting.destroy(function(err){
+      if (err) return next(err);
+
       res.status(204);
       res.end();
 

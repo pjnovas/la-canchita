@@ -59,10 +59,18 @@ describe('DELETE /meetings/:id', function() {
       },{
         createdBy: groups[0].members[5].id,
         title: 'Meeting 5',
+      }, {
+        createdBy: groups[0].members[2].id,
+        title: 'Meeting Past',
+        when: new Date()
+      }, {
+        createdBy: groups[0].members[2].id,
+        title: 'Meeting Cancelled',
+        cancelled: true
       }]);
 
       groups[0].save(function(err, group){
-        expect(group.meetings.length).to.be.equal(6);
+        expect(group.meetings.length).to.be.equal(8);
         groups[0] = group;
         done();
       });
@@ -82,7 +90,7 @@ describe('DELETE /meetings/:id', function() {
       .expect(expected)
       .end(function(err, res){
         if (err) return done(err);
-        if (expected !== 200){
+        if (expected !== 204){
           return done();
         }
 
@@ -97,6 +105,23 @@ describe('DELETE /meetings/:id', function() {
           return;
         }
 
+      });
+  }
+
+  function sendJoin(index, gIndex, mIndex, expected, done){
+    var group = groups[gIndex];
+    var gid = group.id;
+    var mid = group.meetings[mIndex].id;
+
+    userAgents[index]
+      .post('/api/meetings/' + mid + '/attendees/me')
+      .expect(expected)
+      .end(function(err, res){
+        expect(err).to.not.be.ok();
+        expect(res.body).to.be.an('object');
+        expect(res.body.id).to.be.ok();
+        expect(res.body.user.id).to.be.equal(userAgents[index].user.id);
+        done();
       });
   }
 
@@ -124,6 +149,37 @@ describe('DELETE /meetings/:id', function() {
 
   it('Disallow ROLE [member] to remove a meetin - Forbidden', function (done) {
     sendRemove(4, 0, 5, 403, done);
+  });
+
+  it('Must set meeting as cancelled if have more than 2 attendees', function (done) {
+    var mIndex = 2;
+    var mid = groups[0].meetings[mIndex].id;
+
+    sendJoin(3, 0, mIndex, 200, function(){ //join user 3
+      sendJoin(4, 0, mIndex, 200, function(){ //join user 4
+
+        sendRemove(2, 0, mIndex, 200, function(){ //send a remove from user 2 (creator)
+
+          Meeting.findOne({ id: mid }).exec(function(err, meeting){
+            expect(err).to.not.be.ok();
+
+            expect(meeting).to.be.ok();
+            expect(meeting.cancelled).to.be.true;
+
+            done();
+          });
+
+        });
+      });
+    });
+  });
+
+  it('Disallow if meeting is in the past', function (done) {
+    sendRemove(2, 0, 6, 403, done);
+  });
+
+  it('Disallow if meeting is cancelled', function (done) {
+    sendRemove(2, 0, 7, 403, done);
   });
 
 });

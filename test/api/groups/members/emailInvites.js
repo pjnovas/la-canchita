@@ -106,10 +106,10 @@ describe('GET /v/invite/:token', function() {
 
       function(_done){ // user sends an invalid token
         agent
-          .get('/v/invite/not-found')
+          .get('/v/invite/notfound')
           .expect(302)
           .end(function(err, res){
-            expect(res.headers.location).to.be.equal('/v/not-found');
+            expect(res.headers.location).to.be.equal('/v/notfound');
             _done();
           });
       },

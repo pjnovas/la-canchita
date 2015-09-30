@@ -19,6 +19,10 @@ module.exports = function(req, res, next) {
     return res.forbidden('meeting_is_closed_due_to_date');
   }
 
+  if (meeting.cancelled){
+    return res.forbidden('meeting_is_closed_due_to_cancellation');
+  }
+
   next();
 
 };

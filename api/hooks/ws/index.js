@@ -30,11 +30,13 @@ module.exports = function WS(sails) {
       "update_member",
       "new_meeting",
       "update_meeting",
-      "remove_meeting"
+      "remove_meeting",
+      "cancelled_meeting"
     ],
     "meetings": [
       "update",
       "remove",
+      "cancelled",
       "join",
       "leave",
       "confirm"

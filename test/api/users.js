@@ -140,7 +140,7 @@ describe('\nUser ( ͡° ͜ʖ ͡°)\n', function() {
         .put('/api/users/me')
         .send({
           name: 'Crazy User',
-          email: 'some@example.com',
+          //email: 'some@example.com', // NEEDS Verification now
           username: 'xxx-yyy',
           plan: 2,
         })
@@ -151,7 +151,7 @@ describe('\nUser ( ͡° ͜ʖ ͡°)\n', function() {
 
           expect(res.body.id).to.be.equal(userAgents[0].user.id);
           expect(res.body.name).to.be.equal('Crazy User');
-          expect(res.body.email).to.be.equal('some@example.com');
+          //expect(res.body.email).to.be.equal('some@example.com');
 
           // not allowed
           expect(res.body.plan).to.be.equal(0);
