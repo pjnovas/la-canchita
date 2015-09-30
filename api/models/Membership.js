@@ -27,12 +27,8 @@ module.exports = {
     },
 
     invitedBy: { model: 'Membership' },
-    removedBy: { model: 'Membership' },
-
-    matches_played: {
-      type: 'integer',
-      defaultsTo: 0
-    }
+    removedBy: { model: 'Membership' }
+    
   }
 
 };

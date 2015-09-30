@@ -15,13 +15,4 @@ describe('\nGroup ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)\n', function(
 
   require('./meetings');
 
-  // TODO:
-  /*
-   * Add resource to set Attended
-   * Add Counters for join and confirm: attendance, joins, confirmations
-   *
-   * Create quota
-   *
-   */
-
 });
