@@ -6,6 +6,9 @@ before(function(done) {
     log: {
       level: 'error'
     },
+    email: {
+      testMode: true
+    },
     models: {
       connection: 'test',
       migrate: 'drop'

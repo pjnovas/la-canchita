@@ -39,7 +39,6 @@ email.initialize = function(){
   sails.config.email.templateDir
     = path.resolve(sails.config.appPath, sails.config.email.templateDir);
 
-  sails.config.email.testMode = (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') ? true : false;
 };
 
 email.sendWelcome = function(userToken, done){
