@@ -15,6 +15,7 @@
  */
 
 module.exports.passport = {
+/*
   local: {
     strategy: require('passport-local').Strategy
   },
@@ -22,7 +23,6 @@ module.exports.passport = {
   bearer: {
     strategy: require('passport-http-bearer').Strategy
   },
-
   twitter: {
     name: 'Twitter',
     protocol: 'oauth',
@@ -32,7 +32,7 @@ module.exports.passport = {
       consumerSecret: 'your-customer-secret'
     }
   },
-/*
+
   github: {
     name: 'GitHub',
     protocol: 'oauth2',
@@ -42,18 +42,18 @@ module.exports.passport = {
       clientSecret: 'your-client-secret'
     }
   },
-*/
+
   facebook: {
     name: 'Facebook',
     protocol: 'oauth2',
     strategy: require('passport-facebook').Strategy,
     options: {
       clientID: 'your-client-id',
-      clientSecret: 'your-client-secret',
-      scope: ['email'] /* email is necessary for login behavior */
+      clientSecret: 'your-client-secret'
+      scope: ['email'] // email is necessary for login behavior
     }
   },
-/*
+
   google: {
     name: 'Google',
     protocol: 'oauth2',
@@ -61,6 +61,10 @@ module.exports.passport = {
     options: {
       clientID: 'your-client-id',
       clientSecret: 'your-client-secret'
+      scope: [
+        'https://www.googleapis.com/auth/plus.login',
+        'https://www.googleapis.com/auth/plus.profile.emails.read'
+      ]
     }
   },
 

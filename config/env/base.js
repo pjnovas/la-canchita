@@ -1,5 +1,5 @@
 /**
- * Development environment settings
+ * Base file for environment settings
  *
  * This file can include shared settings for a development team,
  * such as API keys or remote database passwords.  If you're using
@@ -11,6 +11,9 @@
  */
 
 module.exports = {
+
+  // Rename this file into the environment name (like development).
+  // And set the configs
 
   log: {
     level: 'verbose'
@@ -31,7 +34,7 @@ module.exports = {
   },
 
   session: {
-    secret: '0832b6e8c615489e87c45a9c3a9a98e4',
+    secret: 'xxxxxxxx',
 
     adapter: 'mongo',
     host: 'localhost',
@@ -48,8 +51,8 @@ module.exports = {
   email: {
     service: 'Hotmail',
     auth: {
-      user: 'djdxes@hotmail.com',
-      pass: 'nBm0g1f1'
+      user: 'test@hotmail.com',
+      pass: 'password'
     },
     templateDir:  'views/email',
     from: 'noreply@la-canchita.com',
@@ -67,8 +70,18 @@ module.exports = {
       protocol: 'oauth',
       strategy: require('passport-twitter').Strategy,
       options: {
-        consumerKey: 'RGhiVGXOQJAuR4OFDbtcQ',
-        consumerSecret: '6hGT8OipIyBjjYedTF4hQMDRWaGiYqG2W2jBlh1dz0'
+        consumerKey: 'your-customer-key',
+        consumerSecret: 'your-customer-secret'
+      }
+    },
+
+    github: {
+      name: 'GitHub',
+      protocol: 'oauth2',
+      strategy: require('passport-github').Strategy,
+      options: {
+        clientID: 'your-client-id',
+        clientSecret: 'your-client-secret'
       }
     },
 
@@ -77,9 +90,9 @@ module.exports = {
       protocol: 'oauth2',
       strategy: require('passport-facebook').Strategy,
       options: {
-        clientID: '816845671761489',
-        clientSecret: '1e2945591b264d70516297603429b312',
-        scope: ['email']
+        clientID: 'your-client-id',
+        clientSecret: 'your-client-secret'
+        scope: ['email'] // email is necessary for login behavior
       }
     },
 
@@ -88,8 +101,8 @@ module.exports = {
       protocol: 'oauth2',
       strategy: require('passport-google-oauth').OAuth2Strategy,
       options: {
-        clientID: '688294781590-ufgr2p2tmja0go4iq2ma8n0eqpivdicq.apps.googleusercontent.com',
-        clientSecret: 'FKeHZK0b1r4NS0QeRPJvpCi8',
+        clientID: 'your-client-id',
+        clientSecret: 'your-client-secret'
         scope: [
           'https://www.googleapis.com/auth/plus.login',
           'https://www.googleapis.com/auth/plus.profile.emails.read'

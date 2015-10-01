@@ -41,14 +41,9 @@ assets/styles/la-canchita-web.css
 #
 ################################################
 
-config/local.js
-config/passport.js
-config/connections.js
-config/email.js
-
-
-
-
+config/env/development.js
+config/env/production.js
+config/env/test.js
 
 ################################################
 # Dependencies

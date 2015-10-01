@@ -21,5 +21,3 @@ after(function(done) {
   console.log();
   sails.lower(done);
 });
-
-
