@@ -21,9 +21,9 @@ module.exports = {
     groups_members: { type: 'boolean', defaultsTo: true },
 
     meetings_create: { type: 'boolean', defaultsTo: true },
-    meetings_change: { type: 'boolean', defaultsTo: true },
-    meetings_states: { type: 'boolean', defaultsTo: true },
-    meetings_remove: { type: 'boolean', defaultsTo: true },
+    meetings_cancel: { type: 'boolean', defaultsTo: true },
+    meetings_confirm_start: { type: 'boolean', defaultsTo: true },
+    meetings_daybefore_start: { type: 'boolean', defaultsTo: true },
 
     // Hooks
 

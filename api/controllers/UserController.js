@@ -8,6 +8,15 @@
 var validator = require('validator');
 var hat       = require('hat');
 
+var settings = [
+  "emails",
+  "invites",
+  "meetings_create",
+  "meetings_confirm_start",
+  "meetings_cancel",
+  "meetings_daybefore_start"
+];
+
 module.exports = {
 
   me: function(req, res, next){
@@ -62,17 +71,6 @@ module.exports = {
         var dirtySettings = false;
 
         if (req.body.settings){
-
-          var settings = [
-            "emails",
-            "invites",
-            "groups_change",
-            "groups_members",
-            "meetings_create",
-            "meetings_change",
-            "meetings_states",
-            "meetings_remove",
-          ];
 
           settings.forEach(function(setting){
             if (req.body.settings.hasOwnProperty(setting)){
