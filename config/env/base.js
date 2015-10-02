@@ -59,6 +59,21 @@ module.exports = {
     testMode: true
   },
 
+  jobs: {
+    "jobsDirectory": "api/jobs",
+
+    "db": {
+      "address"    : "localhost:27017/jobs",
+      "collection" : "agendaJobs"
+    },
+
+    "name": "process name",
+    "processEvery": "10 seconds",
+    "maxConcurrency": 20,
+    "defaultConcurrency": 5,
+    "defaultLockLifetime": 10000
+  },
+
   passport: {
 
     local: {

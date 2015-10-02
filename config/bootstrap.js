@@ -15,6 +15,9 @@ module.exports.bootstrap = function(cb) {
   sails.services.email.initialize();
   sails.services.image.initialize();
 
+  Jobs.now('meetingsConfirm');
+  Jobs.now('meetingsDayBefore');
+
   // It's very important to trigger this callback method when you are finished
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
   cb();

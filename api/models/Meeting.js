@@ -44,6 +44,8 @@ module.exports = {
 
     cancelled: { type: 'boolean', defaultsTo: false },
 
+    confirmNotified: { type: 'boolean', defaultsTo: false },
+    tomorrowNotified: { type: 'boolean', defaultsTo: false },
   },
 
 };
